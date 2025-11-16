@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editorial Tech – maketas</title>
+
+  <meta name="author" content="Marijus Tamulynas">
+  <meta name="copyright" content="© Marijus Tamulynas, 2025. Visos teisės saugomos.">
+
+  <style>
+    *{ box-sizing:border-box; margin:0; padding:0; }
+
+    :root{
+      --hero-height: 520px;
+      --hero-fit: contain;
+      --hero-offset-left: 0;
+
+      --ui-bg: rgba(14,16,22,.86);
+      --stroke: rgba(200,230,255,.14);
+      --text: #e7eef7;
+      --glow: 0 0 32px rgba(0,200,255,.15);
+
+      --bg-zoom: 110%;
+      --bg-dim:  .16;
+
+      --anim-speed: 18s;
+      --call-green-1: #28d17c;
+      --call-green-2: #1bb96b;
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      color:var(--text);
+      font-family:system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+    }
+
+    body{
+      background:
+        linear-gradient(rgba(0,0,0,var(--bg-dim)), rgba(0,0,0,var(--bg-dim))),
+        url('bengraudas.png') center top / var(--bg-zoom) fixed no-repeat;
+      background-color:#0b0f14;
+    }
+
+    .header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; padding:10px 14px; margin:14px; border-radius:14px;
+      background: var(--ui-bg); border:1px solid var(--stroke); backdrop-filter: blur(8px);
+      box-shadow: var(--glow);
+    }
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand img{ width:40px; height:40px; object-fit:cover; border-radius:10px }
+    .nav{display:flex; gap:16px}
+    .nav a{
+      text-decoration:none; color:var(--text);
+      padding:8px 12px; border-radius:12px; border:1px solid var(--stroke);
+      background: rgba(10,12,18,.6);
+    }
+
+    .container{ max-width:1280px; margin:18px auto 40px; padding:0 16px }
+
+    .hero-row{
+      display:grid; grid-template-columns: 1fr 420px; gap:18px; align-items:start;
+    }
+    .card{
+      background: var(--ui-bg); border:1px solid var(--stroke); border-radius:18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.32);
+    }
+
+    .hero-wrap{
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .hero-img{
+      width: 100%;
+      height: var(--hero-height);
+      object-fit: var(--hero-fit);
+      object-position: left center;
+      display:block; border-radius:14px;
+      transform: translateX(var(--hero-offset-left));
+      background:#0b0f14;
+    }
+
+    /* ========= PLANŠETĖ ========= */
+    .tablet{
+      position:relative; padding:22px; border-radius:28px;
+      background: linear-gradient(180deg, rgba(18,20,26,.95), rgba(12,14,20,.88));
+      border:1px solid rgba(160,185,220,.25);
+      box-shadow: 0 16px 48px rgba(0,0,0,.35), var(--glow);
+    }
+    .tablet .bezel{
+      position:relative; height: calc(var(--hero-height) - 24px);
+      background:#0d1016; border-radius:22px; overflow:hidden;
+      border:1px solid rgba(200,230,255,.18);
+    }
+    .tablet .cam{
+      position:absolute; top:8px; left:50%; transform:translateX(-50%);
+      width:8px; height:8px; background:#2ad; border-radius:50%;
+      box-shadow:0 0 8px rgba(0,200,255,.6); z-index:5;
+    }
+    .tablet .screen{
+      position:absolute; inset:10px; border-radius:18px; overflow:hidden;
+      background:#020617;
+      border:1px solid rgba(200,230,255,.15);
+    }
+
+    .tablet .status{
+      position:absolute; top:12px; left:16px; right:16px; height:16px;
+      display:flex; align-items:center; justify-content:space-between;
+      font-size:12px; opacity:.85; z-index:3;
+    }
+    .tablet .ind{ display:flex; align-items:center; gap:6px }
+    .dot{ width:6px; height:6px; border-radius:50%; background:#9bd0ff; opacity:.8 }
+    .bat{
+      width:22px; height:10px; border-radius:2px;
+      border:1px solid rgba(255,255,255,.6); position:relative
+    }
+    .bat::after{
+      content:""; position:absolute; top:2px; left:2px; height:6px; width:14px; background:#9bd0ff
+    }
+    .tablet .homebar{
+      position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+      width:80px; height:4px; background:rgba(255,255,255,.25); border-radius:3px; z-index:3;
+    }
+
+    /* ==== 3D „KNYGOS“ REKLAMOS STENDAS ==== */
+    .tablet .pillar-scene{
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(56,189,248,0.28), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(96,165,250,0.28), transparent 60%),
+        #020617;
+    }
+
+    .tablet .pillar-floor{
+      position:absolute;
+      left:-15%;
+      right:-15%;
+      bottom:-40%;
+      height:80%;
+      background:radial-gradient(circle at center, rgba(15,23,42,0.95) 0, transparent 65%);
+      transform-origin:top;
+      transform:perspective(900px) rotateX(68deg);
+      border-top:1px solid rgba(15,23,42,0.9);
+      overflow:hidden;
+    }
+    .tablet .pillar-floor::before{
+      content:"";
+      position:absolute;
+      inset:-50%;
+      background-image:
+        linear-gradient(to right, rgba(56,189,248,0.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56,189,248,0.22) 1px, transparent 1px);
+      background-size:46px 46px;
+      opacity:0.35;
+      animation:pillar-grid 20s linear infinite;
+    }
+    @keyframes pillar-grid{
+      0%   { transform:translate3d(0,0,0); }
+      100% { transform:translate3d(-46px,-46px,0); }
+    }
+
+    .tablet .pillar-shadow{
+      position:absolute;
+      left:50%;
+      bottom:11%;
+      width:300px;
+      height:60px;
+      transform:translateX(-50%) perspective(900px) rotateX(78deg);
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(15,23,42,0.9), transparent 70%);
+      filter:blur(3px);
+      opacity:.9;
+    }
+
+    .tablet .pillar{
+      position:absolute;
+      left:50%;
+      bottom:16%;
+      width:260px;
+      height:320px;
+      transform-origin:center bottom;
+      transform:translateX(-50%) translateY(0) perspective(900px) rotateY(-18deg);
+      border-radius:20px;
+      background:linear-gradient(180deg,#020617,#020617 45%,#020617);
+      box-shadow:
+        0 24px 48px rgba(0,0,0,1),
+        0 0 0 1px rgba(15,23,42,0.95),
+        0 0 40px rgba(56,189,248,0.6);
+      overflow:hidden;
+      animation:pillar-rotate 14s ease-in-out infinite;
+    }
+    @keyframes pillar-rotate{
+      0%{
+        transform:translateX(-50%) translateY(0) perspective(900px) rotateY(-18deg);
+      }
+      50%{
+        transform:translateX(-50%) translateY(-8px) perspective(900px) rotateY(12deg);
+      }
+      100%{
+        transform:translateX(-50%) translateY(0) perspective(900px) rotateY(-18deg);
+      }
+    }
+
+    .tablet .pillar::before{
+      content:"";
+      position:absolute;
+      left:-14px;
+      top:12px;
+      bottom:12px;
+      width:24px;
+      border-radius:18px 0 0 18px;
+      background:linear-gradient(180deg, #020617, #020617 40%, #020617 100%);
+      box-shadow:
+        8px 0 20px rgba(0,0,0,0.9),
+        0 0 0 1px rgba(15,23,42,0.85);
+    }
+
+    .tablet .pillar-pages{
+      position:absolute;
+      right:-10px;
+      top:14px;
+      bottom:14px;
+      width:16px;
+      border-radius:0 14px 14px 0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(248,250,252,0.35),
+          rgba(248,250,252,0.35) 2px,
+          rgba(148,163,184,0.2) 3px,
+          rgba(15,23,42,0.3) 4px
+        );
+      opacity:.85;
+      box-shadow:-4px 0 10px rgba(15,23,42,0.9);
+    }
+
+    .tablet .pillar-glow{
+      position:absolute;
+      inset:-20%;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(56,189,248,0.4), transparent 65%),
+        radial-gradient(circle at 0% 100%, rgba(59,130,246,0.3), transparent 65%);
+      opacity:.65;
+      pointer-events:none;
+    }
+
+    .tablet .pillar-highlight{
+      position:absolute;
+      inset:-20%;
+      background:linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+      mix-blend-mode:screen;
+      opacity:0;
+      pointer-events:none;
+      animation:pillar-highlight 4.4s ease-in-out infinite;
+    }
+    @keyframes pillar-highlight{
+      0%{
+        transform:translateX(-40%);
+        opacity:0;
+      }
+      40%{
+        transform:translateX(0%);
+        opacity:0.9;
+      }
+      80%{
+        transform:translateX(40%);
+        opacity:0;
+      }
+      100%{
+        transform:translateX(40%);
+        opacity:0;
+      }
+    }
+
+    .tablet .pillar-edge{
+      position:absolute;
+      top:12px;
+      bottom:12px;
+      right:8px;
+      width:3px;
+      border-radius:999px;
+      background:linear-gradient(to bottom, transparent, rgba(125,211,252,0.95), transparent);
+      opacity:.8;
+      filter:blur(.3px);
+      animation:pillar-edge-run 3.8s ease-in-out infinite;
+    }
+    @keyframes pillar-edge-run{
+      0%   { transform:translateY(14%); opacity:.4; }
+      50%  { transform:translateY(-14%); opacity:1; }
+      100% { transform:translateY(14%); opacity:.4; }
+    }
+
+    .tablet .pillar-content{
+      position:relative;
+      z-index:1;
+      height:100%;
+      padding:18px 20px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      color:#e5e7eb;
+      font-size:13px;
+    }
+
+    .tablet .pillar-label{
+      font-size:11px;
+      letter-spacing:0.16em;
+      text-transform:uppercase;
+      color:#bfdbfe;
+    }
+    .tablet .pillar-title{
+      margin-top:6px;
+      font-size:20px;
+      font-weight:600;
+      line-height:1.2;
+    }
+    .tablet .pillar-title span{ color:#22c55e; }
+
+    .tablet .pillar-text{
+      margin-top:6px;
+      font-size:13px;
+      opacity:.92;
+    }
+
+    .tablet .pillar-bottom{
+      margin-top:10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .tablet .pillar-cta{
+      align-self:flex-start;
+      padding:6px 14px;
+      border-radius:999px;
+      background:linear-gradient(to right,#0ea5e9,#22c55e);
+      color:#020617;
+      font-size:12px;
+      font-weight:600;
+      box-shadow:0 0 16px rgba(56,189,248,0.8);
+      white-space:nowrap;
+    }
+    .tablet .pillar-note{
+      font-size:11px;
+      opacity:.78;
+    }
+
+    .call-fab{
+      position:absolute; right:14px; bottom:14px;
+      width:48px; height:48px; border-radius:50%;
+      background: radial-gradient(120% 120% at 30% 30%, var(--call-green-1), var(--call-green-2));
+      box-shadow: 0 10px 26px rgba(27,185,107,.35), 0 0 0 1px rgba(255,255,255,.12) inset;
+      display:grid; place-items:center; text-decoration:none;
+      z-index:10;
+    }
+    .call-fab:hover{
+      box-shadow: 0 12px 30px rgba(27,185,107,.55), 0 0 0 2px rgba(255,255,255,.18) inset;
+      transform: translateY(-1px);
+    }
+    .call-fab svg{ width:22px; height:22px; fill:white; filter: drop-shadow(0 0 6px rgba(255,255,255,.6)) }
+
+    .open-link{
+      position:absolute;
+      inset:10px;
+      border-radius:inherit;
+      text-indent:-9999px;
+    }
+
+    /* ========= PASLAUGŲ MODULIAI (vietoj telefonų) ========= */
+    .services-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      justify-content:space-between;
+      margin-top:26px;
+    }
+
+    .service-card{
+      position:relative;
+      flex:1 1 180px;
+      max-width:220px;
+      padding:14px 16px 16px;
+      border-radius:20px;
+      text-decoration:none;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 0 0, rgba(56,189,248,0.25), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(59,130,246,0.22), transparent 65%),
+        rgba(11,15,23,0.96);
+      border:1px solid rgba(148,163,184,0.5);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(15,23,42,0.9);
+      overflow:hidden;
+      transform:translateY(0);
+      animation: svc-float 10s ease-in-out infinite;
+    }
+
+    .service-card::before{
+      content:"";
+      position:absolute;
+      inset:auto 16px -16px;
+      height:30px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(56,189,248,0.45), transparent 70%);
+      opacity:0.45;
+      filter:blur(6px);
+      z-index:-1;
+    }
+
+    .service-card:hover{
+      transform:translateY(-6px);
+      box-shadow:
+        0 18px 40px rgba(0,0,0,0.95),
+        0 0 0 1px rgba(59,130,246,0.9);
+    }
+
+    @keyframes svc-float{
+      0%   { transform:translateY(0); }
+      50%  { transform:translateY(-4px); }
+      100% { transform:translateY(0); }
+    }
+    .service-card.s2{ animation-delay: .8s; }
+    .service-card.s3{ animation-delay: 1.6s; }
+    .service-card.s4{ animation-delay: 2.4s; }
+    .service-card.s5{ animation-delay: 3.2s; }
+
+    .svc-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .svc-label{
+      font-size:10px;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+      color:#bfdbfe;
+      white-space:nowrap;
+    }
+    .svc-icon{
+      width:24px;
+      height:24px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,0.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      opacity:.9;
+    }
+
+    .svc-title{
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .svc-sub{
+      font-size:12px;
+      opacity:.85;
+    }
+
+    .footer{
+      max-width:1280px;
+      margin:26px auto 24px;
+      padding:0 16px;
+      opacity:.85;
+      text-align:center;
+      font-size:14px;
+    }
+
+    @media (max-width:1180px){
+      .hero-row{ grid-template-columns: 1fr }
+      .services-row{ justify-content:center }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="brand">
+      <img src="zenkliukas.jpg" alt="Ženklas" />
+    </div>
+    <nav class="nav">
+      <a href="#">About</a><a href="#">Work</a><a href="#">Awards</a><a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero-row">
+      <div class="card hero-wrap">
+        <img class="hero-img" src="447.png" alt="Hero vaizdas">
+      </div>
+
+      <!-- PLANŠETĖ su 3D „knygos“ reklamos stulpu -->
+      <aside class="tablet">
+        <div class="bezel">
+          <div class="cam"></div>
+          <div class="screen">
+
+            <div class="pillar-scene">
+              <div class="pillar-floor"></div>
+              <div class="pillar-shadow"></div>
+
+              <div class="pillar">
+                <div class="pillar-glow"></div>
+                <div class="pillar-highlight"></div>
+                <div class="pillar-pages"></div>
+                <div class="pillar-edge"></div>
+
+                <div class="pillar-content">
+                  <div>
+                    <div class="pillar-label">REKLAMA ŠIOJE SVETAINĖJE</div>
+                    <div class="pillar-title">
+                      Ši reklamos vieta dabar <span>laisva</span>.
+                    </div>
+                    <div class="pillar-text">
+                      Čia gali atsirasti jūsų kampanija. Spustelkite – ir susisiekime dėl reklamos.
+                    </div>
+                  </div>
+                  <div class="pillar-bottom">
+                    <div class="pillar-cta">Sužinoti apie reklamos vietą</div>
+                    <div class="pillar-note">Visas šis stendas veda į reklamos / partnerių skiltį.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="status">
+              <span class="ind">10:24</span>
+              <span class="ind"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+              <span class="ind"><span class="bat"></span></span>
+            </div>
+          </div>
+
+          <a class="open-link" href="ads.html">Reklama</a>
+          <a class="call-fab" href="ads.html" aria-label="Eiti į reklamos / partnerių puslapį">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1v3.5a1 1 0 01-1 1C10.85 21.01 3 13.15 3 3.99a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.46.57 3.57a1 1 0 01-.24 1.02l-2.2 2.21z"/>
+            </svg>
+          </a>
+          <div class="homebar"></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- PASLAUGŲ MODULIAI (vietoj telefonų) -->
+    <section class="services-row">
+      <a class="service-card s1" href="shop.html">
+        <div class="svc-top">
+          <div class="svc-label">E-PARDUOTUVĖS</div>
+          <div class="svc-icon">e-com</div>
+        </div>
+        <div class="svc-title">Pardavimo vitrinės</div>
+        <div class="svc-sub">Internetinių parduotuvių dizainas ir paleidimas.</div>
+      </a>
+
+      <a class="service-card s2" href="apps.html">
+        <div class="svc-top">
+          <div class="svc-label">APP PASLAUGOS</div>
+          <div class="svc-icon">app</div>
+        </div>
+        <div class="svc-title">Programėlių augimas</div>
+        <div class="svc-sub">iOS / Android vizualai ir kampanijos.</div>
+      </a>
+
+      <a class="service-card s3" href="studio.html">
+        <div class="svc-top">
+          <div class="svc-label">KŪRYBOS KAMPELIS</div>
+          <div class="svc-icon">lab</div>
+        </div>
+        <div class="svc-title">Eksperimentinė kūryba</div>
+        <div class="svc-sub">Konceptai, prototipai, išbandymai.</div>
+      </a>
+
+      <a class="service-card s4" href="ads.html">
+        <div class="svc-top">
+          <div class="svc-label">REKLAMA / PARTNERIAI</div>
+          <div class="svc-icon">ads</div>
+        </div>
+        <div class="svc-title">Matomos kampanijos</div>
+        <div class="svc-sub">Stendai, baneriai, bendri projektai.</div>
+      </a>
+
+      <a class="service-card s5" href="kontaktai.html">
+        <div class="svc-top">
+          <div class="svc-label">KONTAKTAI</div>
+          <div class="svc-icon">hi</div>
+        </div>
+        <div class="svc-title">Susisiekime</div>
+        <div class="svc-sub">Trumpas kelias iki pokalbio.</div>
+      </a>
+    </section>
+  </main>
+
+  <footer class="footer">© Marijus Tamulynas, 2025. Visos teisės saugomos.</footer>
+</body>
+</html>
