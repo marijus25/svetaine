@@ -1962,3 +1962,68 @@ body::before {
 @media (max-width: 600px) {
   .mygtukas-lg { height: auto; min-height: 54px; padding: 14px 22px; white-space: normal; text-align: center; max-width: 100%; }
 }
+
+/* === VAKARO ŠVIESA (2026-10-03) ===========================================
+   Spalvos iš naujos Kristinos nuotraukos ir tos pačios kaip gyvoje scenoje:
+   gilus vakaro mėlynas fonas, Žemės žydra (nuorodos, rėmeliai, aktyvus
+   meniu) ir saulėlydžio auksas (mygtukai, kainos). Fonas — ta pati nuotrauka,
+   stipriai sulieta (nuotraukos/fonas.jpg). Violetinė, pilka ir balti
+   „piliulių" mygtukai išimti. */
+:root {
+  --popierius:        #0A1D2B;
+  --plokste:          rgba(8, 24, 38, .52);
+  --pavirsius:        rgba(8, 24, 38, .56);
+  --pavirsius-2:      rgba(143, 234, 242, .06);
+  --pavirsius-3:      rgba(143, 234, 242, .09);
+  --rasalas:          #F4FBFC;
+  --rasalas-2:        #DDEFF2;
+  --prislopintas:     #A9CDD0;
+  --silpnas:          #7FA6B0;
+  --linija:           rgba(143, 234, 242, .18);
+  --linija-2:         rgba(143, 234, 242, .09);
+  --lauko-krastas:    rgba(143, 234, 242, .30);
+  --zenklas-tekstas:  #DDEFF2;
+  --zydra:            #8FEAF2;
+  --akcentas:         #FFC46B;
+  --akcentas-tamsus:  #FFD99C;
+  --akcentas-sviesus: rgba(255, 196, 107, .16);
+  --ant-akcento:      #2B1A00;
+  --tamsus-tekstas:   #0A1D2B;
+  --gerai:            #6EE7B7;
+  --gerai-fonas:      rgba(110, 231, 183, .12);
+  --pavojus:          #FF8F7A;
+  --pavojus-fonas:    rgba(255, 143, 122, .12);
+  --spalva-1: #FF8F7A; --spalva-2: #8FEAF2; --spalva-3: #6EE7B7; --spalva-4: #C9B6FF; --spalva-5: #FFC46B;
+}
+body { background: #0A1D2B; }
+body::before {
+  background:
+    radial-gradient(ellipse 50% 45% at 30% 55%, rgba(143, 234, 242, .16), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 95% 30%, rgba(255, 196, 107, .14), transparent 70%),
+    linear-gradient(rgba(6, 16, 26, .10), rgba(6, 16, 26, .45)),
+    url("nuotraukos/fonas.jpg") center / cover no-repeat,
+    #0A1D2B;
+}
+a { color: var(--zydra); }
+.virsus { background: rgba(6, 18, 30, .45); }
+.meniu a.aktyvus, .meniu .aktyvus, .meniu-jungiklis.aktyvus {
+  background: transparent; color: var(--zydra); box-shadow: inset 0 0 0 1px var(--zydra);
+}
+.meniu-sarasas { background: #0E2638; }
+@media (max-width: 900px) { .virsus .meniu { background: #0C2233; } }
+.apacia { background: rgba(4, 14, 24, .62); }
+.trupiniai, .sekcija-juosta { background: rgba(143, 234, 242, .04); }
+.m-sviesus { background: transparent; color: var(--zydra); border-color: var(--zydra); }
+.m-sviesus:hover { background: var(--zydra); color: var(--tamsus-tekstas); }
+.m-pagrindinis:hover { background: var(--akcentas-tamsus); color: var(--ant-akcento); }
+.kortele, .paslaugos-kortele, .paslaugos-langas, .palyginimo-kortele, .kreives-deze { border-color: var(--linija); }
+.paslaugos-kortele:hover, .paslaugos-langas:hover { border-color: var(--zydra); box-shadow: 0 18px 44px rgba(0, 10, 20, .4), 0 0 0 1px rgba(143, 234, 242, .25); }
+.paslaugos-ikona, .pasiulymo-ik { background: rgba(143, 234, 242, .12); color: var(--zydra); }
+.laukas select option { background: #0E2638; }
+.laukas input:focus, .laukas textarea:focus, .laukas select:focus { border-color: var(--zydra); box-shadow: 0 0 0 3px rgba(143, 234, 242, .22); }
+.antraste-maza, .etikete { color: var(--zydra); }
+.patarimas, .greitas-pildymas { border-left-color: var(--zydra); }
+.i-virsu { box-shadow: 0 8px 24px rgba(0, 10, 20, .45); }
+.kodas { background: rgba(4, 14, 24, .6); }
+.langas { border-color: rgba(143, 234, 242, .20); }
+.langas.scena { background: #0A1D2B url("nuotraukos/kristina.jpg") center 18% / cover no-repeat; }
