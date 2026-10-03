@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vertinimo pažyma — Tikra vertė</title>
+  <meta name="description" content="Nepriklausomas daikto būklės ir rinkos vertės sertifikatas.">
+  <meta name="author" content="Marijus Tamulynas">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-puslapis="sertifikatas">
+
+  <div id="virsus"></div>
+
+  <div class="puslapio-antraste nespausdinti">
+    <div class="wrap">
+      <div class="antraste-maza">Pardavėjams</div>
+      <h1>Vertinimo pažyma</h1>
+      <p class="lead">Tavo patikra — tvarkingu dokumentu. Atspausdink arba išsaugok PDF ir pridėk prie skelbimo: pirkėjas mato vertę ir būklę, o ne tik tavo žodžius.</p>
+    </div>
+  </div>
+
+  <section class="wrap sertifikato-vieta">
+
+    <!-- Valdymas: matomas ekrane, į popierių nekeliauja. -->
+    <div class="sertifikato-valdymas nespausdinti" id="sertValdymas">
+      <label class="laukas" style="flex:1;min-width:240px;">
+        <span class="etikete">Kuri patikra</span>
+        <select id="sertPasirinkimas"></select>
+      </label>
+      <button type="button" class="mygtukas m-pagrindinis" id="sertSpausdinti" style="height:52px;padding:0 26px;">Spausdinti arba PDF</button>
+    </div>
+
+    <article class="sertifikatas" id="sertifikatas" aria-live="polite">
+      <div class="sert-vandenzenklis" id="sertVandenzenklis" hidden>Pavyzdys</div>
+
+      <header class="sert-galva">
+        <div class="sert-zenklas">
+          <svg width="44" height="44" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <circle cx="16" cy="16" r="14.5" stroke="#7A5A2E" stroke-width="1.2"/>
+            <circle cx="16" cy="16" r="11" stroke="#7A5A2E" stroke-width="0.7" opacity="0.5"/>
+            <path d="M10.5 16.5l4 4 7.5-8" stroke="#7A5A2E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="stulpelis" style="gap:2px;">
+            <span class="sert-vardas">Tikra vertė</span>
+            <span class="etikete">Nepriklausomas vertinimas</span>
+          </div>
+        </div>
+        <div class="stulpelis sert-nr" style="gap:2px;">
+          <span class="etikete">Pažyma</span>
+          <span class="sert-numeris" id="sertNr">&mdash;</span>
+          <span class="smulkus" id="sertData">&mdash;</span>
+        </div>
+      </header>
+
+      <div class="sert-meandras" aria-hidden="true"></div>
+
+      <div class="sert-kunas">
+        <div class="stulpelis tarpas-8">
+          <span class="etikete">Vertintas daiktas</span>
+          <h2 class="sert-daiktas" id="sertDaiktas">&mdash;</h2>
+          <span class="smulkus" id="sertSavybes"></span>
+        </div>
+
+        <div class="sert-verte">
+          <div class="stulpelis tarpas-8">
+            <span class="etikete">Rinkos vertė</span>
+            <span class="sert-skaicius" id="sertVerte">&mdash;</span>
+          </div>
+          <div class="stulpelis tarpas-8">
+            <span class="etikete">Būklė</span>
+            <span class="sert-skaicius sert-bukle" id="sertBukle">&mdash;</span>
+            <span class="smulkus" id="sertBukleKaip"></span>
+          </div>
+        </div>
+
+        <div class="stulpelis tarpas-12">
+          <span class="etikete">Pažymėti sugadinimai</span>
+          <div id="sertSugadinimai" class="sert-sarasas"><span class="smulkus">&mdash;</span></div>
+        </div>
+
+        <p class="sert-pareiskimas">
+          Vertė nustatyta nepriklausomai nuo pardavėjo prašomos kainos — ji į vertinimą neįtraukiama.
+          Pažyma sudaryta pagal savininko pateiktus duomenis ir nuotraukas; tai ne techninė ekspertizė.
+          Vertė aktuali išdavimo dieną.
+        </p>
+      </div>
+
+      <footer class="sert-apacia">
+        <span>Tikra vertė &middot; Alytus</span>
+        <span id="sertApacia">Išduota &mdash;</span>
+      </footer>
+    </article>
+
+    <div class="patarimas nespausdinti" id="sertPastaba" style="max-width:860px;margin:22px auto 0;">
+      <b>Kaip pridėti prie skelbimo</b>
+      <span>Spausk „Spausdinti arba PDF" ir spausdintuvo vietoje pasirink „Išsaugoti kaip PDF". Tą failą įkelk į skelbimą arba nusiųsk pirkėjui. Vieša nuoroda, kurią pirkėjas galėtų pasitikrinti pats, atsiras, kai svetainė turės serverį.</span>
+    </div>
+  </section>
+
+  <div id="apacia"></div>
+
+  <script src="saugiklis.js"></script>
+  <script src="katalogas.js"></script>
+  <script src="svetaine.js"></script>
+</body>
+</html>
