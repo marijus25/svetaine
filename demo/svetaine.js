@@ -96,30 +96,33 @@ const SVETAINE = {
 
   pavadinimas: "Tikra vertė",
 
-  /* Meniu. Įrankiai eina iš IRANKIAI, čia lieka tik tai, kas ne įrankis. */
+  /* Meniu. Įrankiai eina iš IRANKIAI, čia lieka tik tai, kas ne įrankis.
+     „Pradžia" — klasikinės svetainės pradžia (langai.html). Gyva scena
+     (index.html) pasiekiama paspaudus ženklą kairėje. „Įmonėms" — poraštėje
+     ir kainų puslapyje, ne viršuje. */
   meniu: [
-    { pav: "Pradžia",  url: "index.html" },
+    { pav: "Pradžia",  url: "langai.html" },
     { pav: "Įrankiai", irankiai: true },
     { pav: "Kainos",    url: "kainos.html" },
-    { pav: "Įmonėms",   url: "imonems.html" },
     { pav: "Kontaktai", url: "kontaktai.html" }
   ],
 
   /* Mygtukas antraštės dešinėje (puslapis gali jį persirašyti) */
   mygtukas: { pav: "Mano patikros", url: "mano-patikros.html" },
 
-  /* Poraštės stulpeliai */
+  /* El. pašto adresas susisiekimui, pvz. "vardas@pastas.lt". Kol tuščias,
+     kontaktų forma ir pašto eilutė nerodomos. Įrašius adresą, viskas
+     atsiranda ir veikia savaime — daugiau nieko keisti nereikia. */
+  pastas: "",
+
+  /* Poraštės stulpeliai. Tik nuorodos į puslapius, kurie tikrai yra. */
   porastes_stulpeliai: [
-    { antraste: "Įrankiai", nuorodos: IRANKIAI.map(i => ({ pav: i.pav, url: i.url })) },
-    { antraste: "Apie", nuorodos: [
-      { pav: "Kaip vertiname", url: "#" },
+    { antraste: "Įrankiai", nuorodos: IRANKIAI.map(i => ({ pav: i.pav, url: i.url }))
+        .concat([{ pav: "Mano patikros", url: "mano-patikros.html" }]) },
+    { antraste: "Informacija", nuorodos: [
       { pav: "Kainos", url: "kainos.html" },
+      { pav: "Įmonėms", url: "imonems.html" },
       { pav: "Kontaktai", url: "kontaktai.html" }
-    ]},
-    { antraste: "Teisinė informacija", nuorodos: [
-      { pav: "Privatumo politika", url: "#" },
-      { pav: "Slapukai", url: "#" },
-      { pav: "Naudojimo sąlygos", url: "#" }
     ]}
   ],
 
@@ -131,31 +134,31 @@ const SVETAINE = {
   puslapiai: {
     index:        { aktyvus: "Pradžia" },
     skelbimas:    { aktyvus: "Patikrink skelbimą",
-                    trupiniai: [["Pradžia","index.html"], ["Patikrink skelbimą"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Patikrink skelbimą"]] },
     palyginimas:  { aktyvus: "Kainų palyginimas",
-                    trupiniai: [["Pradžia","index.html"], ["Kainų palyginimas"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Kainų palyginimas"]] },
     patikros:     { aktyvus: null,
                     mygtukas: { pav: "Patikrinti skelbimą", url: "skelbimas.html" },
-                    trupiniai: [["Pradžia","index.html"], ["Mano patikros"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Mano patikros"]] },
     paslauga:     { aktyvus: "Pilnas vertinimas",
-                    trupiniai: [["Pradžia","index.html"], ["Pilnas vertinimas"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Pilnas vertinimas"]] },
     /* patikra-*.html — po vieną kiekvienai kategorijai (kopija iš patikra-kita.html).
        Trupinių paskutinė dalis įrašoma iš data-pav, tad naujai kategorijai
        čia nieko keisti nereikia. */
     patikra:      { aktyvus: "Pilnas vertinimas",
-                    trupiniai: [["Pradžia","index.html"], ["Pilnas vertinimas","paslauga.html"], ["Patikra"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Pilnas vertinimas","paslauga.html"], ["Patikra"]] },
     kainos:       { aktyvus: "Kainos",
-                    trupiniai: [["Pradžia","index.html"], ["Kainos"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Kainos"]] },
     imonems:      { aktyvus: "Įmonėms",
-                    trupiniai: [["Pradžia","index.html"], ["Įmonėms"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Įmonėms"]] },
     kontaktai:    { aktyvus: "Kontaktai",
-                    trupiniai: [["Pradžia","index.html"], ["Kontaktai"]] },
+                    trupiniai: [["Pradžia","langai.html"], ["Kontaktai"]] },
     rezultatas:   { aktyvus: "Pilnas vertinimas",
                     mygtukas: { pav: "Nauja patikra", url: "paslauga.html" },
-                    trupiniai: [["Pradžia","index.html"], ["Pilnas vertinimas","paslauga.html"], ["Rezultatas"]],
+                    trupiniai: [["Pradžia","langai.html"], ["Pilnas vertinimas","paslauga.html"], ["Rezultatas"]],
                     trupiniu_desine: "&nbsp;" },
     sertifikatas: { aktyvus: "Pažyma pardavėjams",
-                    trupiniai: [["Pradžia","index.html"], ["Vertinimo pažyma"]] }
+                    trupiniai: [["Pradžia","langai.html"], ["Pažyma pardavėjams"]] }
   }
 };
 
@@ -201,25 +204,29 @@ function antraste(cfg) {
     if (p.irankiai) {
       const aktyvus = IRANKIAI.some(function (i) { return i.pav === cfg.aktyvus; });
       const eilutes = IRANKIAI.map(function (i) {
-        return '<a href="' + i.url + '"' + (i.pav === cfg.aktyvus ? ' class="aktyvus"' : '') +
+        return '<a href="' + i.url + '"' + (i.pav === cfg.aktyvus ? ' class="aktyvus" aria-current="page"' : '') +
                '><b>' + i.pav + '</b><span>' + i.kada + '</span></a>';
       }).join('');
       return '<span class="meniu-grupe">' +
              '<button type="button" class="meniu-jungiklis' + (aktyvus ? ' aktyvus' : '') +
-             '" aria-expanded="false">' + p.pav + '<span class="meniu-rodykle">&#9662;</span></button>' +
-             '<span class="meniu-sarasas">' + eilutes + '</span></span>';
+             '" aria-expanded="false" aria-controls="irankiuSarasas">' + p.pav +
+             '<span class="meniu-rodykle" aria-hidden="true">&#9662;</span></button>' +
+             '<span class="meniu-sarasas" id="irankiuSarasas">' + eilutes + '</span></span>';
     }
-    const klase = (p.pav === cfg.aktyvus) ? ' class="aktyvus"' : '';
+    const klase = (p.pav === cfg.aktyvus) ? ' class="aktyvus" aria-current="page"' : '';
     return '<a href="' + p.url + '"' + klase + '>' + p.pav + '</a>';
   }).join('\n        ');
 
+  /* Pirmas dalykas puslapyje — „Pereiti prie turinio". Matoma tik gavus
+     fokusą, todėl klaviatūrai nebereikia pereiti viso meniu. */
   return '' +
+    '<a class="mygtukas mygtukas-sm m-pagrindinis praleisti" href="#turinys">Pereiti prie turinio</a>\n' +
     '<header class="virsus">\n' +
     '  <div class="wrap">\n' +
     '    ' + antrastesZenklas() + '\n' +
     '    <button type="button" class="meniu-mobilus" aria-expanded="false" aria-controls="pagrindinisMeniu">' +
     '<span class="meniu-bruksniai" aria-hidden="true"></span><span class="meniu-zodis">Meniu</span></button>\n' +
-    '    <nav class="meniu" id="pagrindinisMeniu">\n        ' + nuorodos + '\n' +
+    '    <nav class="meniu" id="pagrindinisMeniu" aria-label="Pagrindinis meniu">\n        ' + nuorodos + '\n' +
     '        <a class="mygtukas mygtukas-sm m-pagrindinis" href="' + mygt.url + '">' + mygt.pav + '</a>\n' +
     '    </nav>\n' +
     '  </div>\n' +
@@ -229,9 +236,9 @@ function antraste(cfg) {
 function trupiniai(cfg) {
   if (!cfg.trupiniai) return '';
   const dalys = cfg.trupiniai.map(function (d, i) {
-    const skyriklis = i ? '<span class="skyriklis">/</span>' : '';
+    const skyriklis = i ? '<span class="skyriklis" aria-hidden="true">/</span>' : '';
     const vidus = (i === cfg.trupiniai.length - 1)
-      ? '<span class="dabartinis">' + d[0] + '</span>'
+      ? '<span class="dabartinis" aria-current="page">' + d[0] + '</span>'
       : '<a href="' + d[1] + '">' + d[0] + '</a>';
     return skyriklis + vidus;
   }).join('');
@@ -241,12 +248,13 @@ function trupiniai(cfg) {
 
   /* „Atgal": grįžta ten, iš kur atėjai. Jei atėjai iš kitur (nuoroda, žymė),
      veda vienu laipteliu aukščiau pagal trupinius — niekada iš svetainės. */
-  const tevas = cfg.trupiniai.length > 1 ? (cfg.trupiniai[cfg.trupiniai.length - 2][1] || 'index.html') : 'index.html';
+  const tevas = cfg.trupiniai.length > 1 ? (cfg.trupiniai[cfg.trupiniai.length - 2][1] || 'langai.html') : 'langai.html';
   const atgal = '<a class="atgal" href="' + tevas + '" data-atgal="1">' +
     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Atgal</a>';
 
-  return '<div class="trupiniai"><div class="wrap">' + atgal + '<span class="trupiniu-kelias">' + dalys + '</span>' + desine + '</div></div>';
+  return '<nav class="trupiniai" aria-label="Naršymo kelias"><div class="wrap">' + atgal +
+         '<span class="trupiniu-kelias">' + dalys + '</span>' + desine + '</div></nav>';
 }
 
 function porastes_stulpelis(s) {
@@ -299,6 +307,34 @@ function poraste() {
   const a = document.getElementById('apacia');
   if (a) a.outerHTML = poraste();
 
+  /* „Pereiti prie turinio" veda į <main id="turinys">. Jei puslapis jo
+     neturi — į bloką su pirmąja h1 antrašte, o jei ir jos nėra — į tai, kas
+     eina iškart po antrašte ir trupiniais. Fokusas perkeliamas iš tikrųjų,
+     kad ir ekrano skaitytuvas, ir kitas Tab prasidėtų nuo turinio. */
+  const praleisti = document.querySelector('.praleisti');
+  if (praleisti) {
+    if (!document.getElementById('turinys')) {
+      const h1 = document.querySelector('h1');
+      const po = document.querySelector('nav.trupiniai') || document.querySelector('header.virsus');
+      const tikslas = h1 ? (h1.closest('.puslapio-antraste, main, section, article') || h1.parentElement)
+                         : (po && po.nextElementSibling);
+      if (tikslas) {
+        if (!tikslas.id) tikslas.id = 'turinys';
+        praleisti.setAttribute('href', '#' + tikslas.id);
+      }
+    }
+    praleisti.addEventListener('click', function (e) {
+      const t = document.getElementById(praleisti.getAttribute('href').slice(1));
+      if (!t) return;
+      e.preventDefault();
+      if (!t.hasAttribute('tabindex')) {
+        t.setAttribute('tabindex', '-1');
+        t.addEventListener('blur', function () { t.removeAttribute('tabindex'); }, { once: true });
+      }
+      t.focus();
+    });
+  }
+
   /* Mygtukas „Atgal". Istorija naudojama tik tada, kai ankstesnis puslapis
      yra šios pačios svetainės — kitaip žmogus išskristų į paiešką. */
   document.querySelectorAll('[data-atgal]').forEach(function (a) {
@@ -325,29 +361,37 @@ function poraste() {
   window.addEventListener('scroll', rodytiVirsun, { passive: true });
   rodytiVirsun();
 
-  /* Siauras ekranas: meniu sulenda po vienu mygtuku. */
+  /* Siauras ekranas: meniu sulenda po vienu mygtuku. Fokusui išėjus iš
+     antraštės (Tab toliau), meniu užsidaro ir nebekabo virš turinio. */
   const mob = document.querySelector('.meniu-mobilus');
-  if (mob) {
-    const virsus = mob.closest('.virsus');
+  const virsus = mob ? mob.closest('.virsus') : null;
+  const meniu = document.getElementById('pagrindinisMeniu');
+  const uzdarytiMeniu = function (grazinti) {
+    if (!virsus || !virsus.classList.contains('meniu-atviras')) return;
+    virsus.classList.remove('meniu-atviras');
+    mob.setAttribute('aria-expanded', 'false');
+    if (grazinti) mob.focus();
+  };
+  if (mob && virsus) {
     mob.addEventListener('click', function () {
       const atv = !virsus.classList.contains('meniu-atviras');
       virsus.classList.toggle('meniu-atviras', atv);
       mob.setAttribute('aria-expanded', atv ? 'true' : 'false');
     });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { virsus.classList.remove('meniu-atviras'); mob.setAttribute('aria-expanded', 'false'); }
+    virsus.addEventListener('focusout', function (e) {
+      if (e.relatedTarget && !virsus.contains(e.relatedTarget)) uzdarytiMeniu(false);
     });
   }
 
-  /* Iškrentantis įrankių sąrašas. Atsidaro paspaudus, užsidaro paspaudus šalia
-     arba Esc — klaviatūra turi veikti taip pat kaip pelė. */
+  /* Iškrentantis įrankių sąrašas. Atsidaro paspaudus, užsidaro paspaudus šalia,
+     išėjus iš jo su Tab arba Esc — klaviatūra turi veikti taip pat kaip pelė. */
   const jungiklis = document.querySelector('.meniu-jungiklis');
-  if (jungiklis) {
-    const grupe = jungiklis.closest('.meniu-grupe');
-    const perjungti = function (atidaryti) {
-      grupe.classList.toggle('atidaryta', atidaryti);
-      jungiklis.setAttribute('aria-expanded', atidaryti ? 'true' : 'false');
-    };
+  const grupe = jungiklis ? jungiklis.closest('.meniu-grupe') : null;
+  const perjungti = function (atidaryti) {
+    grupe.classList.toggle('atidaryta', atidaryti);
+    jungiklis.setAttribute('aria-expanded', atidaryti ? 'true' : 'false');
+  };
+  if (grupe) {
     jungiklis.addEventListener('click', function (e) {
       e.preventDefault();
       perjungti(!grupe.classList.contains('atidaryta'));
@@ -355,10 +399,71 @@ function poraste() {
     document.addEventListener('click', function (e) {
       if (!grupe.contains(e.target)) perjungti(false);
     });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') perjungti(false);
+    grupe.addEventListener('focusout', function (e) {
+      if (e.relatedTarget && !grupe.contains(e.relatedTarget)) perjungti(false);
     });
   }
+
+  /* Esc uždaro pirmiausia įrankių sąrašą, paskui telefono meniu. Fokusas
+     grįžta į mygtuką, kuris jį atidarė, o ne į puslapio pradžią. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (grupe && grupe.classList.contains('atidaryta')) {
+      const viduje = grupe.contains(document.activeElement);
+      perjungti(false);
+      if (viduje) jungiklis.focus();
+      return;
+    }
+    uzdarytiMeniu(!!meniu && meniu.contains(document.activeElement));
+  });
+})();
+
+/* Kontaktų forma (kontaktai.html). Siunčiama per el. pašto programą
+   (mailto:), todėl veikia ir be serverio. Kol SVETAINE.pastas tuščias,
+   forma ir pašto eilutė lieka paslėptos. Temą galima parinkti nuoroda:
+   kontaktai.html?tema=reklama (klausimas, klaida, reklama, imonems, kita). */
+(function kontaktuForma() {
+  const pastas = String(SVETAINE.pastas || '').trim();
+  const eilute = document.getElementById('pastoEilute');
+  const forma = document.getElementById('kontaktuForma');
+  if (!pastas || (!eilute && !forma)) return;
+
+  if (eilute) {
+    const nuoroda = document.createElement('a');
+    nuoroda.href = 'mailto:' + pastas;
+    nuoroda.textContent = pastas;
+    (eilute.querySelector('[data-pastas]') || eilute).appendChild(nuoroda);
+    eilute.hidden = false;
+  }
+  if (!forma) return;
+
+  const temos = Array.prototype.slice.call(forma.querySelectorAll('.tema[data-tema]'));
+  const rinktis = function (b) {
+    temos.forEach(function (x) {
+      x.classList.toggle('pasirinkta', x === b);
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+  };
+  let pradine = null;
+  try {
+    const q = new URLSearchParams(location.search).get('tema');
+    pradine = temos.filter(function (b) { return b.dataset.tema === q; })[0] || null;
+  } catch (x) {}
+  if (temos.length) rinktis(pradine || temos[0]);
+
+  forma.addEventListener('click', function (e) {
+    const b = e.target.closest('.tema[data-tema]');
+    if (b) rinktis(b);
+  });
+  forma.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const b = temos.filter(function (x) { return x.classList.contains('pasirinkta'); })[0] || temos[0];
+    const zinute = document.getElementById('zinute');
+    location.href = 'mailto:' + pastas +
+      '?subject=' + encodeURIComponent('Tikra vertė: ' + (b ? b.textContent.trim() : 'žinutė')) +
+      '&body=' + encodeURIComponent(zinute ? zinute.value : '');
+  });
+  forma.hidden = false;
 })();
 
 
@@ -506,7 +611,8 @@ const NUOTRAUKOS = {
       return '' +
         '<figure class="miniatiura-langelis">' +
         '  <img src="' + n.diag.url + '" alt="">' +
-        '  <button type="button" class="miniatiura-x" data-imesti="' + i + '" title="Išmesti">&times;</button>' +
+        '  <button type="button" class="miniatiura-x" data-imesti="' + i + '" aria-label="Išmesti nuotrauką Nr. ' +
+        (i + 1) + '"><span aria-hidden="true">&times;</span></button>' +
         '  <figcaption style="color:' + SPALVOS[v.busena] + '">' + v.tekstas + '</figcaption>' +
         '</figure>';
     }).join("") +
@@ -519,8 +625,9 @@ const NUOTRAUKOS = {
 
     const sant = document.getElementById("nuotraukuSuvestine");
     if (sant) {
+      /* Po tuščia zona nieko nerašome: nuotraukos nebūtinos. */
       const s = this.suvestine();
-      sant.textContent = s.tekstas;
+      sant.textContent = this.sarasas.length ? s.tekstas : "";
     }
 
     /* Nuotraukos yra didžiausias tikslumo svoris, tad reikia perskaičiuoti
@@ -594,7 +701,15 @@ NUOTRAUKOS.prijungti = function () {
   if (sarasas) {
     sarasas.addEventListener("click", e => {
       const m = e.target.closest("[data-imesti]");
-      if (m) { e.preventDefault(); NUOTRAUKOS.imesti(parseInt(m.dataset.imesti, 10)); }
+      if (m) {
+        e.preventDefault();
+        const i = parseInt(m.dataset.imesti, 10);
+        NUOTRAUKOS.imesti(i);
+        /* Fokusas nedingsta: pereina į kitą nuotrauką arba į failų pasirinkimą. */
+        const kitas = sarasas.querySelector('[data-imesti="' + i + '"]') ||
+                      sarasas.querySelector('[data-imesti="' + (i - 1) + '"]') || ivestis;
+        if (kitas) kitas.focus();
+      }
     });
   }
 
@@ -620,6 +735,22 @@ NUOTRAUKOS.prijungti = function () {
    3 DALIS — PATIKRA
    ========================================================================== */
 
+/* Eurai su tūkstančių tarpais, kaip įprasta lietuviškai: „1 800 €".
+   Tarpai nelūžtantys, kad skaičius ir ženklas neišsiskirtų į dvi eilutes. */
+function eurai(n) {
+  return Math.round(n).toLocaleString("lt-LT").replace(/\s/g, " ") + " €";
+}
+function euraiRezis(nuo, iki) {
+  return Math.round(nuo) === Math.round(iki)
+    ? eurai(nuo)
+    : eurai(nuo).replace(" €", "") + "–" + eurai(iki);
+}
+/* Tekstas iš skelbimo ar laukelio — į HTML tik išvalytas. */
+function tekstoSauga(t) {
+  return String(t == null ? "" : t).replace(/[&<>"]/g,
+    c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+}
+
 const PATIKRA = {
 
   /* Verdikto ribos. 1.3 = brangiau nei 30 % virš vertės jau yra pervertinimas. */
@@ -641,7 +772,9 @@ const PATIKRA = {
   /* --- Paieška kataloge ---------------------------------------------------
      Trys pakopos, nuo tiksliausios iki laisviausios. Grąžina ir tai, KAIP
      rastas įrašas, kad galėtume sąžiningai parodyti tikslumą.              */
-  rasti(pavadinimas) {
+  /* kategorija — kai žinoma (puslapio ar skelbimo), kitų kategorijų įrašai
+     neimami: „Bosch skalbimo mašina" neturi rasti automobilio „mašina". */
+  rasti(pavadinimas, kategorija) {
     const q = this.normalizuoti(pavadinimas);
     if (!q) return null;
 
@@ -649,7 +782,7 @@ const PATIKRA = {
       raktas,
       duomenys: KATALOGAS[raktas],
       visiVardai: [raktas].concat(KATALOGAS[raktas].kiti_vardai || []).map(v => this.normalizuoti(v))
-    }));
+    })).filter(i => !kategorija || !i.duomenys.kategorija || i.duomenys.kategorija === kategorija);
 
     /* 1. Tikslus sutapimas */
     for (const i of irasai) {
@@ -843,7 +976,7 @@ const PATIKRA = {
     let klasesPav = null, panasiuN = null, placiau = 0;
 
     let atskaitos = false;
-    rastas = this.rasti(pavadinimas);
+    rastas = this.rasti(pavadinimas, kategorija);
     if (rastas) {
       bazine = rastas.duomenys.verte;
       saltinis = "katalogas";
@@ -991,8 +1124,8 @@ const PATIKRA = {
 
   /* --- Tekstai verdiktui --------------------------------------------------- */
   antraste(r) {
-    if (r.verdiktas === "per-brangu")  return "Ši kaina " + r.skirtumas + " &euro; per didelė";
-    if (r.verdiktas === "gera-kaina")  return "Ši kaina " + r.skirtumas + " &euro; žemiau vertės";
+    if (r.verdiktas === "per-brangu")  return "Ši kaina " + eurai(r.skirtumas) + " per didelė";
+    if (r.verdiktas === "gera-kaina")  return "Ši kaina " + eurai(r.skirtumas) + " žemiau vertės";
     return "Ši kaina atitinka rinką";
   },
   zyme(r) {
@@ -1082,7 +1215,7 @@ const PATAISOS = {
     { raktas: "deze",       pav: "Originali dėžė",       poveikis: +0.04 },
     { raktas: "priedai",    pav: "Visi priedai",         poveikis: +0.06 },
     { raktas: "dokumentai", pav: "Kvitas ar dokumentai", poveikis: +0.03 },
-    { raktas: "kabeliai",   pav: "Pakrovėjas, kabeliai", poveikis: +0.03 }
+    { raktas: "kabeliai",   pav: "Įkroviklis, laidai",   poveikis: +0.03 }
   ],
   garantija: [
     { raktas: "yra",     pav: "Garantija dar galioja", poveikis: +0.08 },
@@ -1091,9 +1224,9 @@ const PATAISOS = {
   ],
   defektai: [
     { raktas: "nera",       pav: "Defektų nėra",               poveikis:  0.00 },
-    { raktas: "ibrezimai",  pav: "Įbrėžimai, nutrinta",        poveikis: -0.05 },
+    { raktas: "ibrezimai",  pav: "Įbrėžimai, nutrynimai",     poveikis: -0.05 },
     { raktas: "funkcijos",  pav: "Neveikia dalis funkcijų",    poveikis: -0.15 },
-    { raktas: "keista",     pav: "Keista baterija ar detalė",  poveikis: -0.08 },
+    { raktas: "keista",     pav: "Pakeista baterija ar detalė", poveikis: -0.08 },
     { raktas: "remontuota", pav: "Buvo remontuota",            poveikis: -0.10 }
   ],
   amzius_uz_metus: -0.03,
@@ -1116,6 +1249,18 @@ const DUOMENYS = {
     return (typeof PATAISOS !== "undefined" && PATAISOS[vardas]) || [];
   },
 
+  /* Bendros grupės, kurios šiai kategorijai neturi prasmės (automobiliui —
+     dėžė, priedai, garantija). Jų neklausiame ir tikslumui jų nereikia. */
+  beBendru() {
+    const k = document.body.dataset.kategorija;
+    return (k && typeof DETALES !== "undefined" && DETALES[k] && DETALES[k].be_bendru) || [];
+  },
+
+  /* Žingsnio pavadinimas pagal tai, kas jame lieka. */
+  zingsnioPavadinimas() {
+    return this.beBendru().indexOf("komplektacija") >= 0 ? "Žinomi defektai" : "Kas atiduodama ir kas žinoma";
+  },
+
   /* --- Chip'ų piešimas --------------------------------------------------- */
   piesti() {
     const deze = document.getElementById("papildomiDuomenys");
@@ -1126,34 +1271,24 @@ const DUOMENYS = {
          informacija pirkėjui — ką jis su tuo darytų, išskyrus atkartojimą.
          Žmogui svarbu, KĄ įskaitome, o ne kiek kuris svelia. */
       return '<button type="button" class="tema' + (pazymeta ? " pasirinkta" : "") +
+             '" aria-pressed="' + (pazymeta ? "true" : "false") +
              '" data-grupe="' + g + '" data-raktas="' + x.raktas + '">' + x.pav + "</button>";
     };
 
-    deze.innerHTML = `
-      <div class="stulpelis tarpas-8">
-        <span class="etikete">Kas atiduodama su daiktu</span>
-        <div class="temos">${this.grupe("komplektacija")
-          .map(x => chip("komplektacija", x, this.komplektacija.has(x.raktas))).join("")}</div>
-      </div>
+    const be = this.beBendru();
+    const grupes = [
+      { g: "komplektacija", pav: "Kas atiduodama su daiktu", yra: r => this.komplektacija.has(r) },
+      { g: "garantija",     pav: "Garantija",                yra: r => this.garantija === r },
+      { g: "defektai",      pav: "Žinomi defektai",          yra: r => this.defektai.has(r) }
+    ].filter(x => be.indexOf(x.g) < 0);
+    /* Liko viena grupė — jos vardas jau yra žingsnio antraštėje. */
+    const viena = grupes.length === 1;
 
-      <div class="stulpelis tarpas-8">
-        <span class="etikete">Garantija</span>
-        <div class="temos">${this.grupe("garantija")
-          .map(x => chip("garantija", x, this.garantija === x.raktas)).join("")}</div>
-      </div>
-
-      <div class="stulpelis tarpas-8">
-        <span class="etikete">Žinomi defektai</span>
-        <div class="temos">${this.grupe("defektai")
-          .map(x => chip("defektai", x, this.defektai.has(x.raktas))).join("")}</div>
-      </div>
-
-      <div class="laukas" style="max-width:220px;">
-        <label class="etikete" for="amzius">Kiek metų daiktui</label>
-        <input type="number" id="amzius" min="0" max="40" step="1" placeholder="pvz. 3"
-               value="${this.amzius === null ? "" : this.amzius}">
-      </div>
-    `;
+    deze.innerHTML = grupes.map(x =>
+      '<div class="stulpelis tarpas-8">' +
+      '<span class="etikete' + (viena ? " tik-skaitytuvui" : "") + '" id="grupe_' + x.g + '">' + x.pav + "</span>" +
+      '<div class="temos" role="group" aria-labelledby="grupe_' + x.g + '">' +
+      this.grupe(x.g).map(o => chip(x.g, o, x.yra(o.raktas))).join("") + "</div></div>").join("");
   },
 
   /* --- Paspaudimai -------------------------------------------------------- */
@@ -1166,6 +1301,7 @@ const DUOMENYS = {
       if (!m) return;
       e.preventDefault();
       const g = m.dataset.grupe, r = m.dataset.raktas;
+      const fokuse = document.activeElement === m;
 
       if (g === "garantija") {
         this.garantija = (this.garantija === r) ? null : r;
@@ -1181,13 +1317,12 @@ const DUOMENYS = {
         this.komplektacija.has(r) ? this.komplektacija.delete(r) : this.komplektacija.add(r);
       }
       this.piesti();
-      this.atnaujintiTiksluma();
-    });
-
-    deze.addEventListener("input", e => {
-      if (e.target.id !== "amzius") return;
-      const v = parseInt(e.target.value, 10);
-      this.amzius = isNaN(v) ? null : Math.max(0, Math.min(40, v));
+      /* Perpiešus mygtukas yra naujas — fokusas grąžinamas, kad klaviatūra
+         neiššoktų į puslapio pradžią. */
+      if (fokuse) {
+        const f = deze.querySelector('[data-grupe="' + g + '"][data-raktas="' + r + '"]');
+        if (f) f.focus();
+      }
       this.atnaujintiTiksluma();
     });
 
@@ -1254,19 +1389,29 @@ const DUOMENYS = {
   tikslumas() {
     const punktai = [];
     const preke = document.getElementById("preke");
-    const rasta = preke && preke.value.trim() && PATIKRA.rasti(preke.value.trim());
+    const rasta = preke && preke.value.trim() &&
+                  PATIKRA.rasti(preke.value.trim(), document.body.dataset.kategorija || null);
     const metaiPav = !!(preke && /\b(19[5-9]\d|20\d\d)\b/.test(preke.value));
-    punktai.push({ ok: !!rasta || metaiPav, sv: 25, ko: "modelis su pagaminimo metais" });
+    const metai = this.amzius !== null || metaiPav;
+    punktai.push({ ok: !!rasta || metai, sv: 25, ko: "pagaminimo metai" });
 
-    const nuotrauku = (typeof NUOTRAUKOS !== "undefined")
-      ? NUOTRAUKOS.suvestine() : { kiek: 0, pasitikejimas: "zemas" };
-    const gerosNuotraukos = nuotrauku.pasitikejimas !== "zemas";
-    punktai.push({ ok: gerosNuotraukos, sv: 30, ko: "bent dvi aiškios nuotraukos" });
+    /* Nuotraukos vertę keičia tik tada, kai yra variklis (būklė iš nuotraukų).
+       Be jo prašyti nuotraukų tikslumo vardan būtų netiesa. */
+    if (PATIKRA.agentasGalimas()) {
+      const nuotrauku = (typeof NUOTRAUKOS !== "undefined")
+        ? NUOTRAUKOS.suvestine() : { kiek: 0, pasitikejimas: "zemas" };
+      punktai.push({ ok: nuotrauku.pasitikejimas !== "zemas", sv: 30, ko: "bent dvi aiškios nuotraukos" });
+    }
 
-    punktai.push({ ok: this.komplektacija.size > 0, sv: 15, ko: "kas atiduodama su daiktu" });
-    punktai.push({ ok: this.defektai.size > 0,      sv: 15, ko: "atsakymas apie defektus" });
-    punktai.push({ ok: !!this.garantija,            sv: 5,  ko: "garantija" });
-    punktai.push({ ok: this.amzius !== null || metaiPav, sv: 10, ko: "amžius" });
+    const be = this.beBendru();
+    if (be.indexOf("komplektacija") < 0) {
+      punktai.push({ ok: this.komplektacija.size > 0, sv: 15, ko: "kas atiduodama su daiktu" });
+    }
+    punktai.push({ ok: this.defektai.size > 0, sv: 15, ko: "atsakymas apie defektus" });
+    if (be.indexOf("garantija") < 0) {
+      punktai.push({ ok: !!this.garantija, sv: 5, ko: "garantija" });
+    }
+    punktai.push({ ok: metai, sv: 10, ko: "pagaminimo metai" });
 
     /* Kategorijos kriterijai. Automobiliui rida svarbesnė už dėžutę, tad jie
        turi savo svorį — kitaip rodiklis meluotų. */
@@ -1280,8 +1425,12 @@ const DUOMENYS = {
                      ko: "kategorijos duomenys (rida, apžiūra, istorija)" });
     }
 
-    const proc = punktai.filter(p => p.ok).reduce((s, p) => s + p.sv, 0);
-    const trukstA = punktai.filter(p => !p.ok).sort((a, b) => b.sv - a.sv).map(p => p.ko);
+    /* Procentai nuo to, ko šiame puslapyje iš viso klausiama — kitaip
+       automobilis niekada nepasiektų 100 %, o kriterijai išeitų virš jo. */
+    const viso = punktai.reduce((s, p) => s + p.sv, 0) || 1;
+    const proc = Math.round(punktai.filter(p => p.ok).reduce((s, p) => s + p.sv, 0) / viso * 100);
+    const trukstA = punktai.filter(p => !p.ok).sort((a, b) => b.sv - a.sv).map(p => p.ko)
+      .filter((ko, i, visi) => visi.indexOf(ko) === i);
     const lygis = proc >= 75 ? "aukstas" : (proc >= 45 ? "vidutinis" : "zemas");
     return { proc, lygis, trukstA };
   },
@@ -1289,6 +1438,9 @@ const DUOMENYS = {
   atnaujintiTiksluma() {
     const deze = document.getElementById("tikslumas");
     if (!deze) return;
+    /* Tuščia forma nepasitinka raudonu „0 %". */
+    const preke = document.getElementById("preke");
+    if (!preke || !preke.value.trim()) { deze.innerHTML = ""; return; }
     const t = this.tikslumas();
     const spalva = { aukstas: "var(--gerai)", vidutinis: "var(--zenklas)", zemas: "var(--pavojus)" }[t.lygis];
     const zodis  = { aukstas: "aukštas", vidutinis: "vidutinis", zemas: "žemas" }[t.lygis];
@@ -1333,7 +1485,6 @@ const SUGADINIMAI = {
   rankinis: false,       /* žmogus pasirinko pats — spėjimas nebeperrašo */
   pasirinkti: new Map(), /* detalė -> taisymo raktas */
   kriterijai: new Map(), /* kriterijaus raktas -> reikšmė (tekstas, Set arba skaičius) */
-  praleistiFoto: false,
 
   yra() {
     return typeof DETALES !== "undefined" && DETALES && Object.keys(DETALES).length > 0;
@@ -1385,7 +1536,6 @@ const SUGADINIMAI = {
     if (senas === k) return this.kategorija;
     this.pasirinkti.clear();
     this.kriterijai.clear();
-    this.praleistiFoto = false;
     this.kategorija = k ? { raktas: k, cfg: DETALES[k] } : null;
     return this.kategorija;
   },
@@ -1424,7 +1574,9 @@ const SUGADINIMAI = {
         });
       } else {
         const o = (k.variantai || []).find(x => x.raktas === v);
-        if (o && o.poveikis) sarasas.push({ pav: k.pav + ": " + o.pav, poveikis: o.poveikis });
+        /* „Techninė apžiūra: galioja…", ne „…: Galioja…" */
+        if (o && o.poveikis) sarasas.push({ pav: k.pav + ": " + o.pav.charAt(0).toLocaleLowerCase("lt") + o.pav.slice(1),
+                                            poveikis: o.poveikis });
       }
     }
     return { sarasas, suma: sarasas.reduce((s, x) => s + x.poveikis, 0) };
@@ -1440,6 +1592,7 @@ const SUGADINIMAI = {
 
     const chip = (kr, o, pazymeta) =>
       '<button type="button" class="tema' + (pazymeta ? " pasirinkta" : "") +
+      '" aria-pressed="' + (pazymeta ? "true" : "false") +
       '" data-kriterijus="' + kr.raktas + '" data-reiksme="' + o.raktas + '">' +
       o.pav + "</button>";
 
@@ -1458,13 +1611,13 @@ const SUGADINIMAI = {
       const v = this.kriterijai.get(k.raktas);
       const chips = (k.variantai || []).map(o => chip(k, o,
         k.tipas === "keli" ? (v instanceof Set && v.has(o.raktas)) : v === o.raktas)).join("");
-      return '<div class="stulpelis tarpas-8"><span class="etikete">' + k.pav + "</span>" +
-             '<div class="temos">' + chips + "</div></div>";
+      return '<div class="stulpelis tarpas-8"><span class="etikete" id="kr_pav_' + k.raktas + '">' + k.pav + "</span>" +
+             '<div class="temos" role="group" aria-labelledby="kr_pav_' + k.raktas + '">' + chips + "</div></div>";
     }).join("");
 
     deze.innerHTML = `
       <header class="zingsnio-antraste">
-        <h3>Kas svarbu šiai kategorijai</h3>
+        <h2>Kas svarbu šiai kategorijai</h2>
         <span class="smulkus">${this.kategorija.cfg.pav} &middot; būtent tai keičia kainą labiausiai</span>
       </header>
       <div class="stulpelis tarpas-18">${blokai}</div>
@@ -1482,6 +1635,7 @@ const SUGADINIMAI = {
       const kr = this.kriterijuSarasas().find(x => x.raktas === m.dataset.kriterijus);
       if (!kr) return;
       const r = m.dataset.reiksme;
+      const fokuse = document.activeElement === m;
 
       if (kr.tipas === "keli") {
         const s = this.kriterijai.get(kr.raktas) instanceof Set
@@ -1492,6 +1646,10 @@ const SUGADINIMAI = {
         this.kriterijai.set(kr.raktas, this.kriterijai.get(kr.raktas) === r ? null : r);
       }
       this.piestiKriterijus();
+      if (fokuse) {
+        const f = deze.querySelector('[data-kriterijus="' + kr.raktas + '"][data-reiksme="' + r + '"]');
+        if (f) f.focus();
+      }
       if (typeof DUOMENYS !== "undefined") DUOMENYS.atnaujintiTiksluma();
     });
 
@@ -1518,7 +1676,7 @@ const SUGADINIMAI = {
 
       /* Pavyzdys laukelyje turi atitikti kategoriją — „PlayStation 5"
          automobilio puslapyje suklaidina. */
-      const pav = { automobilis: "pvz. Opel Astra 2008", elektronika: "pvz. iPhone 13",
+      const pav = { automobilis: "pvz. Opel Astra", elektronika: "pvz. iPhone 13",
                     buitine_technika: "pvz. Bosch skalbimo mašina",
                     dviratis: "pvz. Trek Marlin 5" };
       const laukas = document.getElementById("preke");
@@ -1530,13 +1688,13 @@ const SUGADINIMAI = {
     const dabartine = this.kategorija ? this.kategorija.raktas : "";
     const mygtukai = Object.keys(DETALES).map(k =>
       '<button type="button" class="tema' + (dabartine === k ? " pasirinkta" : "") +
-      '" data-kategorija="' + k + '">' + DETALES[k].pav + "</button>").join("") +
+      '" aria-pressed="' + (dabartine === k) + '" data-kategorija="' + k + '">' + DETALES[k].pav + "</button>").join("") +
       '<button type="button" class="tema' + (!dabartine ? " pasirinkta" : "") +
-      '" data-kategorija="">Kita</button>';
+      '" aria-pressed="' + (!dabartine) + '" data-kategorija="">Kita</button>';
 
     deze.innerHTML =
-      '<span class="etikete">Kas tai per daiktas</span>' +
-      '<div class="temos">' + mygtukai + "</div>" +
+      '<span class="etikete" id="kategorijosPav">Kas tai per daiktas</span>' +
+      '<div class="temos" role="group" aria-labelledby="kategorijosPav">' + mygtukai + "</div>" +
       '<span class="smulkus">' +
       (this.rankinis ? "Pasirinkta ranka." : "Spėjame pagal pavadinimą — gali pataisyti.") +
       " Nuo to priklauso, kokių detalių ir duomenų klausiame.</span>";
@@ -1549,8 +1707,14 @@ const SUGADINIMAI = {
       const m = e.target.closest("[data-kategorija]");
       if (!m) return;
       e.preventDefault();
-      this.nustatytiRaktu(m.dataset.kategorija || null, true);
+      const k = m.dataset.kategorija || "";
+      const fokuse = document.activeElement === m;
+      this.nustatytiRaktu(k || null, true);
       this.piesti();
+      if (fokuse) {
+        const f = deze.querySelector('[data-kategorija="' + k + '"]');
+        if (f) f.focus();
+      }
       if (typeof DUOMENYS !== "undefined") DUOMENYS.atnaujintiTiksluma();
     });
   },
@@ -1566,7 +1730,7 @@ const SUGADINIMAI = {
 
   fotoTrukumas() {
     const reikia = this.reikiaNuotrauku();
-    if (!reikia || this.praleistiFoto) return 0;
+    if (!reikia) return 0;
     return Math.max(0, reikia - this.nuotrauku());
   },
 
@@ -1637,29 +1801,34 @@ const SUGADINIMAI = {
            defektų procentas yra mūsų svoris, tad jo nerodome. */
         const zymus = t.lauzas
           ? "nebetaisoma"
-          : (t.procentas ? "mažina vertę" : t.nuo + "&ndash;" + t.iki + " &euro;");
-        return '<button type="button" class="tema' + (pasirinktas === t.raktas ? " pasirinkta" : "") +
-               '" data-detale="' + raktas + '" data-taisymas="' + t.raktas + '">' +
+          : (t.procentas ? "mažina vertę" : euraiRezis(t.nuo, t.iki));
+        const p = pasirinktas === t.raktas;
+        return '<button type="button" class="tema' + (p ? " pasirinkta" : "") +
+               '" aria-pressed="' + p + '" data-detale="' + raktas + '" data-taisymas="' + t.raktas + '">' +
                t.pav + '<span class="tema-kaina">' + zymus + "</span></button>";
       }).join("");
 
       return '' +
         '<div class="sugadinimas' + (aktyvi ? " aktyvi" : "") + '">' +
-        '  <button type="button" class="sugadinimo-antraste" data-jungiklis="' + raktas + '">' +
-        '    <span class="sugadinimo-zyme">' + (aktyvi ? "&times;" : "+") + '</span>' +
+        '  <button type="button" class="sugadinimo-antraste" data-jungiklis="' + raktas +
+        '" aria-expanded="' + aktyvi + '">' +
+        '    <span class="sugadinimo-zyme" aria-hidden="true">' + (aktyvi ? "&times;" : "+") + '</span>' +
         '    <span>' + d.pav + '</span>' +
         '  </button>' +
-        (aktyvi ? '<div class="temos" style="margin-top:10px;">' + mygtukai + "</div>" : "") +
+        (aktyvi ? '<div class="temos" role="group" aria-label="' + d.pav + '" style="margin-top:10px;">' +
+                  mygtukai + "</div>" : "") +
         '</div>';
     }).join("");
 
+    /* Skiltis — sutraukiamas <details>: atidarymas laikomas ant paties
+       konteinerio, tad perpiešiant vidų jis neužsidaro. */
     deze.innerHTML = `
-      <header class="zingsnio-antraste">
-        <h3>Kas sugadinta</h3>
-        <span class="smulkus">Pažymi tik tai, ką matai — parodysime, kiek kainuotų sutvarkyti</span>
-      </header>
+      <summary class="zingsnio-antraste">
+        <h2>Kas sugadinta</h2>
+        <span class="smulkus">Pažymėk, jei matai gedimų</span>
+      </summary>
       <div class="sugadinimu-tinklas">${blokai}</div>
-      <div class="patarimas" id="sugadinimuSuma"></div>
+      <div class="patarimas" id="sugadinimuSuma" hidden></div>
     `;
     this.piestiSuma();
     this.piestiKriterijus();
@@ -1672,53 +1841,42 @@ const SUGADINIMAI = {
     const k = this.kaina();
 
     if (!k.eilutes.length) {
-      deze.innerHTML = '<b>Kol kas nieko nepažymėta</b>' +
-        '<span>Jei daiktas tvarkingas — palik tuščią. Tada vertinsime tik pagal būklę.</span>';
+      deze.innerHTML = "";
+      deze.hidden = true;
       return;
     }
+    deze.hidden = false;
 
     if (k.lauzas) {
       const l = this.lauzoVerte();
       deze.innerHTML = '<b>Nebetaisoma</b>' +
         '<span>Pažymėjai gedimą, po kurio taisyti neapsimoka. Tokiu atveju vertė ' +
-        'skaičiuojama ne nuo rinkos kainos, o kaip <b>' + l.nuo + "–" + l.iki +
-        ' &euro;</b> — ' + (l.paaiskinimas || "likutinė vertė") + ".</span>";
+        'skaičiuojama ne nuo rinkos kainos, o kaip <b>' + euraiRezis(l.nuo, l.iki) +
+        '</b> — ' + (l.paaiskinimas || "likutinė vertė") + ".</span>";
       return;
     }
 
     const dalys = k.eilutes.map(e => e.detale + ": " + e.taisymas +
-      (e.procentas ? "" : " (" + e.nuo + "–" + e.iki + " €)"));
-    deze.innerHTML = '<b>Sutvarkymas apytiksliai ' + k.nuo + "–" + k.iki + ' &euro;</b>' +
+      (e.procentas ? "" : " (" + euraiRezis(e.nuo, e.iki) + ")"));
+    deze.innerHTML = '<b>Sutvarkymas apytiksliai ' + euraiRezis(k.nuo, k.iki) + '</b>' +
       "<span>" + dalys.join(" &middot; ") + "</span>" +
-      '<span style="color:var(--pavojus);">Skaičiai apytiksliai — servisų įkainiai skiriasi. ' +
-      "Realią kainą pasako tik konkretus meistras.</span>";
+      '<span class="smulkus">Apytiksliai — tikslią kainą pasakys servisas.</span>';
   },
 
+  /* Nuotraukos nebūtinos. Be variklio jos vertės nekeičia, tad ir
+     neprašome. Su varikliu — tik švelni užuomina, niekada ne kliūtis. */
   piestiFoto() {
     const deze = document.getElementById("fotoReikalavimas");
     if (!deze) return;
 
     const reikia = this.reikiaNuotrauku();
-    if (!reikia) { deze.innerHTML = ""; deze.style.display = "none"; return; }
-    deze.style.display = "";
-
-    const turi = this.nuotrauku();
-    const truksta = Math.max(0, reikia - turi);
-    const kampai = (this.kategorija.cfg.kampai || []).join(" &middot; ");
-
-    if (truksta === 0) {
-      deze.innerHTML = '<b style="color:var(--gerai);">Nuotraukų pakanka</b>' +
-        "<span>" + turi + " iš reikalingų " + reikia + ".</span>";
-      return;
+    const truksta = Math.max(0, reikia - this.nuotrauku());
+    if (!reikia || !truksta || !PATIKRA.agentasGalimas()) {
+      deze.innerHTML = ""; deze.style.display = "none"; return;
     }
-
-    deze.innerHTML = '<b>Šiai kategorijai reikia bent ' + reikia + ' nuotraukų</b>' +
-      "<span>Turi " + turi + ". Trūksta " + truksta + ".</span>" +
-      "<span>Ko reikia: " + kampai + "</span>" +
-      '<span class="smulkus">Be jų sugadinimų nematyti, o vertė lieka spėjimu.</span>' +
-      (this.praleistiFoto ? "" :
-        '<button type="button" class="tema" id="praleistiFoto" style="margin-top:8px;align-self:flex-start;">' +
-        "Neturiu daugiau nuotraukų — vertink taip</button>");
+    deze.style.display = "";
+    const kampai = (this.kategorija.cfg.kampai || []).join(", ");
+    deze.innerHTML = "<span>Tiksliausia su " + reikia + " nuotraukomis: " + kampai + ".</span>";
   },
 
   prijungti() {
@@ -1733,6 +1891,7 @@ const SUGADINIMAI = {
       if (jungiklis) {
         e.preventDefault();
         const r = jungiklis.dataset.jungiklis;
+        const fokuse = document.activeElement === jungiklis;
         if (this.pasirinkti.has(r)) {
           this.pasirinkti.delete(r);
         } else {
@@ -1742,6 +1901,10 @@ const SUGADINIMAI = {
           this.pasirinkti.set(r, vidurys ? vidurys.raktas : null);
         }
         this.piesti();
+        if (fokuse) {
+          const f = deze.querySelector('[data-jungiklis="' + r + '"]');
+          if (f) f.focus();
+        }
         if (typeof DUOMENYS !== "undefined") DUOMENYS.atnaujintiTiksluma();
         return;
       }
@@ -1749,22 +1912,17 @@ const SUGADINIMAI = {
       const m = e.target.closest("[data-taisymas]");
       if (m) {
         e.preventDefault();
-        this.pasirinkti.set(m.dataset.detale, m.dataset.taisymas);
+        const d = m.dataset.detale, t = m.dataset.taisymas;
+        const fokuse = document.activeElement === m;
+        this.pasirinkti.set(d, t);
         this.piesti();
+        if (fokuse) {
+          const f = deze.querySelector('[data-detale="' + d + '"][data-taisymas="' + t + '"]');
+          if (f) f.focus();
+        }
         if (typeof DUOMENYS !== "undefined") DUOMENYS.atnaujintiTiksluma();
       }
     });
-
-    const foto = document.getElementById("fotoReikalavimas");
-    if (foto) {
-      foto.addEventListener("click", e => {
-        if (!e.target.closest("#praleistiFoto")) return;
-        e.preventDefault();
-        this.praleistiFoto = true;
-        this.piestiFoto();
-        if (typeof DUOMENYS !== "undefined") DUOMENYS.atnaujintiTiksluma();
-      });
-    }
 
     document.addEventListener("nuotraukos-pakito", () => this.piestiFoto());
   },
@@ -1828,7 +1986,10 @@ const VERTES_KREIVE = {
     const nuoMetu = Math.max(0, amzius - 7);
     const ikiMetu = amzius + 5;
 
-    const plotis = 720, aukstis = 300;
+    /* Brėžinys tokio pločio, kokia jo vieta: telefone užrašai lieka skaitomi,
+       o ne sumažėja iki penkių taškų. */
+    const plotis = Math.round(Math.max(320, Math.min(720, (deze.clientWidth || 720) - 50)));
+    const aukstis = plotis < 480 ? 240 : 300;
     const KAIRE = 16, DESINE = 16, VIRSUS = 26, APACIA = 52;
     const x = (m) => KAIRE + ((m - nuoMetu) / (ikiMetu - nuoMetu)) * (plotis - KAIRE - DESINE);
     const y = (v) => VIRSUS + (1 - Math.min(1, v / maksY)) * (aukstis - VIRSUS - APACIA);
@@ -1861,7 +2022,7 @@ const VERTES_KREIVE = {
     const lygiuoti = kaire ? "end" : "start";
 
     const zymos = [];
-    for (let m = Math.ceil(nuoMetu); m <= ikiMetu; m += 2) {
+    for (let m = Math.ceil(nuoMetu); m <= ikiMetu; m += (plotis < 480 ? 4 : 2)) {
       zymos.push('<text x="' + x(m).toFixed(1) + '" y="' + (aukstis - 22) +
                  '" class="kreives-zyme" text-anchor="middle">' + m + " m.</text>");
     }
@@ -1891,12 +2052,12 @@ const VERTES_KREIVE = {
       (perBrangu ? " brangu" : " pigu") + '"/>' +
       '<text x="' + ux.toFixed(1) + '" y="' + (ky - 12).toFixed(1) + '" text-anchor="' + lygiuoti +
       '" class="kreives-uzrasas' + (perBrangu ? " brangu" : " pigu") + '">Prašoma ' +
-      d.kaina + " &#8364;</text>" +
+      eurai(d.kaina) + "</text>" +
 
       /* Reali vertė ant kreivės */
       '<circle cx="' + vx.toFixed(1) + '" cy="' + vy.toFixed(1) + '" r="6.5" class="kreives-verte"/>' +
       '<text x="' + ux.toFixed(1) + '" y="' + (vy + 22).toFixed(1) + '" text-anchor="' + lygiuoti +
-      '" class="kreives-uzrasas">Vertė ' + verte + " &#8364;</text>" +
+      '" class="kreives-uzrasas">Vertė ~' + eurai(verte) + "</text>" +
 
       zymos.join("") +
       "</svg>" +
@@ -1906,9 +2067,6 @@ const VERTES_KREIVE = {
       '<span><i class="zyme-taskas verte"></i>Šis daiktas — su rida ir būkle</span>' +
       '<span><i class="zyme-taskas ' + (perBrangu ? "brangu" : "pigu") +
       '"></i>Prašoma kaina</span></div>' +
-      '<span class="smulkus">Linija — kiek paprastai vertas tokios klasės daiktas tiek metų. ' +
-      "Šis konkretus stovi žemiau arba aukščiau dėl ridos ir būklės. " +
-      "Prašoma kaina virš jo reiškia, kad prašoma daugiau, nei daiktas vertas.</span>" +
       "</div>";
   }
 };
@@ -1961,6 +2119,8 @@ const ISTORIJA = {
       isSkelbimo: !!r.isSkelbimo,
       bukle: r.bukle ? r.bukle.pav : null,
       bukleIsNuotrauku: !!r.bukleIsNuotrauku,
+      /* Pažymai: ar iš tiesų buvo nuotraukų — kad ji nemeluotų. */
+      nuotrauku: r.nuotraukos ? (r.nuotraukos.kiek || 0) : 0,
       metai: r.pozymiai && r.pozymiai.metai ? r.pozymiai.metai : (r.metai || null),
       rida: r.pozymiai && r.pozymiai.rida ? r.pozymiai.rida : (r.rida || null),
       sugadinimai: (r.sugadinimai || []).map(e => ({ detale: e.detale, taisymas: e.taisymas })),
@@ -1997,6 +2157,19 @@ const ISTORIJA = {
 
 const PALYGINIMAS = {
 
+  /* Viena eilutė, sutampanti su verdiktu: tas pats skelbimas visur vadinamas
+     taip pat — „Brangiau už vertę 2 231 €", ne vienur „per didelė", kitur
+     „−2 703 €". Skirtumas nuo vidurio lieka tik rikiavimui. */
+  eilute(x) {
+    if (x.verdiktas === "per-brangu") {
+      return { pav: "Brangiau už vertę", reiksme: eurai(x.kaina - x.verteIki), spalva: "--pavojus" };
+    }
+    if (x.verdiktas === "gera-kaina") {
+      return { pav: "Pigiau už vertę", reiksme: eurai(x.verteNuo - x.kaina), spalva: "--gerai" };
+    }
+    return { pav: "Kaina", reiksme: "atitinka rinką", spalva: null };
+  },
+
   piesti(dezesId, pasirinkti) {
     const deze = document.getElementById(dezesId);
     if (!deze) return;
@@ -2004,10 +2177,14 @@ const PALYGINIMAS = {
     const visi = ISTORIJA.visi();
     const sarasas = pasirinkti ? visi.filter(x => pasirinkti.includes(x.id)) : visi;
 
+    /* Antraštė ir „Išvalyti sąrašą" — tik kai iš tiesų yra ką lyginti. */
+    const galva = document.getElementById("palyginimoGalva");
+    if (galva) galva.hidden = sarasas.length < 2;
+
     if (sarasas.length < 2) {
       deze.innerHTML = sarasas.length === 1
         ? '<div class="patarimas"><b>Renkiesi iš kelių?</b><span>Patikrink dar vieną — ' +
-          "abu atsiras lentelėje ir pamatysi, kuris iš tikrųjų geresnis.</span></div>"
+          "abu atsiras palyginime ir pamatysi, kuris iš tikrųjų geresnis.</span></div>"
         : "";
       return;
     }
@@ -2017,39 +2194,35 @@ const PALYGINIMAS = {
 
     const korteles = su.map(k => {
       const x = k.x;
-      const spalva = k.skirtumas >= 0 ? "--gerai" : "--pavojus";
-      const zenklas = k.skirtumas >= 0 ? "+" : "";
-      const verte = x.verteNuo === x.verteIki
-        ? x.verteNuo + " &euro;" : x.verteNuo + "&ndash;" + x.verteIki + " &euro;";
+      const e = this.eilute(x);
+      const vardas = tekstoSauga(x.pavadinimas);
       return '<div class="palyginimo-kortele' + (k === geriausias ? " geriausia" : "") + '">' +
-        (k === geriausias ? '<span class="palyginimo-zyme">Geriausias pirkinys</span>' : "") +
-        '<button type="button" class="palyginimo-x" data-imesti="' +
-        x.id.replace(/"/g, "&quot;") + '" title="Išmesti">&times;</button>' +
-        "<h3>" + x.pavadinimas + "</h3>" +
+        (k === geriausias ? '<span class="palyginimo-zyme">' +
+          (k.skirtumas >= 0 ? "Geriausias pirkinys" : "Mažiausiai pervertintas") + "</span>" : "") +
+        '<button type="button" class="palyginimo-x" data-imesti="' + tekstoSauga(x.id) +
+        '" aria-label="Išmesti „' + vardas + '“"><span aria-hidden="true">&times;</span></button>' +
+        "<h3>" + vardas + "</h3>" +
         '<div class="palyginimo-eile"><span class="smulkus">Prašoma</span>' +
-        '<b class="skaicius">' + x.kaina + " &euro;</b></div>" +
+        '<b class="skaicius">' + eurai(x.kaina) + "</b></div>" +
         '<div class="palyginimo-eile"><span class="smulkus">Reali vertė</span>' +
-        '<b class="skaicius">' + verte + "</b></div>" +
+        '<b class="skaicius">' + euraiRezis(x.verteNuo, x.verteIki) + "</b></div>" +
         '<hr class="linija-h">' +
-        '<div class="palyginimo-eile"><span class="smulkus">Skirtumas</span>' +
-        '<b class="skaicius" style="color:var(' + spalva + ');font-size:24px;">' +
-        zenklas + k.skirtumas + " &euro;</b></div>" +
-        '<span class="smulkus">' + (x.pasitikejimas === "zemas"
-          ? "Įvertis pagal klasę" : "Pagrįsta duomenimis") + "</span></div>";
+        '<div class="palyginimo-eile"><span class="smulkus">' + e.pav + "</span>" +
+        '<b class="skaicius" style="' + (e.spalva ? "color:var(" + e.spalva + ");" : "") + 'font-size:20px;">' +
+        e.reiksme + "</b></div></div>";
     }).join("");
 
-    deze.innerHTML =
-      '<div class="palyginimo-tinklas">' + korteles + "</div>" +
-      '<div class="patarimas" style="margin-top:18px;">' +
-      "<b>Lyginamas ne pigumas, o skirtumas</b>" +
-      "<span>Geresnis tas skelbimas, kuriame prašoma kaina labiau atsilieka nuo realios " +
-      "vertės. Pigesnis daiktas gali būti blogesnis pirkinys.</span></div>";
+    deze.innerHTML = '<div class="palyginimo-tinklas">' + korteles + "</div>";
 
-    deze.querySelectorAll("[data-imesti]").forEach(m => {
+    deze.querySelectorAll("[data-imesti]").forEach((m, i) => {
       m.addEventListener("click", e => {
         e.preventDefault();
         ISTORIJA.imesti(m.dataset.imesti);
         this.piesti(dezesId, pasirinkti);
+        /* Fokusas nedingsta: pereina į kitos kortelės mygtuką. */
+        const liko = deze.querySelectorAll("[data-imesti]");
+        const kitas = liko[Math.min(i, liko.length - 1)];
+        if (kitas) kitas.focus();
       });
     });
   }
@@ -2115,7 +2288,8 @@ const SKELBIMO_PATIKRA = {
     if (ta) {
       const k = rasti("ta");
       const o = k && (k.variantai || []).find(x => x.raktas === ta);
-      if (o && o.poveikis) sarasas.push({ pav: "Techninė apžiūra: " + o.pav, poveikis: o.poveikis });
+      if (o && o.poveikis) sarasas.push({ pav: "Techninė apžiūra: " + o.pav.charAt(0).toLocaleLowerCase("lt") +
+                                          o.pav.slice(1), poveikis: o.poveikis });
     }
 
     if (d.metai && typeof PATAISOS !== "undefined") {
@@ -2127,7 +2301,8 @@ const SKELBIMO_PATIKRA = {
     const def = SKELBIMAS.defektuBusena(d.defektai);
     if (def && typeof PATAISOS !== "undefined") {
       const o = (PATAISOS.defektai || []).find(x => x.raktas === def);
-      if (o && o.poveikis) sarasas.push({ pav: "Skelbime nurodyta: " + o.pav, poveikis: o.poveikis });
+      if (o && o.poveikis) sarasas.push({ pav: "Skelbime nurodyta: " + o.pav.charAt(0).toLocaleLowerCase("lt") +
+                                          o.pav.slice(1), poveikis: o.poveikis });
     }
 
     return { sarasas, suma: sarasas.reduce((s, x) => s + x.poveikis, 0) };
@@ -2190,70 +2365,78 @@ const SKELBIMO_PATIKRA = {
   },
 
   /* --- Piešimas ------------------------------------------------------------ */
-  piestiDuomenis(d) {
+  /* beKainos — kai prašoma kaina jau parodyta didžiuoju skaičiumi virš lentelės. */
+  piestiDuomenis(d, beKainos) {
     const eil = [
       ["Prekė", d.pavadinimas],
-      ["Kaina", d.kaina ? d.kaina + " €" : null],
+      ["Kaina", !beKainos && d.kaina ? eurai(d.kaina) : null],
       ["Metai", d.metai],
       ["Rida", d.rida ? d.rida.toLocaleString("lt-LT") + " km" : null],
       ["Variklis", d.variklis],
       ["Kuras", d.kuras],
       ["Pavarų dėžė", d.deze],
       ["Kėbulas", d.kebulas],
-      ["Techninė iki", d.ta],
+      ["Techninė apžiūra iki", d.ta],
       ["Defektai", d.defektai],
     ].filter(x => x[1]);
 
     return '<div class="skelbimo-laukai">' + eil.map(x =>
       '<div class="skelbimo-laukas"><span class="etikete">' + x[0] + "</span>" +
-      "<b>" + x[1] + "</b></div>").join("") + "</div>";
+      "<b>" + tekstoSauga(x[1]) + "</b></div>").join("") + "</div>";
   },
 
-  piesti(a, tekstas) {
+  /* Ar šis puslapis — palyginimas. Ten pilnas verdiktas nerodomas: atsakymas
+     yra pats palyginimas po forma. */
+  palyginimoPuslapis() {
+    return document.body.dataset.puslapis === "palyginimas";
+  },
+
+  piesti(a, tekstas, tyliai) {   /* tyliai — perskaičiavimas pakeitus kainą: puslapis nenušoka */
     const deze = document.getElementById("skelbimoRezultatas");
     if (!deze) return;
+    const ramiai = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (a.klaida) {
-      /* Ne aklavietė ir ne tyla. Parodome, KĄ perskaitėme ir ko trūksta, plius
-         pirmas gauto teksto eilutes — iš jų iškart matyti, ar nukopijuota tai,
-         ko reikia, ar portalo meniu. Trūkstamą įrašai ranka ir eini toliau. */
+      /* Ne aklavietė ir ne tyla: tik tai, ko trūksta. Kaina įrašoma į tą
+         patį laukelį viršuje — ją pakeitus atsakymas perskaičiuojamas pats. */
       const d = a.dalinis || {};
-      const eil = (tekstas || "").split("\n").slice(0, 12).join("\n");
+      const gKaina = document.getElementById("gKaina");
+
+      if (d.pavadinimas) {
+        deze.innerHTML =
+          '<div class="kortele stulpelis tarpas-8" style="border-left:3px solid var(--pavojus);">' +
+          "<b>Neradome kainos skelbime.</b>" +
+          '<span class="tekstas">Įrašyk ją laukelyje „Prašoma kaina“.</span></div>';
+        if (gKaina) gKaina.focus();
+        return;
+      }
+
       deze.innerHTML =
         '<div class="kortele stulpelis tarpas-14" style="border-left:3px solid var(--pavojus);">' +
-        "<b>" + a.klaida + "</b>" +
-        '<span class="tekstas">Portalai skelbimą surašo skirtingai. Įrašyk trūkstamą ranka — ' +
-        "visa kita jau perskaityta.</span>" +
-        (Object.keys(d).filter(k => d[k]).length ? this.piestiDuomenis(d) : "") +
-        '<div class="laukas" style="margin-top:6px;">' +
-        '<label class="etikete" for="rPavadinimas">Kas tai per daiktas</label>' +
-        '<input type="text" id="rPavadinimas" placeholder="pvz. BMW 120 2008" value="' +
-        (d.pavadinimas || "").replace(/"/g, "&quot;") + '"></div>' +
+        "<b>" + (d.kaina ? "Neradome, kas parduodama." : "Neradome, kas parduodama, ir kainos.") + "</b>" +
         '<div class="laukas">' +
-        '<label class="etikete" for="rKaina">Prašoma kaina</label>' +
-        '<input type="number" id="rKaina" placeholder="3450" value="' +
-        (d.kaina || "") + '"></div>' +
+        '<label class="etikete" for="rPavadinimas">Kas tai per daiktas</label>' +
+        '<input type="text" id="rPavadinimas" placeholder="pvz. BMW 120 2008"></div>' +
+        (d.kaina ? "" : '<span class="smulkus">Kainą įrašyk laukelyje „Prašoma kaina“.</span>') +
         '<button type="button" class="mygtukas m-pagrindinis" id="rMygtukas" ' +
-        'style="align-self:flex-start;">Vertinti</button>' +
-        '<details style="margin-top:6px;"><summary class="smulkus" style="cursor:pointer;">' +
-        "Ką perskaitėme iš teksto</summary>" +
-        '<pre style="white-space:pre-wrap;font-family:var(--mono);font-size:13px;' +
-        'background:var(--pavirsius-3);padding:12px;margin-top:8px;max-height:220px;' +
-        'overflow:auto;">' + eil.replace(/[<>&]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c])) +
-        "</pre></details></div>";
+        'style="align-self:flex-start;">Vertinti</button></div>';
 
       const m = document.getElementById("rMygtukas");
       if (m) {
         m.addEventListener("click", e => {
           e.preventDefault();
-          const pav = (document.getElementById("rPavadinimas").value || "").trim();
-          const kn = parseFloat(document.getElementById("rKaina").value);
-          if (!pav || isNaN(kn) || kn <= 0) return;
-          const g = document.getElementById("gKaina");
-          if (g) { g.value = kn; g.dataset.ranka = "1"; }
-          const papildytas = Object.assign({}, this.duomenys, { pavadinimas: pav, kaina: kn });
+          const vardas = document.getElementById("rPavadinimas");
+          const pav = (vardas.value || "").trim();
+          const kn = gKaina ? parseFloat(gKaina.value) : NaN;
+          const kaina = (!isNaN(kn) && kn > 0) ? kn : d.kaina;
+          if (!pav) { vardas.focus(); return; }
+          if (!kaina) { if (gKaina) gKaina.focus(); return; }
+          if (gKaina) { gKaina.value = kaina; gKaina.dataset.ranka = "1"; }
+          const papildytas = Object.assign({}, this.duomenys, { pavadinimas: pav, kaina: kaina });
           this.duomenys = papildytas;
           this.piesti(this.vertintiSuDuomenimis(papildytas, tekstas), tekstas);
+          deze.tabIndex = -1;
+          deze.focus({ preventScroll: true });
         });
       }
       return;
@@ -2261,69 +2444,100 @@ const SKELBIMO_PATIKRA = {
 
     const r = a.rezultatas;
     if (r.busena === "nerasta") {
+      /* Žinome, kas tai, bet ne metus — paprašome būtent jų. */
+      if (r.truksta === "pagaminimo metų") {
+        deze.innerHTML =
+          '<div class="kortele stulpelis tarpas-14" style="border-left:3px solid var(--silpnas);">' +
+          "<b>Neradome pagaminimo metų.</b>" +
+          '<div class="laukas" style="max-width:260px;">' +
+          '<label class="etikete" for="rMetai">Pagaminimo metai</label>' +
+          '<input type="number" id="rMetai" inputmode="numeric" min="1950" max="' + new Date().getFullYear() +
+          '" step="1" placeholder="pvz. 2015"></div>' +
+          '<button type="button" class="mygtukas m-pagrindinis" id="rMygtukas" ' +
+          'style="align-self:flex-start;">Vertinti</button>' +
+          this.piestiDuomenis(this.duomenys) + "</div>";
+        const m = document.getElementById("rMygtukas");
+        if (m) m.addEventListener("click", e => {
+          e.preventDefault();
+          const l = document.getElementById("rMetai");
+          const v = parseInt(l.value, 10);
+          if (!(v >= 1950 && v <= new Date().getFullYear())) { l.focus(); return; }
+          const papildytas = Object.assign({}, this.duomenys, { metai: v });
+          this.piesti(this.vertintiSuDuomenimis(papildytas, tekstas), tekstas);
+          deze.tabIndex = -1;
+          deze.focus({ preventScroll: true });
+        });
+        return;
+      }
       deze.innerHTML =
         '<div class="kortele stulpelis tarpas-12" style="border-left:3px solid var(--silpnas);">' +
-        "<b>Šio daikto kataloge dar nėra: „" + r.pavadinimas + "“</b>" +
-        '<span class="tekstas">Be lyginamų kainų tikros vertės pasakyti negalime. ' +
-        "Skelbimo duomenys perskaityti — jie žemiau.</span>" +
+        "<b>Šio daikto kataloge dar nėra: „" + tekstoSauga(r.pavadinimas) + "“</b>" +
+        '<span class="tekstas">Be lyginamų kainų tikros vertės pasakyti negalime.</span>' +
         this.piestiDuomenis(this.duomenys) + "</div>";
       return;
     }
 
-    const rezis = r.verteNuo !== r.verteIki;
-    const verte = rezis ? r.verteNuo + "&ndash;" + r.verteIki + " &euro;" : r.verteNuo + " &euro;";
-    const skirt = r.verdiktas === "per-brangu"
-      ? "Prašoma <b>" + r.skirtumas + " &euro;</b> daugiau, nei daiktas vertas."
-      : (r.verdiktas === "gera-kaina"
-          ? "Prašoma <b>" + r.skirtumas + " &euro;</b> mažiau už vertę."
-          : "Kaina atitinka rinką.");
+    const d = this.duomenys;
+
+    /* Į istoriją — iš ten dirba ir palyginimas, ir „Mano patikros". */
+    r.isSkelbimo = true;
+    r.pozymiai = { metai: d.metai || null, rida: d.rida || null };
+
+    try {
+      sessionStorage.setItem("tv_skelbimas", JSON.stringify(Object.assign({ tekstas: tekstas }, this.duomenys)));
+    } catch (e) {}
+
+    if (this.palyginimoPuslapis()) {
+      deze.innerHTML = '<p class="tekstas"><b>Pridėta:</b> ' + tekstoSauga(r.pavadinimas) +
+                       " — " + eurai(r.kaina) + "</p>";
+      ISTORIJA.prideti(r);
+      PALYGINIMAS.piesti("palyginimas");
+      const pal = document.getElementById("palyginimas");
+      if (pal && pal.parentNode && !tyliai) {
+        try { pal.parentNode.scrollIntoView({ behavior: ramiai ? "auto" : "smooth", block: "start" }); } catch (e) {}
+      }
+      return;
+    }
 
     deze.innerHTML =
       '<div class="verdiktas ' + r.verdiktas + '" style="padding:44px 36px 32px;">' +
       '  <span class="etikete">' + PATIKRA.zyme(r) + "</span>" +
       '  <h2 style="font-size:34px;">' + PATIKRA.antraste(r) + "</h2>" +
-      '  <p style="font-size:16.5px;line-height:1.55;color:var(--rasalas-2);">' + skirt + "</p>" +
+      '  <p style="font-size:16.5px;line-height:1.55;color:var(--rasalas-2);"><b>' +
+      tekstoSauga(r.pavadinimas) + "</b></p>" +
       "</div>" +
 
       '<div class="rodikliai" style="margin-top:26px;">' +
       '  <div class="stulpelis tarpas-8"><span class="etikete">Prašoma kaina</span>' +
-      '    <span class="skaicius">' + r.kaina + " &euro;</span></div>" +
+      '    <span class="skaicius">' + eurai(r.kaina) + "</span></div>" +
       '  <div class="stulpelis tarpas-8"><span class="etikete">Reali vertė</span>' +
-      '    <span class="skaicius" style="color:var(--zenklas);">' + verte + "</span></div>" +
-      '  <div class="stulpelis tarpas-8"><span class="etikete">Vertinta kaip</span>' +
+      '    <span class="skaicius" style="color:var(--zenklas);">' + euraiRezis(r.verteNuo, r.verteIki) + "</span></div>" +
+      '  <div class="stulpelis tarpas-8"><span class="etikete">Būklė</span>' +
       '    <span class="skaicius">' + r.bukle.pav + "</span></div>" +
       "</div>" +
 
       '<div class="patarimas" style="margin-top:26px;">' +
-      "<b>Remtasi tik pardavėjo žodžiais</b>" +
-      "<span>Skelbimo tekstas nėra apžiūra. Daužtas kėbulas, rūdys, dūmijantis variklis " +
-      "ar nudėvėta sankaba tekste nematyti — o jie keičia vertę labiausiai. " +
-      "Prieš pirkdamas apžiūrėk daiktą ir tada paleisk pilną vertinimą.</span></div>" +
+      "<b>Tai tik skelbimo duomenys</b>" +
+      "<span>Prieš pirkdamas apžiūrėk daiktą — gedimų tekste nematyti.</span></div>" +
 
       '<div id="vertesKreive" style="margin-top:26px;"></div>' +
 
       '<div style="margin-top:26px;">' +
-      '<div class="antraste-maza" style="margin-bottom:12px;">Ką perskaitėme skelbime</div>' +
-      this.piestiDuomenis(this.duomenys) + "</div>" +
+      '<h3 class="antraste-maza" style="margin-bottom:12px;">Ką perskaitėme skelbime</h3>' +
+      this.piestiDuomenis(d, true) + "</div>" +
 
-      '<a class="mygtukas mygtukas-lg m-pagrindinis" style="margin-top:26px;" href="' +
-      (r.kategorijosRaktas ? "patikra-" + r.kategorijosRaktas + ".html" : "patikra-kita.html") +
-      '?is=skelbimo">Pilnas vertinimas su nuotraukomis</a>';
+      /* Kita kategorija neturi savo vertinimo — tada renkamasi iš sąrašo. */
+      '<a class="mygtukas m-kontūras" style="margin-top:26px;" href="' +
+      (r.kategorijosRaktas && DETALES[r.kategorijosRaktas]
+        ? "patikra-" + r.kategorijosRaktas + ".html?is=skelbimo" : "paslauga.html") +
+      '">Pilnas vertinimas</a>';
 
-    const d = this.duomenys;
     VERTES_KREIVE.piesti("vertesKreive", {
       pavadinimas: r.pavadinimas, kategorija: r.kategorijosRaktas,
       metai: d.metai, verteNuo: r.verteNuo, verteIki: r.verteIki, kaina: r.kaina,
       pozymiai: { metai: d.metai, rida: d.rida, kuras: d.kuras, kebulas: d.kebulas }
     });
 
-    try {
-      sessionStorage.setItem("tv_skelbimas", JSON.stringify(Object.assign({ tekstas: tekstas }, this.duomenys)));
-    } catch (e) {}
-
-    /* Į istoriją — iš ten dirba ir palyginimas, ir „Mano patikros". */
-    r.isSkelbimo = true;
-    r.pozymiai = { metai: d.metai || null, rida: d.rida || null };
     ISTORIJA.prideti(r);
     PALYGINIMAS.piesti("palyginimas");
   },
@@ -2337,29 +2551,60 @@ const SKELBIMO_PATIKRA = {
     const mygtukas = document.getElementById("gMygtukas");
     const busena = document.getElementById("gBusena");
     const kaina = document.getElementById("gKaina");
+    const ramiai = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+    /* Nuorodą perskaityti gali tik variklis. Be jo laukelis tik klaidintų. */
+    const nuorodosEile = document.getElementById("gNuorodosEile");
+    if (nuorodosEile) nuorodosEile.hidden = !PATIKRA.agentasGalimas();
+
     if (kaina) {
       /* Įrašyta prieš įklijuojant — skirta ateinančiam skelbimui; įrašyta
-         matant atsakymą — pataiso rodomą skelbimą. */
+         matant atsakymą — pataiso rodomą skelbimą ir atsakymas perskaičiuojamas. */
       const ranka = () => {
         kaina.dataset.ranka = "1";
         if (!deze.innerHTML.trim()) kaina.dataset.pries = "1";
       };
       if (kaina.value) ranka();
-      kaina.addEventListener("input", ranka);
+      let laikas = null;
+      kaina.addEventListener("input", () => {
+        ranka();
+        clearTimeout(laikas);
+        laikas = setTimeout(() => {
+          const v = parseFloat(kaina.value);
+          const d = this.duomenys;
+          if (!d || !d.pavadinimas || !(v > 0) || !deze.innerHTML.trim()) return;
+          if (d.kaina && Math.round(d.kaina) === Math.round(v)) return;
+          /* Senas įrašas su ankstesne kaina nebelieka istorijoje. */
+          if (d.kaina) ISTORIJA.imesti(d.pavadinimas + "|" + Math.round(d.kaina));
+          const t = tekstas ? tekstas.value : "";
+          this.piesti(this.vertintiSuDuomenimis(Object.assign({}, d, { kaina: v }), t), t, true);
+        }, 400);
+      });
     }
 
     const vertinti = (t, meta) => {
       if (!t || !t.trim()) {
-        busena.innerHTML = '<span style="color:var(--pavojus);">Įklijuok skelbimo tekstą arba įdėk nuorodą.</span>';
+        busena.innerHTML = '<span style="color:var(--pavojus);">Įklijuok skelbimo tekstą.</span>';
+        if (tekstas) tekstas.focus();
         return;
       }
       busena.textContent = "";
       this.piesti(this.vertinti(t, meta), t);
-      deze.scrollIntoView({ behavior: "smooth", block: "start" });
+      /* Atsakymas atsiranda žemiau — ekrano skaitytuvas turi jį išgirsti, o ne
+         likti teksto laukelyje. Jei žmogaus laukia laukelis (trūksta kainos),
+         fokusas lieka jame. */
+      const f = document.activeElement;
+      if (!f || f === document.body || f === tekstas || f === mygtukas || f === nuoroda) {
+        deze.tabIndex = -1;
+        deze.focus({ preventScroll: true });
+      }
+      if (!this.palyginimoPuslapis()) {
+        deze.scrollIntoView({ behavior: ramiai() ? "auto" : "smooth", block: "start" });
+      }
     };
 
     const isNuorodos = async () => {
-      const u = nuoroda.value.trim();
+      const u = nuoroda && !nuoroda.closest("[hidden]") ? nuoroda.value.trim() : "";
       /* Be serverio nuorodos neperskaitysi: jei šiai nuorodai tekstas jau įklijuotas, vertinam jį. */
       if (!u || (!PATIKRA.agentasGalimas() && tekstas.value.trim() && nuoroda.dataset.tekstui === u)) {
         return vertinti(tekstas.value);
@@ -2371,8 +2616,6 @@ const SKELBIMO_PATIKRA = {
       if (!a || a.klaida) {
         busena.innerHTML = '<span style="color:var(' + (a && a.patarimas ? "--zenklas" : "--pavojus") + ');">' +
           ((a && a.klaida) || "Nepavyko. Įklijuok tekstą.") + "</span>";
-        const kitaip = document.querySelector(".pildymas-kitaip");
-        if (kitaip) kitaip.open = true;
         tekstas.focus();
         if (a && a.patarimas) tekstas.select();   /* naujas skelbimas pakeis seną */
         return;
@@ -2382,7 +2625,7 @@ const SKELBIMO_PATIKRA = {
     };
 
     mygtukas.addEventListener("click", e => { e.preventDefault(); isNuorodos(); });
-    nuoroda.addEventListener("keydown", e => {
+    if (nuoroda) nuoroda.addEventListener("keydown", e => {
       if (e.key === "Enter") { e.preventDefault(); isNuorodos(); }
     });
     tekstas.addEventListener("paste", e => {
@@ -2390,7 +2633,7 @@ const SKELBIMO_PATIKRA = {
       if (!t) return;
       /* Naujas skelbimas: ankstesniam skirta ranka įrašyta kaina nebegalioja. */
       if (kaina && !kaina.dataset.pries) delete kaina.dataset.ranka;
-      nuoroda.dataset.tekstui = nuoroda.value.trim();
+      if (nuoroda) nuoroda.dataset.tekstui = nuoroda.value.trim();
       setTimeout(() => vertinti(t), 0);
     });
   }
@@ -2407,6 +2650,8 @@ const SKELBIMO_PATIKRA = {
   const valyti = document.getElementById("valytiIstorija");
   if (valyti) valyti.addEventListener("click", e => {
     e.preventDefault();
+    /* Ištrina ir pažymas — tad tik paklausus. */
+    if (!confirm("Ištrinti visas išsaugotas patikras?")) return;
     ISTORIJA.isvalyti();
     PALYGINIMAS.piesti("palyginimas");
   });
@@ -2491,9 +2736,7 @@ function ikona(raktas) {
     ik: (typeof ikona === "function" ? ikona(r).replace('width="44" height="44"', 'width="22" height="22"') : R()),
     zodziai: [DETALES[r].pav, r.replace("_", " "), (DETALES[r].zodziai || []).join(" ")].join(" "),
     grupe: "Įvertinti pagal daiktą"
-  })).concat([{ url: "patikra-kita.html", pav: "Kita", apie: "Baldai, įrankiai, instrumentai, žaislai.",
-                ik: (typeof ikona === "function" ? ikona("kita").replace('width="44" height="44"', 'width="22" height="22"') : R()),
-                zodziai: "kita baldai įrankiai žaislai", grupe: "Įvertinti pagal daiktą" }]);
+  }));
   const visi = irankiai.concat(daiktai);
 
   const be = (t) => String(t || "").toLowerCase()
@@ -2519,7 +2762,8 @@ function ikona(raktas) {
       sarasas = su.map(o => o.x);
       geriausias = sarasas[0] || null;
     }
-    if (kiekis) kiekis.textContent = q ? (sarasas.length + " rasta") : skaicius(irankiai.length + daiktai.length, ["pasiūlymas", "pasiūlymai", "pasiūlymų"]);
+    /* Skaičius rodomas tik ieškant — be paieškos jis nieko nepasako. */
+    if (kiekis) kiekis.textContent = q ? "Rasta: " + sarasas.length : "";
     if (!sarasas.length) {
       deze.innerHTML = '<p class="pasiulymai-tuscia">Tokio įrankio dar nėra. Parašyk mums per ' +
         '<a href="kontaktai.html">kontaktus</a> — gal būtent jį ir padarysime.</p>';
@@ -2548,37 +2792,23 @@ function ikona(raktas) {
   if (!deze) return;
   if (typeof DETALES === "undefined") return;
 
+  /* Tik kategorijos, kurias iš tiesų mokame įvertinti. „Kita" neturi nei
+     katalogo, nei kreivės — ji baigdavosi „vertės pasakyti negalime". */
   const sarasas = Object.keys(DETALES).map(r => ({
     raktas: r, cfg: DETALES[r], url: "patikra-" + r + ".html"
   }));
-  sarasas.push({
-    raktas: "kita",
-    cfg: { pav: "Kita", antraste: "Bet kuris kitas daiktas",
-           ivadas: "Baldai, įrankiai, instrumentai, žaislai." },
-    url: "patikra-kita.html"
-  });
 
   deze.innerHTML = sarasas.map(x => {
     const cfg = x.cfg;
-    const detaliu = cfg.detales ? Object.keys(cfg.detales).length : 0;
-    const foto = cfg.min_nuotrauku || 0;
-
-    /* Apatinė eilutė sako, kuo ta skiltis kitokia. Ne reklama — faktai. */
-    const zymes = [];
-    if (detaliu) zymes.push(skaicius(detaliu, ["tikrinama detalė", "tikrinamos detalės", "tikrinamų detalių"]));
-    if (foto) zymes.push(skaicius(foto, ["nuotrauka", "nuotraukos", "nuotraukų"]));
-    if ((cfg.kriterijai || []).length) zymes.push(skaicius((cfg.kriterijai || []).length, ["kriterijus", "kriterijai", "kriterijų"]));
-
     return '' +
       '<a class="paslaugos-kortele" href="' + x.url + '">' +
       '  <span class="paslaugos-ikona">' + ikona(x.raktas) + "</span>" +
       '  <span class="paslaugos-turinys">' +
-      "    <h3>" + cfg.pav + "</h3>" +
+      "    <h2>" + cfg.pav + "</h2>" +
       '    <span class="tekstas">' + (cfg.ivadas || "") + "</span>" +
       "  </span>" +
       '  <span class="paslaugos-apacia">' +
-      '    <span class="smulkus">' + zymes.join(" &middot; ") + "</span>" +
-      '    <span class="paslaugos-rodykle">&rarr;</span>' +
+      '    <span class="paslaugos-rodykle" aria-hidden="true">&rarr;</span>' +
       "  </span>" +
       "</a>";
   }).join("");
@@ -2647,9 +2877,14 @@ const SKELBIMAS = {
 
   rida(t) {
     const prie = t.match(/rida[^0-9]{0,20}(\d[\d  .,]*)/i);
-    if (prie) return this.skaicius(prie[1]);
+    if (prie) return this.skaicius(prie[1]) * this.tukst(t.slice(prie.index + prie[0].length));
     const km = t.match(/(\d[\d  .,]*)\s*km\b/i);
     return km ? this.skaicius(km[1]) : null;
+  },
+
+  /* „rida 260 tūkst. km" — tai 260 000, ne 260. po — tekstas iškart po skaičiaus. */
+  tukst(po) {
+    return /^\s*t[ūu]kst/i.test(po || "") ? 1000 : 1;
   },
 
   /* Pavadinimas. Pirma eilutė netinka: nukopijavus portalo puslapį viršuje
@@ -2709,12 +2944,7 @@ const SKELBIMAS = {
     nustatyti("preke", d.pavadinimas, "prekė");
     nustatyti("kaina", d.kaina, "kaina");
     nustatyti("kr_rida", d.rida, "rida");
-
-    const metai = d.metai;
-    if (metai) {
-      const dabar = new Date().getFullYear();
-      nustatyti("amzius", Math.max(0, dabar - metai), "amžius");
-    }
+    nustatyti("metai", d.metai, "metai");
     return rasta;
   },
 
@@ -2750,7 +2980,7 @@ const SKELBIMAS = {
       const v = m[1].trim();
       if (tipas === "skaicius") {
         const sk = v.match(/\d[\d  .,]*/);
-        if (sk) return this.skaicius(sk[0]);
+        if (sk) return this.skaicius(sk[0]) * this.tukst(v.slice(sk.index + sk[0].length));
       } else if (tipas === "metai") {
         const sk = v.match(/(19[5-9]\d|20[0-4]\d)/);
         if (sk) return parseInt(sk[1], 10);
@@ -2985,23 +3215,42 @@ const FORMA = {
 
   /* Forma sudėta ŽINGSNIAIS. Buvo viena ilga lygiavertė juosta — žmogus
      nežinojo, kur jis yra ir kiek dar liko. Dabar kiekvienas žingsnis turi
-     romėnišką numerį, pavadinimą ir vieną sakinį, kam jis reikalingas.
+     numerį, pavadinimą ir vieną sakinį, kam jis reikalingas.
 
      Numerius skaičiuoja CSS (counter), ne ranka rašytas tekstas: kai
      kategorija neturi kriterijų ar detalių, tas žingsnis paslėptas ir
-     numeracija nesusigadina. */
-  zingsnis(pavadinimas, uzuomina, vidus, attrs) {
-    return '<section class="zingsnis"' + (attrs || "") + ">" +
-      '<header class="zingsnio-antraste"><h3>' + pavadinimas + "</h3>" +
+     numeracija nesusigadina.
+
+     sutraukta — nebūtinas žingsnis: <details>, kurį atsidaro tik tas, kas
+     nori daugiau. Atsakymui užtenka pirmųjų žingsnių. */
+  zingsnis(pavadinimas, uzuomina, vidus, attrs, sutraukta) {
+    const zyme = sutraukta ? "details" : "section";
+    const galva = sutraukta ? "summary" : "header";
+    return "<" + zyme + ' class="zingsnis"' + (attrs || "") + ">" +
+      "<" + galva + ' class="zingsnio-antraste"><h2>' + pavadinimas + "</h2>" +
       (uzuomina ? '<span class="smulkus">' + uzuomina + "</span>" : "") +
-      "</header>" + vidus + "</section>";
+      "</" + galva + ">" + vidus + "</" + zyme + ">";
   },
 
   piesti(forma) {
-    const z = (a, b, c, d) => this.zingsnis(a, b, c, d);
+    const z = (a, b, c, d, e) => this.zingsnis(a, b, c, d, e);
+    const dabar = new Date().getFullYear();
 
-    forma.innerHTML =
-      z("Daiktas ir kaina", "Nuo šitų dviejų priklauso visa kita", `
+    /* Skelbimo tekstas — sutrauktas: dauguma pildo ranka. Nuoroda rodoma tik
+       su varikliu: be jo „Užpildyti" tik atidarytų skelbimą naujame lange. */
+    const isTeksto = `
+          <details class="pildymas-kitaip">
+            <summary>Užpildyti iš skelbimo teksto</summary>
+            <div class="laukas" style="margin-top:12px;">
+              <textarea id="skelbimoTekstas" rows="4" style="height:104px;" aria-label="Skelbimo tekstas"
+                        placeholder="Pažymėk skelbimo tekstą, nukopijuok ir įklijuok čia"></textarea>
+              <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                <button type="button" class="mygtukas mygtukas-sm m-kontūras" id="skelbimoMygtukas">Užpildyti iš teksto</button>
+                <span class="smulkus" id="skelbimoAtsakas" aria-live="polite"></span>
+              </div>
+            </div>
+          </details>`;
+    const isSkelbimo = PATIKRA.agentasGalimas() ? `
         <div class="greitas-pildymas">
           <div class="laukas">
             <label class="etikete" for="nuoroda">Turi skelbimą? Įdėk nuorodą</label>
@@ -3009,33 +3258,30 @@ const FORMA = {
               <input type="url" id="nuoroda" name="nuoroda" placeholder="https://...">
               <button type="button" class="mygtukas mygtukas-sm m-pagrindinis" id="nuorodosMygtukas">Užpildyti</button>
             </div>
-            <span class="smulkus" id="nuorodosAtsakas">Laukai užsipildys patys. Arba įrašyk ranka žemiau.</span>
-          </div>
-          <details class="pildymas-kitaip">
-            <summary>Nepavyko? Įklijuok skelbimo tekstą</summary>
-            <div class="laukas" style="margin-top:12px;">
-              <textarea id="skelbimoTekstas" rows="4" style="height:104px;"
-                        placeholder="Pažymėk skelbimo tekstą, nukopijuok ir įklijuok čia"></textarea>
-              <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-                <button type="button" class="mygtukas mygtukas-sm m-kontūras" id="skelbimoMygtukas">Užpildyti iš teksto</button>
-                <span class="smulkus" id="skelbimoAtsakas"></span>
-              </div>
-            </div>
-          </details>
+            <span class="smulkus" id="nuorodosAtsakas" aria-live="polite"></span>
+          </div>${isTeksto}
+        </div>` : isTeksto;
+
+    forma.innerHTML =
+      z("Daiktas ir kaina", "Nuo šitų trijų priklauso visa kita", isSkelbimo + `
+        <div class="laukas">
+          <label class="etikete" for="preke">Ką tikriname</label>
+          <input type="text" id="preke" name="preke" placeholder="pvz. Opel Astra"
+                 autocomplete="off" list="katalogoSarasas" required>
+          <datalist id="katalogoSarasas"></datalist>
+          <span class="smulkus" id="prekesBusena" style="min-height:17px;"></span>
         </div>
 
-        <div class="tinklelis stulpeliai-2" style="gap:18px;">
+        <div class="tinklelis stulpeliai-2 laukai-poromis">
           <div class="laukas">
-            <label class="etikete" for="preke">Ką tikriname</label>
-            <input type="text" id="preke" name="preke" placeholder="pvz. Opel Astra 2008"
-                   autocomplete="off" list="katalogoSarasas" required>
-            <datalist id="katalogoSarasas"></datalist>
-            <span class="smulkus" id="prekesBusena" style="min-height:17px;"></span>
+            <label class="etikete" for="metai">Pagaminimo metai</label>
+            <input type="number" id="metai" name="metai" inputmode="numeric"
+                   min="1950" max="${dabar}" step="1" placeholder="pvz. 2015">
           </div>
           <div class="laukas">
             <label class="etikete" for="kaina">Prašoma kaina</label>
             <div class="su-valiuta">
-              <input type="number" id="kaina" name="kaina" placeholder="650" min="0" step="1" required>
+              <input type="number" id="kaina" name="kaina" inputmode="numeric" placeholder="650" min="0" step="1" required>
               <span class="valiuta">&euro;</span>
             </div>
           </div>
@@ -3044,10 +3290,13 @@ const FORMA = {
         <div class="stulpelis tarpas-8" id="kategorijosPasirinkimas"></div>`) +
 
       z("Būklė", "Kokią ją matai savo akimis", `
-        <div class="temos" id="bukles"></div>
+        <div class="temos" id="bukles" role="group" aria-label="Būklė"></div>
         <span class="smulkus" id="buklesApibudinimas"></span>`) +
 
-      z("Nuotraukos", "Iš jų tikrinama būklė ir sugadinimai", `
+      '<section class="zingsnis" id="kriterijuSkiltis" style="display:none;"></section>' +
+
+      z("Nuotraukos", "Nebūtina — su jomis atsakymas tikslesnis", `
+        <input type="file" id="nuotraukos" name="nuotraukos" accept="image/*" multiple class="tik-skaitytuvui">
         <label class="nuotrauku-zona" id="nuotraukuZona" for="nuotraukos">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -3055,27 +3304,25 @@ const FORMA = {
             <path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15"/>
           </svg>
           <span class="stulpelis" style="gap:2px;">
-            <span style="font-size:16px;font-weight:500;">Vilk nuotraukas čia arba pasirink iš kompiuterio</span>
+            <span style="font-size:16px;font-weight:500;">Pasirink nuotraukas arba vilk jas čia</span>
             <span class="smulkus">JPG arba PNG, iki 8 nuotraukų</span>
           </span>
         </label>
-        <input type="file" id="nuotraukos" name="nuotraukos" accept="image/*" multiple hidden>
         <div class="miniatiuros" id="nuotraukuSarasas"></div>
         <div class="patarimas" id="fotoReikalavimas" style="display:none;"></div>
-        <span class="smulkus" id="nuotraukuSuvestine"></span>`) +
+        <span class="smulkus" id="nuotraukuSuvestine"></span>`, "", true) +
 
-      z("Kas atiduodama ir kas žinoma", "Kiekvienas pažymėjimas keičia vertę", `
-        <div class="stulpelis tarpas-18" id="papildomiDuomenys"></div>`) +
+      z(DUOMENYS.zingsnioPavadinimas(), "Nebūtina", `
+        <div class="stulpelis tarpas-18" id="papildomiDuomenys"></div>`, "", true) +
 
-      '<section class="zingsnis" id="kriterijuSkiltis" style="display:none;"></section>' +
+      '<details class="zingsnis" id="sugadinimuSkiltis" style="display:none;"></details>' +
 
-      '<section class="zingsnis" id="sugadinimuSkiltis" style="display:none;"></section>' +
-
-      `<div id="formosKlaida" style="display:none;background:var(--pavojus-fonas);
+      `<div id="formosKlaida" role="alert" tabindex="-1" style="display:none;background:var(--pavojus-fonas);
             border-left:3px solid var(--pavojus);padding:14px 16px;font-size:16px;
             line-height:1.5;color:var(--rasalas-2);"></div>
 
-       <button type="submit" class="mygtukas mygtukas-lg m-pagrindinis mygtukas-pilnas">Gauti atsakymą</button>`;
+       <button type="submit" class="mygtukas mygtukas-lg m-pagrindinis mygtukas-pilnas">Gauti atsakymą</button>
+       <p id="gyvasPranesimas" class="tik-skaitytuvui" role="status"></p>`;
   }
 };
 
@@ -3085,7 +3332,15 @@ const FORMA = {
   if (!forma) return;
 
   FORMA.piesti(forma);
+  /* Klaidas sakome patys, lietuviškai — ne naršyklės burbulu angliškai. */
+  forma.noValidate = true;
   NUOTRAUKOS.prijungti();
+
+  /* Būsenos, kurias naudoja žemiau esančios funkcijos. `var`, ne `let`:
+     perskaiciuotiGyvai() kviečiama dar prieš tas eilutes. */
+  var pranesimoLaikas = null, paskutinisPranesimas = "";
+  const ramiai = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const puslapioKat = document.body.dataset.kategorija || null;
 
   /* Būklės mygtukai */
   let pasirinktaBukle = "naudota";
@@ -3093,7 +3348,8 @@ const FORMA = {
   if (bukliuDeze) {
     bukliuDeze.innerHTML = BUKLES.map(b =>
       '<button type="button" class="tema' + (b.raktas === pasirinktaBukle ? ' pasirinkta' : '') +
-      '" data-bukle="' + b.raktas + '" title="' + b.apibudinimas + '">' + b.pav + '</button>'
+      '" aria-pressed="' + (b.raktas === pasirinktaBukle) + '" data-bukle="' + b.raktas +
+      '" title="' + b.apibudinimas + '">' + b.pav + '</button>'
     ).join("");
 
     /* Pradinis paaiškinimas. Anksčiau jis buvo įrašytas HTML'e — dabar formą
@@ -3106,8 +3362,10 @@ const FORMA = {
       const m = e.target.closest("[data-bukle]");
       if (!m) return;
       pasirinktaBukle = m.dataset.bukle;
-      bukliuDeze.querySelectorAll(".tema").forEach(x => x.classList.remove("pasirinkta"));
-      m.classList.add("pasirinkta");
+      bukliuDeze.querySelectorAll(".tema").forEach(x => {
+        x.classList.toggle("pasirinkta", x === m);
+        x.setAttribute("aria-pressed", x === m ? "true" : "false");
+      });
       const apr = document.getElementById("buklesApibudinimas");
       const b = BUKLES.find(x => x.raktas === pasirinktaBukle);
       if (apr && b) apr.textContent = b.apibudinimas;
@@ -3131,22 +3389,29 @@ const FORMA = {
   /* Atsakas iškart po įvedimo. Anksčiau apie tai, kad daikto kataloge nėra,
      sužinodavai tik paspaudęs mygtuką — ir atrodydavo, kad niekas neįvyko. */
   const busena = document.getElementById("prekesBusena");
+
+  /* Pagaminimo metai iš laukelio — tik tikri metai, ne pusiau įrašyti. */
+  function metaiIsLauko() {
+    const l = document.getElementById("metai");
+    const v = l ? parseInt(l.value, 10) : NaN;
+    return (v >= 1950 && v <= new Date().getFullYear()) ? v : null;
+  }
+
   function atnaujintiPrekesBusena() {
     if (!busena || !prekesIvestis) return;
     const q = prekesIvestis.value.trim();
     if (!q) { busena.textContent = ""; return; }
-    const rasta = PATIKRA.rasti(q);
+    /* Tik šio puslapio kategorijoje: skalbimo mašina neturi rasti automobilio. */
+    const rasta = PATIKRA.rasti(q, puslapioKat);
     if (!rasta) {
-      const amz = document.getElementById("amzius");
-      const yraMetai = /\b(19[5-9]\d|20\d\d)\b/.test(q) || (amz && amz.value);
+      const yraMetai = /\b(19[5-9]\d|20\d\d)\b/.test(q) || metaiIsLauko() !== null;
       const kat = typeof SUGADINIMAI !== "undefined" && SUGADINIMAI.kategorija ? SUGADINIMAI.kategorija.raktas : null;
       const kreive = typeof KLASES !== "undefined" && kat && KLASES[kat];
       busena.innerHTML = !kreive
         ? '<span style="color:var(--zenklas);">Šios prekės kataloge dar nėra.</span>'
         : yraMetai
         ? '<span style="color:var(--zenklas);">Tikslaus modelio sąraše nėra — vertinsime pagal metus ir panašius daiktus.</span>'
-        : '<span style="color:var(--zenklas);">Pridėk pagaminimo metus (pvz. „' + q.split(" ").slice(0, 2).join(" ") +
-          ' 2008") — tada vertę pasakysime bet kokiam modeliui.</span>';
+        : '<span style="color:var(--zenklas);">Įrašyk pagaminimo metus — tada vertę pasakysime bet kuriam modeliui.</span>';
     } else if (rasta.tikslumas === "tikslus") {
       busena.innerHTML = '<span style="color:var(--gerai);">Kataloge yra: ' +
                          rasta.raktas + '</span>';
@@ -3178,6 +3443,20 @@ const FORMA = {
       atnaujintiPrekesBusena();
       if (typeof DUOMENYS !== "undefined") DUOMENYS.atnaujintiTiksluma();
       perskaiciuotiGyvai();
+    });
+  }
+
+  /* Metai virsta amžiumi — vidinė logika ta pati, kaip su buvusiu
+     „Kiek metų daiktui". Žmogus žino metus, ne amžių. */
+  const metaiIvestis = document.getElementById("metai");
+  if (metaiIvestis) {
+    metaiIvestis.addEventListener("input", () => {
+      const m = metaiIsLauko();
+      if (typeof DUOMENYS !== "undefined") {
+        DUOMENYS.amzius = m === null ? null : new Date().getFullYear() - m;
+        DUOMENYS.atnaujintiTiksluma();
+      }
+      atnaujintiPrekesBusena();
     });
   }
 
@@ -3221,13 +3500,12 @@ const FORMA = {
     const kat = (typeof SUGADINIMAI !== "undefined" && SUGADINIMAI.kategorija)
       ? SUGADINIMAI.kategorija.raktas : null;
     const ridosLaukas = document.getElementById("kr_rida");
-    const amziausLaukas = document.getElementById("amzius");
-    /* Metai: pirmiausia iš „Kiek metų daiktui", kitaip iš pavadinimo
+    /* Metai: pirmiausia iš laukelio „Pagaminimo metai", kitaip iš pavadinimo
        („Peugeot 307 2006"). Be šito kreivė neturi nuo ko skaičiuoti. */
     const metusPav = metaiIsPavadinimo(pavadinimas);
+    const metaiLauke = metaiIsLauko();
     const pozymiai = {
-      metai: amziausLaukas && amziausLaukas.value
-        ? new Date().getFullYear() - parseInt(amziausLaukas.value, 10) : metusPav,
+      metai: metaiLauke !== null ? metaiLauke : metusPav,
       rida: ridosLaukas && ridosLaukas.value ? parseFloat(ridosLaukas.value) : null
     };
 
@@ -3265,19 +3543,19 @@ const FORMA = {
       /* Ne tyla. Jei daikto kataloge nėra, tai matoma iškart, o ne po mygtuko —
          kitaip žmogus pildo visą formą veltui. */
       gyvas.innerHTML =
-        '<div class="gyvas" style="border-left-color:var(--silpnas);background:var(--pavirsius-3);">' +
-        '<span class="etikete">' + (r.truksta === "kategorijos" ? "Kataloge nėra" : "Trūksta vieno dalyko") + "</span>" +
+        '<div class="gyvas gyvas-nerasta">' +
+        '<span class="etikete">' + (r.truksta === "kategorijos" ? "Kataloge nėra" : "Trūksta pagaminimo metų") + "</span>" +
         '<span class="gyvas-vieta">— &euro;</span>' +
         '<span class="smulkus" style="line-height:1.5;">' + (r.truksta === "kategorijos"
           ? "Šios prekės vertės dar nežinome. Jei tai automobilis, elektronika, buitinė technika " +
             'ar dviratis — rinkis <a href="paslauga.html">tą skiltį</a>.'
-          : "Nurodyk pagaminimo metus — pavadinime (pvz. „Opel Astra 2008\") arba laukelyje „Kiek metų daiktui\".") +
+          : "Įrašyk juos laukelyje „Pagaminimo metai“.") +
         "</span></div>";
       return;
     }
 
     const rezis = r.verteNuo !== r.verteIki;
-    const verte = rezis ? r.verteNuo + "&ndash;" + r.verteIki + " &euro;" : r.verteNuo + " &euro;";
+    const verte = euraiRezis(r.verteNuo, r.verteIki);
     const spalva = { "per-brangu": "--pavojus", "gera-kaina": "--gerai",
                      "rinkos-kaina": "--zenklas" }[r.verdiktas];
 
@@ -3290,21 +3568,52 @@ const FORMA = {
       '  <span class="skaicius gyvas-verte" style="color:var(' + spalva + ');">' + verte + "</span>" +
       '  <div class="gyvas-eile gyvas-antrine">' +
       '    <span class="smulkus">Pardavėjas prašo</span>' +
-      '    <span class="smulkus"><b>' + r.kaina + " &euro;</b></span>" +
+      '    <span class="smulkus"><b>' + eurai(r.kaina) + "</b></span>" +
       "  </div>" +
-      '  <span class="smulkus gyvas-paaiskinimas">Skaičius keičiasi, kai pažymi daugiau. ' +
-      "Mygtukas apačioje duos pilną atsakymą.</span>" +
       "</div>";
+
+    /* Ekrano skaitytuvui — tik nusistovėjusi vertė. Pati juosta perpiešiama
+       po kiekvieno paspaudimo, tad aria-live ant jos būtų triukšmas. */
+    const pranesimas = "Preliminari vertė " + (rezis ? verte : eurai(r.verteNuo)) + ", " +
+                       zodis.toLocaleLowerCase("lt") + ".";
+    clearTimeout(pranesimoLaikas);
+    pranesimoLaikas = setTimeout(() => {
+      const p = document.getElementById("gyvasPranesimas");
+      if (p && pranesimas !== paskutinisPranesimas) {
+        p.textContent = pranesimas;
+        paskutinisPranesimas = pranesimas;
+      }
+    }, 900);
   }
 
   const klaida = document.getElementById("formosKlaida");
-  function rodytiKlaida(tekstas, html) {
+  const klaidosVieta = klaida ? klaida.nextElementSibling : null;   /* mygtukas „Gauti atsakymą" */
+
+  /* Klaida rodoma ten, kur reikia taisyti: po laukeliu, kurio trūksta, o
+     laukelis gauna fokusą. Bendra klaida — prie mygtuko. */
+  function rodytiKlaida(tekstas, html, laukas) {
     if (!klaida) { alert(tekstas); return; }
+    forma.querySelectorAll("[aria-invalid]").forEach(x => {
+      x.removeAttribute("aria-invalid");
+      x.removeAttribute("aria-describedby");
+    });
     if (html) klaida.innerHTML = html; else klaida.textContent = tekstas;
+
+    const vieta = laukas && laukas.closest(".laukas");
+    if (vieta) vieta.appendChild(klaida);
+    else if (klaidosVieta) klaidosVieta.parentNode.insertBefore(klaida, klaidosVieta);
     klaida.style.display = "block";
+
+    if (laukas) {
+      laukas.setAttribute("aria-invalid", "true");
+      laukas.setAttribute("aria-describedby", "formosKlaida");
+      laukas.focus({ preventScroll: true });
+    } else {
+      klaida.focus({ preventScroll: true });
+    }
     /* Forma ilga. Jei žinutė lieka už ekrano ribų, žmogui atrodo, kad
        mygtukas tiesiog nieko nepadarė — todėl ją visada parodome. */
-    try { klaida.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
+    try { klaida.scrollIntoView({ behavior: ramiai() ? "auto" : "smooth", block: "center" }); } catch (e) {}
   }
 
   const mygtukas = forma.querySelector('button[type="submit"]');
@@ -3316,25 +3625,14 @@ const FORMA = {
     const pavadinimas = (document.getElementById("preke").value || "").trim();
     const kaina = parseFloat(document.getElementById("kaina").value);
 
-    if (!pavadinimas) return rodytiKlaida("Įrašykite, ką tikriname.");
-    if (isNaN(kaina) || kaina <= 0) return rodytiKlaida("Įrašykite prašomą kainą skaičiumi.");
-
-    /* Nuotraukų reikalavimas. Automobilio iš dviejų kadrų įvertinti neįmanoma,
-       tad geriau pasakyti tai iš karto nei duoti skaičių, kuriuo negalima remtis. */
-    if (typeof SUGADINIMAI !== "undefined") {
-      SUGADINIMAI.nustatyti(pavadinimas);
-      const truksta = SUGADINIMAI.fotoTrukumas();
-      if (truksta > 0) {
-        const cfg = SUGADINIMAI.kategorija.cfg;
-        return rodytiKlaida("",
-          "<b>Trūksta nuotraukų:</b> dar " + truksta + " iš reikalingų " +
-          SUGADINIMAI.reikiaNuotrauku() + ".<br>" +
-          "Ko reikia: " + (cfg.kampai || []).join(", ") + ".<br><br>" +
-          '<span class="smulkus">Jei daugiau nuotraukų neturi, paspausk ' +
-          "„Neturiu daugiau nuotraukų" + "\u201c prie nuotraukų skilties — " +
-          "įvertinsime, bet atsakymas bus mažiau pagrįstas.</span>");
-      }
+    if (!pavadinimas) return rodytiKlaida("Įrašyk, ką tikriname.", null, document.getElementById("preke"));
+    if (isNaN(kaina) || kaina <= 0) {
+      return rodytiKlaida("Įrašyk prašomą kainą.", null, document.getElementById("kaina"));
     }
+
+    /* Nuotraukos nebūtinos: be variklio jos vertės nekeičia, o su juo —
+       tik patikslina būklę. Atsakymas gaunamas visada. */
+    if (typeof SUGADINIMAI !== "undefined") SUGADINIMAI.nustatyti(pavadinimas);
 
     /* Būklė: pirma bandome nustatyti iš nuotraukų per vietinį agentą.
        Neatsakė arba nepaleistas — lieka tai, ką nurodė žmogus. */
@@ -3371,7 +3669,7 @@ const FORMA = {
     if (typeof SUGADINIMAI !== "undefined" && SUGADINIMAI.kategorija) {
       r.kategorija = SUGADINIMAI.kategorija.cfg.pav;
       r.kategorijosRaktas = SUGADINIMAI.kategorija.raktas;
-      r.nuotraukuPakako = SUGADINIMAI.fotoTrukumas() === 0 && !SUGADINIMAI.praleistiFoto;
+      r.nuotraukuPakako = SUGADINIMAI.fotoTrukumas() === 0;
     }
     r.bukleIsNuotrauku = bukleIsNuotrauku;
     r.nurodytaBukle = pasirinktaBukle;
@@ -3391,9 +3689,8 @@ const FORMA = {
           'elektronika, buitinė technika ar dviratis, rinkis <a href="paslauga.html">tą skiltį</a>.');
       }
       return rodytiKlaida("",
-        "<b>Trūksta pagaminimo metų.</b> Be jų vertės pasakyti negalime — " +
-        "įrašyk juos pavadinime (pvz. „" + pavadinimas.split(" ").slice(0, 2).join(" ") +
-        " 2008\") arba laukelyje „Kiek metų daiktui\".");
+        "<b>Trūksta pagaminimo metų.</b> Įrašyk juos laukelyje „Pagaminimo metai“.",
+        document.getElementById("metai"));
     }
 
     PATIKRA.issaugoti(r);
@@ -3405,30 +3702,8 @@ const FORMA = {
 
 
 
-/* Šoninė juosta patikros puslapiuose. Viena vieta visiems — kitaip keturi
-   puslapiai išsiskirtų per savaitę. */
-(function patikrosSonas() {
-  /* Šone lieka tik tai, kas padeda pildant: gyva vertė, tikslumas ir viena
-     trumpa kortelė. Reklama čia netrukdo — ji ne formos vietoje. */
-  const deze = document.getElementById("sonoInfo");
-  if (!deze) return;
-  const v = (t) => '<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" ' +
-    'stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" ' +
-    'aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg><span>' + t + "</span></li>";
-
-  deze.innerHTML =
-    '<div class="kortele sono-kortele stulpelis tarpas-12">' +
-    '  <div class="etikete">Nemokamai gauni</div>' +
-    '  <ul class="varneles">' +
-    v("Verdiktą: per brangu, rinkos kaina ar gera kaina") +
-    v("Rinkos vertę eurais, su intervalu") +
-    v("Sugadintų detalių sutvarkymo kainą") +
-    "  </ul></div>" +
-    '<div class="sono-pastaba">' +
-    '  <b>Parduodi, o ne perki?</b>' +
-    '  <span class="smulkus">Tas pats vertinimas tinka ir pardavėjui — žinosi, kokią kainą rašyti.</span>' +
-    '  <a href="sertifikatas.html">Pažyma pardavėjams &rarr;</a></div>';
-})();
+/* Šoninė juosta patikros puslapiuose: tik gyva vertė ir tikslumas (HTML).
+   Reklaminių kortelių šalia formos nebėra — jos nepadeda pildyti. */
 
 
 
@@ -3454,51 +3729,62 @@ const FORMA = {
     }
 
     const eil = visi.map(x => {
-      const sk = ISTORIJA.skirtumas(x);
-      const spalva = sk >= 0 ? "--gerai" : "--pavojus";
-      const verte = x.verteNuo === x.verteIki
-        ? x.verteNuo + " &euro;" : x.verteNuo + "&ndash;" + x.verteIki + " &euro;";
+      /* Tie patys žodžiai kaip palyginime ir verdikte. */
+      const e = PALYGINIMAS.eilute(x);
       const data = (x.kada || "").slice(0, 10);
+      const vardas = tekstoSauga(x.pavadinimas);
       return '<div class="patikros-eilute">' +
         '<div class="stulpelis" style="gap:4px;min-width:0;">' +
-        "<b>" + x.pavadinimas + "</b>" +
+        "<b>" + vardas + "</b>" +
         '<span class="smulkus">' + data +
-        (x.kategorija ? " &middot; " + x.kategorija : "") +
+        (x.kategorija ? " &middot; " + tekstoSauga(x.kategorija) : "") +
         (x.isSkelbimo ? " &middot; iš skelbimo" : " &middot; su apžiūra") + "</span>" +
-        (x.nuoroda ? '<a href="' + x.nuoroda + '" target="_blank" rel="noopener noreferrer nofollow" ' +
-          'class="smulkus">Skelbimas &rarr;</a>' : "") +
+        (x.nuoroda && /^https?:\/\//i.test(x.nuoroda)
+          ? '<a href="' + tekstoSauga(x.nuoroda) + '" target="_blank" rel="noopener noreferrer nofollow" ' +
+            'class="smulkus">Skelbimas &rarr;</a>' : "") +
         "</div>" +
         '<div class="stulpelis" style="gap:2px;text-align:right;">' +
         '<span class="smulkus">Prašoma</span>' +
-        '<b class="skaicius" style="font-size:18px;">' + x.kaina + " &euro;</b></div>" +
+        '<b class="skaicius" style="font-size:18px;">' + eurai(x.kaina) + "</b></div>" +
         '<div class="stulpelis" style="gap:2px;text-align:right;">' +
         '<span class="smulkus">Vertė</span>' +
-        '<b class="skaicius" style="font-size:18px;">' + verte + "</b></div>" +
+        '<b class="skaicius" style="font-size:18px;">' + euraiRezis(x.verteNuo, x.verteIki) + "</b></div>" +
         '<div class="stulpelis" style="gap:2px;text-align:right;">' +
-        '<span class="smulkus">Skirtumas</span>' +
-        '<b class="skaicius" style="font-size:19px;color:var(' + spalva + ');">' +
-        (sk >= 0 ? "+" : "") + sk + " &euro;</b></div>" +
+        '<span class="smulkus">' + e.pav + "</span>" +
+        '<b class="skaicius" style="font-size:' + (e.spalva ? "19px;color:var(" + e.spalva + ")" : "15px") + ';">' +
+        e.reiksme + "</b></div>" +
         '<button type="button" class="miniatiura-x" style="position:static;" ' +
-        'data-imesti="' + x.id.replace(/"/g, "&quot;") + '" title="Išmesti">&times;</button>' +
+        'data-imesti="' + tekstoSauga(x.id) + '" aria-label="Išmesti „' + vardas + '“">' +
+        '<span aria-hidden="true">&times;</span></button>' +
         "</div>";
     }).join("");
 
     deze.innerHTML =
       '<div class="kortele" style="padding:0;overflow:hidden;">' + eil + "</div>" +
       '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;">' +
-      '<a class="mygtukas m-pagrindinis" href="palyginimas.html">Palyginti tarpusavyje</a>' +
+      (visi.length > 1 ? '<a class="mygtukas m-pagrindinis" href="palyginimas.html">Palyginti tarpusavyje</a>' : "") +
       '<button type="button" class="mygtukas m-kontūras" id="valytiVisus">Išvalyti sąrašą</button>' +
       "</div>";
 
-    deze.querySelectorAll("[data-imesti]").forEach(m => {
+    deze.querySelectorAll("[data-imesti]").forEach((m, i) => {
       m.addEventListener("click", e => {
         e.preventDefault();
         ISTORIJA.imesti(m.dataset.imesti);
         piesti();
+        /* Fokusas pereina į kitos eilutės mygtuką, o ne į puslapio pradžią. */
+        const liko = deze.querySelectorAll("[data-imesti]");
+        const kitas = liko[Math.min(i, liko.length - 1)] || deze.querySelector("a, button");
+        if (kitas) kitas.focus();
       });
     });
     const v = document.getElementById("valytiVisus");
-    if (v) v.addEventListener("click", e => { e.preventDefault(); ISTORIJA.isvalyti(); piesti(); });
+    if (v) v.addEventListener("click", e => {
+      e.preventDefault();
+      /* Ištrina ir pažymas — tad tik paklausus. */
+      if (!confirm("Ištrinti visas išsaugotas patikras?")) return;
+      ISTORIJA.isvalyti();
+      piesti();
+    });
   }
 
   piesti();
@@ -3526,7 +3812,9 @@ const FORMA = {
     return;
   }
 
-  const didziaja = (t) => t ? t.charAt(0).toLocaleUpperCase("lt") + t.slice(1) : t;
+  /* Didžioji pirma raidė, bet „iPhone", „eBike" lieka kaip parašyta. */
+  const didziaja = (t) => !t || /^[a-ząčęėįšųūž][A-ZĄČĘĖĮŠŲŪŽ]/.test(t)
+    ? t : t.charAt(0).toLocaleUpperCase("lt") + t.slice(1);
   r.pavadinimas = didziaja(String(r.pavadinimas || "").trim());
   document.title = r.pavadinimas + " — rezultatas — Tikra vertė";
 
@@ -3535,9 +3823,14 @@ const FORMA = {
   document.getElementById("verdiktoZyme").textContent = PATIKRA.zyme(r);
   document.getElementById("verdiktoAntraste").innerHTML = PATIKRA.antraste(r);
   const paaisk = document.getElementById("verdiktoPaaiskinimas");
-  paaisk.innerHTML = "<b>" + r.pavadinimas.replace(/</g, "&lt;") + "</b>" +
-    (r.kategorija ? " &middot; " + r.kategorija : "") +
-    "<br>Vertinta nepriklausomai nuo pardavėjo prašomos kainos.";
+  /* Kai kaina rinkos ribose, bet ne vidury — pasakome, kiek ji nuo vertės. */
+  let santykis = "";
+  if (r.verdiktas === "rinkos-kaina") {
+    if (r.kaina > r.verteIki) santykis = "<br>Prašoma " + eurai(r.kaina - r.verteIki) + " daugiau už vertę — galima derėtis.";
+    else if (r.kaina < r.verteNuo) santykis = "<br>Prašoma " + eurai(r.verteNuo - r.kaina) + " mažiau už vertę.";
+  }
+  paaisk.innerHTML = "<b>" + tekstoSauga(r.pavadinimas) + "</b>" +
+    (r.kategorija ? " &middot; " + r.kategorija : "") + santykis;
   if (r.nuoroda) {
     /* Nuoroda išsaugoma, kad po savaitės matytum, kurį skelbimą tikrinai.
        rel=noopener — svetimas puslapis neturi gauti jokios prieigos atgal. */
@@ -3554,10 +3847,10 @@ const FORMA = {
      nes remonto kaina priklauso nuo serviso, ir vienas skaičius tai nuslėptų. */
   const rezis = (r.verteNuo !== undefined && r.verteIki !== undefined &&
                  r.verteNuo !== r.verteIki);
-  document.getElementById("rodPrasoma").innerHTML = r.kaina + " &euro;";
+  document.getElementById("rodPrasoma").innerHTML = eurai(r.kaina);
   document.getElementById("rodVerte").innerHTML = rezis
-    ? '<span style="font-size:0.78em;">' + r.verteNuo + "&ndash;" + r.verteIki + " &euro;</span>"
-    : ((r.verteNuo !== undefined ? r.verteNuo : r.verte) + " &euro;");
+    ? '<span style="font-size:0.78em;">' + euraiRezis(r.verteNuo, r.verteIki) + "</span>"
+    : eurai(r.verteNuo !== undefined ? r.verteNuo : r.verte);
   document.getElementById("rodBukle").textContent = r.bukle.pav;
 
   /* Sugadintų detalių ataskaita */
@@ -3565,7 +3858,7 @@ const FORMA = {
   if (sugDeze && r.sugadinimai && r.sugadinimai.length) {
     const eil = r.sugadinimai.map(e => {
       const kaina = e.lauzas ? "nebetaisoma"
-        : (e.procentas ? "mažina vertę" : e.nuo + "&ndash;" + e.iki + " &euro;");
+        : (e.procentas ? "mažina vertę" : euraiRezis(e.nuo, e.iki));
       return '<div style="display:flex;align-items:baseline;justify-content:space-between;' +
              'gap:16px;padding:11px 0;border-bottom:1px solid var(--linija-2);">' +
              '<span style="font-size:15.5px;"><b>' + e.detale + "</b> &middot; " +
@@ -3578,23 +3871,19 @@ const FORMA = {
       ? '<div class="patarimas" style="margin-top:16px;">' +
         "<b>Vertinta kaip nebetaisoma</b>" +
         "<span>Rinkos kaina čia nebetaikoma. Likutinė vertė <b>" +
-        r.lauzoVerte.nuo + "&ndash;" + r.lauzoVerte.iki + " &euro;</b>" +
+        euraiRezis(r.lauzoVerte.nuo, r.lauzoVerte.iki) + "</b>" +
         (r.lauzoVerte.paaiskinimas ? " — " + r.lauzoVerte.paaiskinimas : "") + ".</span></div>"
       : '<div style="display:flex;align-items:baseline;justify-content:space-between;' +
         'gap:16px;padding:14px 0 0;">' +
         '<span class="etikete">Sutvarkymas apytiksliai</span>' +
         '<span class="skaicius" style="font-size:22px;color:var(--pavojus);">' +
-        r.remontoNuo + "&ndash;" + r.remontoIki + " &euro;</span></div>" +
-        '<div class="patarimas" style="margin-top:14px;">' +
-        "<b>Kainos apytikslės</b>" +
-        "<span>Servisų įkainiai skiriasi kelis kartus — vieno meistro darbas " +
-        "kainuos pigiau nei kito. Šis rėžis rodo tvarką, ne sąmatą. Tikslią " +
-        "kainą pasako tik konkretus servisas apžiūrėjęs daiktą.</span></div>";
+        euraiRezis(r.remontoNuo, r.remontoIki) + "</span></div>" +
+        '<span class="smulkus" style="margin-top:10px;">Apytiksliai — tikslią kainą pasakys servisas.</span>';
 
     sugDeze.innerHTML =
       '<div class="kortele stulpelis" style="padding:26px 28px;">' +
       '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;">' +
-      '<span class="etikete">Rasti sugadinimai</span>' +
+      '<span class="etikete">Pažymėti sugadinimai</span>' +
       '<span class="smulkus">' + (r.kategorija || "") + "</span></div>" +
       '<div style="margin-top:14px;">' + eil + "</div>" + pabaiga + "</div>";
   } else if (sugDeze) {
@@ -3616,10 +3905,10 @@ const FORMA = {
     const eilutes = [];
 
     if (r.saltinis === "katalogas" && r.n) {
-      eilutes.push("Vertinta pagal <b>" + r.n + "</b> panaši" +
-        (r.n % 10 === 1 && r.n !== 11 ? "o skelbimo" : "ų skelbimų") + " kainas" +
-        (r.atnaujinta ? ", atnaujinta " + r.atnaujinta : "") +
-        ". Kraštutinės kainos atmestos, imta rinkos vidurio reikšmė.");
+      eilutes.push("Vertinta pagal <b>" + r.n + "</b>" +
+        (r.n % 10 === 1 && r.n % 100 !== 11 ? " panašaus skelbimo" : " panašių skelbimų") + " kainas" +
+        (r.atnaujinta ? ", atnaujinta " + r.atnaujinta : "") + "." +
+        (r.n >= 3 ? " Kraštutinės kainos atmestos, imta rinkos vidurio reikšmė." : ""));
     } else if (r.saltinis === "panasus") {
       eilutes.push("Tikslaus įrašo apie šį daiktą neturime, tad vertinta pagal <b>" +
         r.panasiuN + "</b> panašius stebėtus skelbimus — tos pačios klasės, artimų " +
@@ -3634,11 +3923,11 @@ const FORMA = {
 
     if (r.pasitikejimas && r.pasitikejimas !== "aukstas") {
       eilutes.push(r.pasitikejimas === "zemas"
-        ? "Pagrįstumas <b>žemas</b>: atsakymas rodo tvarką, ne tikslų skaičių. " +
+        ? "Tikslumas <b>žemas</b>: atsakymas rodo tvarką, ne tikslų skaičių. " +
           "Kuo daugiau tokių daiktų bus patikrinta, tuo siauresnis taps rėžis."
         : (r.saltinis === "panasus"
-            ? "Pagrįstumas <b>vidutinis</b>: remtasi panašiais, o ne tais pačiais daiktais."
-            : "Pagrįstumas <b>vidutinis</b>: šio modelio kainų surinkta dar nedaug."));
+            ? "Tikslumas <b>vidutinis</b>: remtasi panašiais, o ne tais pačiais daiktais."
+            : "Tikslumas <b>vidutinis</b>: šio modelio kainų surinkta dar nedaug."));
     }
 
     eilutes.push(r.bukleIsNuotrauku
@@ -3649,7 +3938,7 @@ const FORMA = {
        dalyvavo, bet negauna svetimo darbo recepto. */
     if (r.pataisos && r.pataisos.length) {
       eilutes.push("Papildomai įskaityta: " +
-        r.pataisos.map(p => p.pav).join(", ") + "." +
+        r.pataisos.map(p => p.pav).join("; ") + "." +
         (r.pataisosApribotos
           ? " Dalis nurodymų persidengia, tad bendras poveikis apribotas."
           : ""));
@@ -3666,15 +3955,12 @@ const FORMA = {
         r.katalogoIrasas + "</b>.");
     }
 
-    if (r.nuotraukos) {
+    if (r.nuotraukos && r.nuotraukos.kiek > 0) {
       const pas = { aukstas: "aukštas", vidutinis: "vidutinis", zemas: "žemas" }[r.nuotraukos.pasitikejimas];
       eilutes.push(r.bukleIsNuotrauku
-        ? "Nuotraukų pagrįstumas — <b>" + pas + "</b>."
-        : "Nuotraukų pagrįstumas — <b>" + pas + "</b>. " + r.nuotraukos.tekstas);
+        ? "Nuotraukų tikslumas — <b>" + pas + "</b>."
+        : "Nuotraukų tikslumas — <b>" + pas + "</b>. " + r.nuotraukos.tekstas);
     }
-
-    eilutes.push("Pardavėjo prašoma kaina į skaičiavimą neįtraukta — ji palyginta tik pabaigoje. " +
-      "Skelbimų kainos beveik visada pripūstos, tad įtraukta ji pati save patvirtintų.");
 
     const varnele = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A5A2E" ' +
       'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -3727,8 +4013,8 @@ const FORMA = {
   const $ = (id) => document.getElementById(id);
   const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g,
     c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-  const didziaja = (t) => t ? t.charAt(0).toLocaleUpperCase("lt") + t.slice(1) : t;
-  const eur = (n) => Math.round(n).toLocaleString("lt-LT").replace(/ /g, " ") + " €";
+  const didziaja = (t) => !t || /^[a-ząčęėįšųūž][A-ZĄČĘĖĮŠŲŪŽ]/.test(t)
+    ? t : t.charAt(0).toLocaleUpperCase("lt") + t.slice(1);
 
   /* Trumpas numeris iš patikros duomenų: tas pats įrašas visada gauna tą patį. */
   function numeris(x) {
@@ -3752,7 +4038,7 @@ const FORMA = {
     $("sertApacia").textContent = "Pavyzdys";
     $("sertSugadinimai").innerHTML = '<span class="smulkus">Sugadintos detalės, jei jų pažymėsi.</span>';
     if (pas) pas.closest("label").style.display = "none";
-    if (mygt) { mygt.textContent = "Pirmiausia — patikra"; mygt.addEventListener("click", () => { location.href = "paslauga.html"; }); }
+    if (mygt) { mygt.textContent = "Įvertinti daiktą"; mygt.addEventListener("click", () => { location.href = "paslauga.html"; }); }
     const pastaba = $("sertPastaba");
     if (pastaba) pastaba.innerHTML = "<b>Pažyma daroma iš patikros</b><span>Įvertink savo daiktą " +
       '<a href="paslauga.html">pilname vertinime</a> arba <a href="skelbimas.html">patikrink savo skelbimą</a> — ' +
@@ -3786,19 +4072,25 @@ const FORMA = {
     if (x.rida) sav.push(Math.round(x.rida).toLocaleString("lt-LT").replace(/ /g, " ") + " km");
     $("sertSavybes").textContent = sav.join(" · ");
 
-    $("sertVerte").textContent = x.verteNuo === x.verteIki
-      ? eur(x.verteNuo) : eur(x.verteNuo).replace(" €", "") + "–" + eur(x.verteIki);
+    $("sertVerte").textContent = euraiRezis(x.verteNuo, x.verteIki);
     $("sertBukle").textContent = x.bukle || "Nenurodyta";
-    $("sertBukleKaip").textContent = x.bukle
-      ? (x.bukleIsNuotrauku ? "Nustatyta iš nuotraukų" : "Nurodyta savininko")
-      : (x.isSkelbimo ? "Vertinta pagal skelbimo aprašymą" : "");
+    /* Pažyma neturi tvirtinti to, ko nebuvo: patikra iš skelbimo — ne savininko
+       žodžiai ir ne nuotraukos. */
+    $("sertBukleKaip").textContent = x.isSkelbimo ? "Pagal skelbimo aprašymą"
+      : (x.bukleIsNuotrauku ? "Nustatyta iš nuotraukų" : "Nurodyta savininko");
+    const parei = $("sertPareiskimas");
+    if (parei) parei.textContent = x.isSkelbimo
+      ? "Pažyma sudaryta pagal skelbimo duomenis; tai ne techninė ekspertizė. Vertė aktuali išdavimo dieną."
+      : "Vertė nustatyta nepriklausomai nuo pardavėjo prašomos kainos — ji į vertinimą neįtraukiama. " +
+        "Pažyma sudaryta pagal savininko pateiktus duomenis" + (x.nuotrauku > 0 || x.bukleIsNuotrauku ? " ir nuotraukas" : "") +
+        "; tai ne techninė ekspertizė. Vertė aktuali išdavimo dieną.";
 
     const sug = x.sugadinimai || [];
     $("sertSugadinimai").innerHTML = sug.length
       ? sug.map(e => '<div class="sert-eilute"><b>' + esc(e.detale) + "</b><span>" + esc(e.taisymas) + "</span></div>").join("") +
         (x.lauzoBusena ? '<div class="sert-eilute"><b>Vertinta kaip nebetaisoma</b><span>likutinė vertė</span></div>'
           : (x.remontoIki ? '<div class="sert-eilute"><span>Sutvarkymas apytiksliai</span><b>' +
-             eur(x.remontoNuo).replace(" €", "") + "–" + eur(x.remontoIki) + "</b></div>" : ""))
+             euraiRezis(x.remontoNuo, x.remontoIki) + "</b></div>" : ""))
       : '<span class="smulkus" style="font-size:16px;">Sugadinimų nepažymėta.</span>';
 
     document.title = "Pažyma " + numeris(x) + " — " + didziaja(x.pavadinimas);

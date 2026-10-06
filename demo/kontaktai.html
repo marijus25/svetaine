@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kontaktai — Tikra vertė</title>
-  <meta name="description" content="Susisiekite dėl vertinimo, sertifikatų arba prieigos įmonėms.">
+  <meta name="description" content="Susisiek dėl vertinimo, pažymų, reklamos arba prieigos įmonėms.">
   <meta name="author" content="Marijus Tamulynas">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,79 +14,49 @@
 <body data-puslapis="kontaktai">
 
   <div id="virsus"></div>
+  <main id="turinys">
   <div class="puslapio-antraste">
     <div class="wrap">
-      <div class="antraste-maza">Kontaktai</div>
-      <h1>Parašykite</h1>
-      <p class="lead">Klausimai apie vertinimą, pastebėtos klaidos arba pasiūlymai — visa tai keliauja į tą pačią dėžutę.</p>
+      <h1>Kontaktai</h1>
     </div>
   </div>
 
   <section class="wrap turinys-ir-sonas" style="padding-bottom:72px;">
 
-    <form class="kortele stulpelis tarpas-22" style="padding:30px;" onsubmit="return false;">
-      <div class="tinklelis stulpeliai-2" style="gap:18px;">
-        <div class="laukas">
-          <label class="etikete" for="vardas">Vardas</label>
-          <input type="text" id="vardas" name="vardas" placeholder="Jūsų vardas" required>
-        </div>
-        <div class="laukas">
-          <label class="etikete" for="pastas">El. paštas</label>
-          <input type="email" id="pastas" name="pastas" placeholder="vardas@imone.lt" required>
-        </div>
-      </div>
-
+    <!-- Forma rodoma tik tada, kai svetaine.js įrašytas SVETAINE.pastas.
+         Siunčiama per el. pašto programą (mailto:), serverio nereikia. -->
+    <form class="kortele stulpelis tarpas-22" style="padding:30px;" id="kontaktuForma" hidden>
       <div class="stulpelis tarpas-8">
         <span class="etikete">Tema</span>
-        <div class="temos"><button type="button" class="tema">Klausimas apie patikrą</button><button type="button" class="tema">Sertifikatas pardavėjui</button><button type="button" class="tema pasirinkta">Sprendimai įmonėms</button><button type="button" class="tema">Kita</button></div>
+        <div class="temos" role="group" aria-label="Tema"><button type="button" class="tema" data-tema="klausimas" aria-pressed="false">Klausimas</button><button type="button" class="tema" data-tema="klaida" aria-pressed="false">Klaida vertinime</button><button type="button" class="tema" data-tema="reklama" aria-pressed="false">Reklama</button><button type="button" class="tema" data-tema="imonems" aria-pressed="false">Įmonėms</button><button type="button" class="tema" data-tema="kita" aria-pressed="false">Kita</button></div>
       </div>
 
       <div class="laukas">
         <label class="etikete" for="zinute">Žinutė</label>
-        <textarea id="zinute" name="zinute" placeholder="Trumpai aprašykite, ko reikia" required></textarea>
+        <textarea id="zinute" name="zinute" placeholder="Trumpai aprašyk, ko reikia"></textarea>
       </div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-        <span class="smulkus" style="line-height:1.5;max-width:520px;">Siųsdami sutinkate, kad susisieksime nurodytu adresu. Duomenų tretiesiems asmenims neperduodame.</span>
-        <button type="submit" class="mygtukas m-pagrindinis">Siųsti žinutę</button>
+        <span class="smulkus">Atsakau per porą dienų.</span>
+        <button type="submit" class="mygtukas m-pagrindinis">Siųsti el. paštu</button>
       </div>
     </form>
 
-    <aside class="stulpelis tarpas-18">
-      <div class="kortele stulpelis" style="padding:26px;">
-        <div class="etikete" style="margin-bottom:6px;">Rekvizitai</div>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--linija-2);">
+    <div class="stulpelis tarpas-18">
+      <div class="kortele stulpelis" style="padding:12px 26px;">
+          <div id="pastoEilute" style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--linija-2);" hidden>
             <span class="smulkus">El. paštas</span>
-            <span style="font-size:14.5px;font-weight:500;">[jusu@pastas.lt]</span>
+            <span data-pastas style="font-size:14.5px;font-weight:500;overflow-wrap:anywhere;"></span>
           </div>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--linija-2);">
-            <span class="smulkus">Telefonas</span>
-            <span style="font-size:14.5px;font-weight:500;">[+370 ...]</span>
-          </div>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--linija-2);">
-            <span class="smulkus">Veiklos forma</span>
-            <span style="font-size:14.5px;font-weight:500;">[individuali veikla, pažymos Nr.]</span>
-          </div>
-          <div style="display:flex;align-items:baseline;justify-content:space-between;padding:14px 0;">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 0;">
             <span class="smulkus">Adresas</span>
             <span style="font-size:14.5px;font-weight:500;">Alytus, Lietuva</span>
           </div>
       </div>
-
-      <div class="kortele stulpelis tarpas-8" style="background:var(--pavirsius-3);padding:24px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg><b style="font-size:14.5px;">Atsakau, kai perskaitau</b>
-        </div>
-        <p class="smulkus" style="line-height:1.55;">Svetainę prižiūriu vakarais, tad atsakymas paprastai ateina per porą dienų. Skubių dalykų čia nepažadu — užtat ir nežadu to, ko neišlaikysiu.</p>
-      </div>
-
-      <div class="kortele stulpelis tarpas-8" style="padding:24px;">
-        <b style="font-size:13.5px;color:var(--rasalas-2);">Radote klaidą vertinime?</b>
-        <p class="smulkus" style="line-height:1.55;">Atsiųskite patikros numerį — peržiūrėsime rankiniu būdu ir pataisysime, jei suklydome.</p>
-      </div>
-    </aside>
+    </div>
 
   </section>
+  </main>
 
   <div id="apacia"></div>
 

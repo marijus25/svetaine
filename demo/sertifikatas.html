@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vertinimo pažyma — Tikra vertė</title>
-  <meta name="description" content="Nepriklausomas daikto būklės ir rinkos vertės sertifikatas.">
+  <title>Pažyma pardavėjams — Tikra vertė</title>
+  <meta name="description" content="Daikto būklės ir rinkos vertės pažyma, kurią gali pridėti prie skelbimo.">
   <meta name="author" content="Marijus Tamulynas">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,11 @@
 <body data-puslapis="sertifikatas">
 
   <div id="virsus"></div>
+  <main id="turinys">
 
   <div class="puslapio-antraste nespausdinti">
     <div class="wrap">
-      <div class="antraste-maza">Pardavėjams</div>
-      <h1>Vertinimo pažyma</h1>
+      <h1>Pažyma pardavėjams</h1>
       <p class="lead">Tavo patikra — tvarkingu dokumentu. Atspausdink arba išsaugok PDF ir pridėk prie skelbimo: pirkėjas mato vertę ir būklę, o ne tik tavo žodžius.</p>
     </div>
   </div>
@@ -82,7 +82,7 @@
           <div id="sertSugadinimai" class="sert-sarasas"><span class="smulkus">&mdash;</span></div>
         </div>
 
-        <p class="sert-pareiskimas">
+        <p class="sert-pareiskimas" id="sertPareiskimas">
           Vertė nustatyta nepriklausomai nuo pardavėjo prašomos kainos — ji į vertinimą neįtraukiama.
           Pažyma sudaryta pagal savininko pateiktus duomenis ir nuotraukas; tai ne techninė ekspertizė.
           Vertė aktuali išdavimo dieną.
@@ -97,9 +97,11 @@
 
     <div class="patarimas nespausdinti" id="sertPastaba" style="max-width:860px;margin:22px auto 0;">
       <b>Kaip pridėti prie skelbimo</b>
-      <span>Spausk „Spausdinti arba PDF" ir spausdintuvo vietoje pasirink „Išsaugoti kaip PDF". Tą failą įkelk į skelbimą arba nusiųsk pirkėjui. Vieša nuoroda, kurią pirkėjas galėtų pasitikrinti pats, atsiras, kai svetainė turės serverį.</span>
+      <span>Spausk „Spausdinti arba PDF“ ir pasirink „Išsaugoti kaip PDF“. Gautą failą pridėk prie skelbimo.</span>
     </div>
   </section>
+
+  </main>
 
   <div id="apacia"></div>
 
