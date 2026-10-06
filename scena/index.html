@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>aidas</title>
+<meta name="description" content="Dirbtinio intelekto įrankiai: idėjos, tyrimas, analizė, planas, kodas, saugumas, automatizacija ir rezultatai vienoje vietoje.">
+<meta name="author" content="Marijus Tamulynas">
+<meta name="theme-color" content="#06222c">
+<link rel="preload" as="image" href="nuotraukos/scena.webp" type="image/webp" fetchpriority="high">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+<!--
+  aidas · pagrindinė scena su kortelėmis — index.html (2026-10-06)
+  Autorius: Marijus Tamulynas. Visos teisės saugomos.
+
+  Kristina laiko holografinę Žemę; aštuonios kortelės — tikri svetainės įrankiai, sujungti su Žeme
+  šviesos gijomis. Kortelės ir gijos — HTML/SVG, ne nuotraukos dalis: ryškus tekstas, paspaudžiamos,
+  prisitaiko prie ekrano.
+
+  Kaip veikia:
+   · .kadras visada laiko nuotraukos proporcijas (1678 × 937) ir uždengia ekraną kaip object-fit: cover,
+     todėl kortelių ir Žemės vietos (--x, --y procentais nuo nuotraukos) niekada nenuslysta.
+   · Dydžiai skaičiuojami cqw vienetais (1 % kadro pločio) — kortelės auga ir mažėja kartu su nuotrauka.
+   · Gijas nupiešia skriptas pagal kortelių --x/--y, todėl kortelę perkelti galima vien pakeitus jos stilių.
+   · Telefone (stačias ekranas) viršuje lieka Kristina su Žeme, kortelės išsidėsto tinkleliu apačioje.
+   · Be bibliotekų. Gerbia „sumažinto judesio" nustatymą.
+-->
+<style>
+:root {
+  --sviesa: 150, 228, 255;           /* holografinė šviesa (Žemės atspalvis) */
+  --tekstas: #F3FBFF;
+  --tylus: #BFE3F0;
+  --gelme: #06222C;
+  --stiklas: rgba(8, 34, 48, .46);
+  --sriftas: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --nuotr-x: 1678;
+  --nuotr-y: 937;
+  --zeme-x: 36.35;                   /* Žemės centras, % nuo nuotraukos */
+  --zeme-y: 53.36;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--sriftas); color: var(--tekstas); background: var(--gelme);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow: hidden;
+}
+a { color: inherit; text-decoration: none; }
+.tik-skaitytuvui { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* --- Viršus: ženklas ir meniu ant stiklo ------------------------------------ */
+.virsus {
+  position: fixed; inset: 0 0 auto; z-index: 5; display: flex; justify-content: space-between; align-items: center;
+  padding: max(18px, env(safe-area-inset-top)) clamp(16px, 2.4vw, 40px) 0; pointer-events: none;
+}
+.virsus > * { pointer-events: auto; }
+.stiklas {
+  background: var(--stiklas); border: 1px solid rgba(var(--sviesa), .28); border-radius: 999px;
+  -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: 0 8px 30px rgba(0, 20, 30, .25);
+}
+.zenklas { display: flex; align-items: center; padding: 9px 18px; }
+.zenklas img { display: block; height: 22px; width: auto; }
+.meniu { display: flex; gap: 2px; padding: 5px; }
+.meniu a {
+  padding: 8px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; letter-spacing: .02em;
+  transition: background .18s ease, color .18s ease;
+}
+.meniu a:hover, .meniu a:focus-visible { background: rgba(var(--sviesa), .16); outline: none; }
+
+/* --- Kadras: nuotrauka + Žemė + gijos + kortelės --------------------------- */
+.scena { position: fixed; inset: 0; overflow: hidden; }
+.kadras {
+  --plotis: max(100vw, calc(100svh * var(--nuotr-x) / var(--nuotr-y)));
+  position: absolute; width: var(--plotis); aspect-ratio: 1678 / 937;
+  /* horizontaliai laikome Žemę ir korteles matomas (židinys ~44 %), vertikaliai — centre */
+  left: clamp(calc(100vw - var(--plotis)), calc(50vw - var(--plotis) * .44), 0px);
+  top: 50%; translate: 0 -50%;
+  container-type: inline-size;
+}
+.kadras picture, .kadras img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.kadras img { object-fit: cover; user-select: none; -webkit-user-drag: none; }
+
+.spindesys {
+  position: absolute; left: calc(var(--zeme-x) * 1%); top: calc(var(--zeme-y) * 1%);
+  width: 19cqw; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(var(--sviesa), .30) 0%, rgba(var(--sviesa), .12) 38%, transparent 66%);
+  mix-blend-mode: screen; animation: alsuoja 5.5s ease-in-out infinite;
+}
+.orbita {
+  position: absolute; left: calc(var(--zeme-x) * 1%); top: calc(var(--zeme-y) * 1%);
+  width: 15.6cqw; aspect-ratio: 1; translate: -50% -50%; pointer-events: none; overflow: visible;
+  animation: sukasi 60s linear infinite;
+}
+@keyframes alsuoja { 50% { opacity: .55; scale: .94; } }
+@keyframes sukasi { to { rotate: 1turn; } }
+
+.gijos { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.gija path { fill: none; stroke-linecap: round; transition: stroke .25s ease, stroke-width .25s ease, opacity .25s ease; }
+.gija .pagrindas { stroke: rgba(var(--sviesa), .8); stroke-width: 2; filter: url(#svytejimas); }
+.gija .srautas {
+  stroke: #E6FAFF; stroke-width: 3.2; stroke-dasharray: 14 300; opacity: .9;
+  animation: teka 3.6s linear infinite; animation-delay: var(--d, 0s);
+}
+.gija.aktyvi .pagrindas { stroke: #fff; stroke-width: 2.8; }
+.gija.aktyvi .srautas { stroke: #fff; stroke-width: 4; animation-duration: 1.4s; }
+@keyframes teka { from { stroke-dashoffset: 314; } to { stroke-dashoffset: 0; } }
+
+.korteles { position: absolute; inset: 0; list-style: none; padding: 0; }
+.kortele {
+  position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); translate: -50% -50%;
+  width: 12.6cqw; padding: .85cqw .95cqw .8cqw; border-radius: .75cqw;
+  display: grid; grid-template-columns: auto 1fr; column-gap: .75cqw; align-items: center;
+  background: linear-gradient(150deg, rgba(20, 70, 96, .58), rgba(6, 30, 44, .52));
+  border: 1px solid rgba(var(--sviesa), .55);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: 0 0 1.1cqw rgba(var(--sviesa), .30), inset 0 0 1.2cqw rgba(var(--sviesa), .12), 0 1cqw 2.4cqw rgba(0, 18, 28, .35);
+  animation: plaukia 7s ease-in-out infinite; animation-delay: var(--d, 0s);
+  transition: box-shadow .25s ease, border-color .25s ease, background .25s ease, scale .25s ease;
+}
+.kortele:hover, .kortele:focus-visible {
+  outline: none; scale: 1.06; border-color: rgba(255, 255, 255, .95);
+  background: linear-gradient(150deg, rgba(34, 104, 136, .70), rgba(8, 40, 58, .62));
+  box-shadow: 0 0 2.2cqw rgba(var(--sviesa), .65), inset 0 0 1.4cqw rgba(var(--sviesa), .22), 0 1.2cqw 2.8cqw rgba(0, 18, 28, .4);
+}
+.kortele svg {
+  grid-row: span 2; width: 2.6cqw; height: 2.6cqw; padding: .45cqw; border-radius: .5cqw;
+  border: 1px solid rgba(var(--sviesa), .45); background: rgba(var(--sviesa), .08);
+  stroke: #EAFBFF; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 .35cqw rgba(var(--sviesa), .8));
+}
+.kortele b {
+  font-size: clamp(11px, .98cqw, 21px); font-weight: 700; letter-spacing: .06em; line-height: 1.15;
+  text-shadow: 0 0 .6cqw rgba(var(--sviesa), .7);
+}
+.kortele span { font-size: clamp(10px, .74cqw, 15px); color: var(--tylus); font-weight: 500; line-height: 1.3; margin-top: .15cqw; }
+/* ilgiausiam pavadinimui — platesnė kortelė */
+.kortele.plati { width: 14.6cqw; }
+@keyframes plaukia { 50% { transform: translateY(-.35cqw); } }
+
+/* atsiradimas */
+.kortele { opacity: 0; }
+.paruosta .kortele { opacity: 1; transition: opacity .7s ease var(--i, 0s), box-shadow .25s ease, border-color .25s ease, background .25s ease, scale .25s ease; }
+.gija { opacity: 0; transition: opacity .9s ease var(--i, 0s); }
+.paruosta .gija { opacity: 1; }
+
+.porastes {
+  position: fixed; right: clamp(16px, 2.4vw, 40px); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 5;
+  padding: 6px 14px; font-size: 11.5px; color: var(--tylus); letter-spacing: .03em;
+}
+
+/* --- Telefonas ir stačias ekranas ------------------------------------------ */
+@media (max-aspect-ratio: 1/1), (max-width: 760px) {
+  body { overflow-y: auto; overflow-x: hidden; }
+  .scena { position: relative; inset: auto; overflow: visible;
+    background: linear-gradient(180deg, transparent 0, var(--gelme) 54svh); }
+  .kadras { position: relative; left: 0; top: 0; translate: none; width: 100%; aspect-ratio: auto; container-type: normal; }
+  .kadras picture { position: relative; height: 64svh; min-height: 330px; }
+  .kadras picture::after { content: ""; position: absolute; inset: 55% 0 0; background: linear-gradient(180deg, transparent, var(--gelme)); }
+  .kadras img { object-position: 2% 50%; }
+  .spindesys, .orbita, .gijos { display: none; }
+  .korteles {
+    position: relative; inset: auto; margin-top: -12svh; z-index: 1;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0 16px 28px;
+  }
+  .kortele {
+    position: relative; left: auto; top: auto; translate: none; width: auto !important; animation: none;
+    padding: 11px 10px; border-radius: 12px; column-gap: 9px; min-width: 0;
+    box-shadow: 0 0 14px rgba(var(--sviesa), .28), inset 0 0 12px rgba(var(--sviesa), .1);
+  }
+  .kortele:hover, .kortele:focus-visible { scale: 1.02; box-shadow: 0 0 22px rgba(var(--sviesa), .55); }
+  .kortele svg { width: 32px; height: 32px; padding: 6px; border-radius: 8px; filter: drop-shadow(0 0 4px rgba(var(--sviesa), .8)); }
+  .kortele b { font-size: 11.5px; letter-spacing: .02em; text-shadow: 0 0 8px rgba(var(--sviesa), .6); }
+  .kortele span { font-size: 11.5px; margin-top: 2px; }
+  .virsus { padding-top: max(12px, env(safe-area-inset-top)); }
+  .zenklas { padding: 8px 14px; }
+  .zenklas img { height: 18px; }
+  .meniu a { padding: 7px 11px; font-size: 12.5px; }
+  .porastes { position: static; padding: 0 0 24px; text-align: center; background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (max-width: 380px) { .meniu a:nth-child(2) { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .spindesys, .orbita, .kortele, .gija .srautas { animation: none !important; }
+  .gija .srautas { display: none; }
+}
+</style>
+</head>
+<body>
+
+<h1 class="tik-skaitytuvui">aidas — dirbtinio intelekto įrankiai</h1>
+
+<header class="virsus">
+  <a class="zenklas stiklas" href="index.html" aria-label="aidas — pradžia"><img src="aidas.png" alt="aidas" width="138" height="30"></a>
+  <nav class="meniu stiklas" aria-label="Pagrindinis meniu">
+    <a href="kainos.html">Kainos</a>
+    <a href="imonems.html">Įmonėms</a>
+    <a href="kontaktai.html">Kontaktai</a>
+  </nav>
+</header>
+
+<main class="scena">
+  <div class="kadras">
+    <picture>
+      <source type="image/webp" srcset="nuotraukos/scena-maza.webp 839w, nuotraukos/scena.webp 1678w" sizes="(max-aspect-ratio: 1/1) 220vw, 100vw">
+      <img src="nuotraukos/scena.jpg" width="1678" height="937" alt="Kristina balkone virš žalio ateities miesto laiko holografinę Žemę" fetchpriority="high" decoding="async">
+    </picture>
+
+    <div class="spindesys" aria-hidden="true"></div>
+    <svg class="orbita" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(150,228,255,.35)" stroke-width=".3" stroke-dasharray="1 2.2"/>
+      <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(220,248,255,.75)" stroke-width=".5" stroke-dasharray="14 140" stroke-linecap="round"/>
+    </svg>
+
+    <svg class="gijos" viewBox="0 0 1678 937" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <filter id="svytejimas" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2.2" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- Tvarka pagal laikrodžio rodyklę = darbo eiga: idėja → tyrimas → … → rezultatas -->
+    <ul class="korteles">
+      <li><a class="kortele" href="gyva.html" style="--x:31;--y:20.8;--d:0s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+        <b>IDĖJOS</b><span>Parašyk, ko reikia</span></a></li>
+      <li><a class="kortele" href="skelbimas.html" style="--x:45.1;--y:19.7;--d:-.9s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+        <b>TYRIMAS</b><span>Patikrink skelbimą</span></a></li>
+      <li><a class="kortele" href="palyginimas.html" style="--x:57.5;--y:29.9;--d:-1.8s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V4M4 20h16"/><path d="M7 15l4-4 3 3 5-6"/><path d="M16 8h3v3"/></svg>
+        <b>ANALIZĖ</b><span>Kainų palyginimas</span></a></li>
+      <li><a class="kortele" href="paslauga.html" style="--x:63.8;--y:45.9;--d:-2.7s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M8.5 10l1.5 1.5L12.5 9M8.5 15.5l1.5 1.5 2.5-2.5M14.5 10.5H16M14.5 16H16"/></svg>
+        <b>PLANAS</b><span>Pilnas vertinimas</span></a></li>
+      <li><a class="kortele" href="imonems.html" style="--x:63.8;--y:63;--d:-3.6s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9.5 7.5 12l2.5 2.5M14 9.5l2.5 2.5-2.5 2.5"/></svg>
+        <b>KODAS</b><span>API įmonėms</span></a></li>
+      <li><a class="kortele" href="sertifikatas.html" style="--x:57.5;--y:78.4;--d:-4.5s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <b>SAUGUMAS</b><span>Vertinimo pažyma</span></a></li>
+      <li><a class="kortele plati" href="kainos.html" style="--x:44.4;--y:85.4;--d:-5.4s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>
+        <b>AUTOMATIZACIJA</b><span>DI planai ir kainos</span></a></li>
+      <li><a class="kortele" href="mano-patikros.html" style="--x:30.4;--y:87;--d:-6.3s">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16"/><path d="M6 20v-5M10 20v-8M14 20v-6M18 20V8"/><path d="M5 11l5-4 4 3 5-5"/></svg>
+        <b>REZULTATAI</b><span>Mano patikros</span></a></li>
+    </ul>
+  </div>
+</main>
+
+<footer class="porastes stiklas">© 2026 Marijus Tamulynas</footer>
+
+<script>
+/* Gijos: nuo Žemės krašto iki kiekvienos kortelės, švelniu lanku. Viskas nuotraukos koordinatėmis. */
+(function () {
+  var W = 1678, H = 937;
+  var css = getComputedStyle(document.documentElement);
+  var zx = parseFloat(css.getPropertyValue("--zeme-x")) / 100 * W;
+  var zy = parseFloat(css.getPropertyValue("--zeme-y")) / 100 * H;
+  var R = 104;                                   /* Žemės spindulys nuotraukoje */
+  var svg = document.querySelector(".gijos");
+  var NS = "http://www.w3.org/2000/svg";
+
+  document.querySelectorAll(".kortele").forEach(function (k, i) {
+    var s = k.style;
+    var x = parseFloat(s.getPropertyValue("--x")) / 100 * W;
+    var y = parseFloat(s.getPropertyValue("--y")) / 100 * H;
+    var dx = x - zx, dy = y - zy, ilgis = Math.hypot(dx, dy);
+    var ux = dx / ilgis, uy = dy / ilgis;
+    var sx = zx + ux * R, sy = zy + uy * R;      /* pradžia ant Žemės paviršiaus */
+    var lenk = (i % 2 ? 1 : -1) * ilgis * .14;   /* lanko išlinkis, pakaitomis */
+    var cx = (sx + x) / 2 - uy * lenk, cy = (sy + y) / 2 + ux * lenk;
+    var d = "M" + sx.toFixed(1) + " " + sy.toFixed(1) + " Q" + cx.toFixed(1) + " " + cy.toFixed(1) + " " + x.toFixed(1) + " " + y.toFixed(1);
+
+    var g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "gija");
+    g.style.setProperty("--d", (-i * .45) + "s");
+    g.style.setProperty("--i", (.15 + i * .08) + "s");
+    ["pagrindas", "srautas"].forEach(function (c) {
+      var p = document.createElementNS(NS, "path");
+      p.setAttribute("d", d); p.setAttribute("class", c);
+      p.setAttribute("pathLength", "314");
+      g.appendChild(p);
+    });
+    svg.appendChild(g);
+    k.style.setProperty("--i", (.35 + i * .08) + "s");
+
+    var ijungti = function () { g.classList.add("aktyvi"); };
+    var isjungti = function () { g.classList.remove("aktyvi"); };
+    k.addEventListener("mouseenter", ijungti); k.addEventListener("focus", ijungti);
+    k.addEventListener("mouseleave", isjungti); k.addEventListener("blur", isjungti);
+  });
+
+  requestAnimationFrame(function () { requestAnimationFrame(function () { document.body.classList.add("paruosta"); }); });
+})();
+</script>
+</body>
+</html>
