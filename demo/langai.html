@@ -14,14 +14,14 @@
 <body data-puslapis="index">
 
   <div id="virsus"></div>
-  <h1 class="tik-skaitytuvui">aidas · Tikra vertė — dirbtinio intelekto įrankiai</h1>
 
   <!-- Pradžia — trys langai per visą plotį: pasiūlymai, reklama, pažintys.
        Fonas vienas visam puslapiui: nuotraukos/ivadas.jpg -->
-  <main class="langai">
+  <main class="langai" id="turinys">
+    <h1 class="tik-skaitytuvui">aidas · Tikra vertė — dirbtinio intelekto įrankiai</h1>
 
     <section class="langas" aria-labelledby="l1">
-      <header class="lango-galva"><h2 id="l1">Pasiūlymai</h2><span class="smulkus" id="pasiulymuKiekis"></span></header>
+      <header class="lango-galva"><h2 id="l1">Pasiūlymai</h2><span class="smulkus" id="pasiulymuKiekis" role="status"></span></header>
       <div class="lango-turinys">
         <form class="klausk" id="pasiulymuForma" role="search">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>
@@ -33,12 +33,11 @@
     </section>
 
     <section class="langas scena" aria-labelledby="l2">
-      <header class="lango-galva"><h2 id="l2">Reklama</h2><span class="smulkus">vietų nuoma</span><span class="lango-zyme gyva">2 laisvos</span></header>
+      <header class="lango-galva"><h2 id="l2">Reklama</h2><span class="lango-zyme gyva">2 laisvos vietos</span></header>
       <div class="lango-turinys">
         <div class="reklamos-vieta didele"><span class="reklamos-pozicija">Vieta A</span><b>Čia gali būti tavo reklama</b><small>Matoma kiekvienam, kas tikrina kainas</small></div>
         <div class="reklamos-vieta maza"><span class="reklamos-pozicija">Vieta B</span><b>Laisva vieta</b><small>Tinka servisams, supirkėjams, parduotuvėms</small></div>
-        <p class="tekstas">Reklama čia rodoma žmonėms, kurie tuo metu renkasi, ką pirkti ar parduoti. Kaina ir laikotarpis — susitarus.</p>
-        <a class="mygtukas m-sviesus mygtukas-pilnas" href="kontaktai.html">Nuomotis vietą</a>
+        <a class="mygtukas m-sviesus mygtukas-pilnas" href="kontaktai.html?tema=reklama" data-reikia-pasto>Nuomotis vietą</a>
       </div>
     </section>
 
@@ -47,8 +46,6 @@
       <div class="lango-turinys pazintys">
         <div class="burbulai" aria-hidden="true"><span></span><span></span></div>
         <h3>Pažinčių programėlė</h3>
-        <p class="tekstas">Šioje vietoje atsiras pažinčių programėlė. Kol ji ruošiama, šis langas lieka tuščias.</p>
-        <a class="mygtukas m-ant-tamsaus" href="kontaktai.html">Pranešti, kai atsiras</a>
       </div>
     </section>
 
@@ -56,6 +53,7 @@
 
   <div id="apacia"></div>
 
+  <script src="nustatymai.js"></script>
   <script src="saugiklis.js"></script>
   <script src="katalogas.js"></script>
   <script src="svetaine.js"></script>

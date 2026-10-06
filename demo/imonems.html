@@ -14,100 +14,46 @@
 <body data-puslapis="imonems">
 
   <div id="virsus"></div>
+  <main id="turinys">
   <div class="puslapio-antraste">
     <div class="wrap">
-      <div class="antraste-maza">Sprendimai įmonėms</div>
-      <h1>Vertinimas jūsų srautui</h1>
-      <p class="lead">Tas pats variklis, kuris dirba viešoje svetainėje, prijungiamas prie jūsų sistemos. Vienodi kriterijai kiekvienai prekei ir kiekvienam darbuotojui.</p>
+      <h1>Vertinimas tavo srautui</h1>
+      <p class="lead">Tas pats vertinimas kaip šioje svetainėje — tavo sistemai. Vienodi kriterijai kiekvienai prekei ir kiekvienam darbuotojui.</p>
     </div>
   </div>
 
   <section class="wrap" style="padding-bottom:64px;">
+    <h2 class="tik-skaitytuvui">Kam tinka</h2>
     <div class="tinklelis stulpeliai-3">
         <article class="kortele stulpelis tarpas-12">
           <h3>Supirkėjams ir komisui</h3>
-          <p class="tekstas" style="font-size:14.5px;">Įvertinkite visą priimamą srautą vienodais kriterijais. Darbuotojas nebespėja klysti, o kainos nebepriklauso nuo dienos nuotaikos.</p>
+          <p class="tekstas" style="font-size:14.5px;">Įvertink visą priimamą srautą vienodais kriterijais. Darbuotojams nebėra kur suklysti, o kainos nebepriklauso nuo dienos nuotaikos.</p>
         </article>
         <article class="kortele stulpelis tarpas-12">
           <h3>Skelbimų portalams</h3>
-          <p class="tekstas" style="font-size:14.5px;">Rodykite vertės įvertinimą šalia skelbimo. Pirkėjai lieka ilgiau, o pervertinti skelbimai nustoja gadinti pasitikėjimą.</p>
+          <p class="tekstas" style="font-size:14.5px;">Rodyk vertės įvertinimą šalia skelbimo. Pirkėjai lieka ilgiau, o pervertinti skelbimai nustoja gadinti pasitikėjimą.</p>
         </article>
         <article class="kortele stulpelis tarpas-12">
           <h3>El. parduotuvėms</h3>
-          <p class="tekstas" style="font-size:14.5px;">Priimate naudotas prekes mainais? Automatinis būklės ir vertės nustatymas pagal kliento nuotraukas.</p>
+          <p class="tekstas" style="font-size:14.5px;">Priimi naudotas prekes mainais? Automatinis būklės ir vertės nustatymas pagal kliento nuotraukas.</p>
         </article>
     </div>
   </section>
 
-  <section class="sekcija-juosta">
-    <div class="wrap" style="display:grid;grid-template-columns:320px minmax(0,1fr);gap:56px;align-items:start;">
-      <div class="stulpelis tarpas-14">
-        <div class="antraste-maza">API</div>
-        <h2 style="font-size:30px;">Viena užklausa</h2>
-        <p class="tekstas" style="font-size:15.5px;">Siunčiate pavadinimą ir nuotraukas — gaunate vertę, būklę ir pasitikėjimo rodiklį. Jokių SDK, jokių priklausomybių.</p>
-      </div>
-      <div class="tinklelis stulpeliai-2" style="gap:20px;">
-        <div class="kodas">
-          <div class="etikete">Užklausa</div>
-          <pre><span class="r">POST</span> /v1/vertinimas
-<span class="r">Content-Type:</span> application/json
-
-{
-  <span class="k">"pavadinimas"</span>: <span class="t">"PlayStation 5"</span>,
-  <span class="k">"nuotraukos"</span>: [
-    <span class="t">"https://..."</span>,
-    <span class="t">"https://..."</span>
-  ]
-}</pre>
-        </div>
-        <div class="kodas">
-          <div class="etikete">Atsakymas</div>
-          <pre>{
-  <span class="k">"verte"</span>: <span class="n">470</span>,
-  <span class="k">"valiuta"</span>: <span class="t">"EUR"</span>,
-  <span class="k">"bukle"</span>: <span class="t">"naudota"</span>,
-  <span class="k">"pasitikejimas"</span>: <span class="n">0.86</span>
-}</pre>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sekcija">
-    <div class="wrap stulpelis tarpas-30">
-      <div class="antraste-maza">Kaip pradėti</div>
-      <div class="tinklelis stulpeliai-3" style="gap:44px;">
-        <div class="stulpelis tarpas-12">
-          <div class="zingsnio-nr">01</div>
-          <h3 style="font-family:var(--sans);font-size:17px;">Parašote</h3>
-          <p class="tekstas" style="font-size:14.5px;">Pasakote, kokias prekes vertinate ir kokia apimtis per mėnesį.</p>
-        </div>
-        <div class="stulpelis tarpas-12">
-          <div class="zingsnio-nr">02</div>
-          <h3 style="font-family:var(--sans);font-size:17px;">Bandomoji prieiga</h3>
-          <p class="tekstas" style="font-size:14.5px;">Gaunate ribotą prieigą ir patikrinate, ar rezultatai atitinka jūsų realybę.</p>
-        </div>
-        <div class="stulpelis tarpas-12">
-          <div class="zingsnio-nr">03</div>
-          <h3 style="font-family:var(--sans);font-size:17px;">Prijungimas</h3>
-          <p class="tekstas" style="font-size:14.5px;">Gaunate raktą ir dokumentaciją. Integracija — viena užklausa.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap" style="padding-bottom:72px;">
+  <section class="wrap" style="padding-bottom:72px;" data-reikia-pasto>
     <div class="kortele kortele-tamsi" style="padding:40px 44px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap;">
       <div class="stulpelis tarpas-8">
-        <h2 style="font-size:28px;">Norite būti pirmi eilėje?</h2>
-        <p style="font-size:15.5px;">API dar ruošiamas. Palikite žinutę — susisieksiu, kai prieiga bus atidaryta.</p>
+        <h2 style="font-size:28px;">Nori gauti prieigą tarp pirmųjų?</h2>
+        <p style="font-size:15.5px;">API dar ruošiamas. Palik žinutę — susisieksiu, kai prieiga bus atidaryta.</p>
       </div>
-      <a class="mygtukas m-sviesus" href="kontaktai.html">Palikti žinutę</a>
+      <a class="mygtukas m-sviesus" href="kontaktai.html?tema=imonems">Palikti žinutę</a>
     </div>
   </section>
+  </main>
 
   <div id="apacia"></div>
 
+  <script src="nustatymai.js"></script>
   <script src="saugiklis.js"></script>
   <script src="katalogas.js"></script>
   <script src="svetaine.js"></script>

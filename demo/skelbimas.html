@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Patikrink skelbimą — Tikra vertė</title>
-  <meta name="description" content="Įklijuok skelbimo tekstą arba nuorodą ir per sekundę sužinok, ar prašoma kaina atitinka realią vertę. Nuotraukų nereikia.">
+  <meta name="description" content="Įklijuok skelbimo tekstą ir per sekundę sužinok, ar prašoma kaina atitinka realią vertę. Nuotraukų nereikia.">
   <meta name="author" content="Marijus Tamulynas">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,11 @@
 <body data-puslapis="skelbimas">
 
   <div id="virsus"></div>
+  <main id="turinys">
   <div class="puslapio-antraste">
     <div class="wrap">
-      <div class="antraste-maza">Greita patikra</div>
       <h1>Patikrink skelbimą</h1>
-      <p class="lead">Radai skelbimą ir nori žinoti, ar kaina normali? Įklijuok jo tekstą arba įdėk nuorodą. Nuotraukų nereikia — atsakymą gauni iškart.</p>
+      <p class="lead">Įklijuok skelbimo tekstą — atsakymą gausi iškart. Nuotraukų nereikia.</p>
     </div>
   </div>
 
@@ -26,50 +26,40 @@
 
     <div class="kortele stulpelis tarpas-18" style="padding:30px;">
       <div class="laukas">
-        <label class="etikete" for="gNuoroda">Nuoroda į skelbimą</label>
-        <div class="su-mygtuku">
-          <input type="url" id="gNuoroda" placeholder="https://...">
-          <button type="button" class="mygtukas m-pagrindinis" id="gMygtukas">Patikrinti</button>
-        </div>
-      </div>
-
-      <div class="laukas">
-        <label class="etikete" for="gKaina">Prašoma kaina
-          <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--pavojus);">— būtina</span>
-        </label>
-        <div class="su-valiuta" style="max-width:260px;">
-          <input type="number" id="gKaina" min="0" step="1" placeholder="3450" required>
-          <span class="valiuta">&euro;</span>
-        </div>
-        <span class="smulkus">Įrašome ją patys iš skelbimo, bet pasitikrink — nuo šito skaičiaus priklauso visas atsakymas.</span>
-      </div>
-
-      <div class="laukas">
-        <label class="etikete" for="gTekstas">Arba įklijuok skelbimo tekstą</label>
+        <label class="etikete" for="gTekstas">Skelbimo tekstas</label>
         <textarea id="gTekstas" style="height:170px;"
                   placeholder="Pažymėk visą skelbimą su duomenų lentele, nukopijuok ir įklijuok čia. Įklijavus patikra prasideda pati."></textarea>
-        <span class="smulkus" id="gBusena"></span>
       </div>
 
-      <div class="patarimas">
-        <b>Kuo daugiau teksto, tuo tikslesnis atsakymas</b>
-        <span>Kopijuok kartu su duomenų lentele: metai, rida, kuras, pavarų dėžė, techninė apžiūra, defektai. Iš jų ir skaičiuojama.</span>
+      <div class="laukas">
+        <label class="etikete" for="gKaina">Prašoma kaina</label>
+        <div class="su-valiuta" style="max-width:260px;">
+          <input type="number" id="gKaina" min="0" step="1" inputmode="numeric" placeholder="paimsime iš skelbimo">
+          <span class="valiuta">&euro;</span>
+        </div>
+      </div>
+
+      <div class="laukas" id="gNuorodosEile" hidden>
+        <label class="etikete" for="gNuoroda">Nuoroda į skelbimą</label>
+        <input type="url" id="gNuoroda" placeholder="https://...">
+      </div>
+
+      <div class="mygtukas-ir-busena">
+        <button type="button" class="mygtukas m-pagrindinis" id="gMygtukas">Patikrinti</button>
+        <span class="smulkus" id="gBusena" role="status"></span>
       </div>
     </div>
 
     <div id="skelbimoRezultatas" style="margin-top:34px;"></div>
     <div id="palyginimas" style="margin-top:34px;"></div>
 
-    <div class="kortele stulpelis tarpas-12" style="margin-top:34px;background:var(--pavirsius-3);padding:26px;">
-      <div class="antraste-maza">Kuo tai skiriasi nuo pilno vertinimo</div>
-      <p class="tekstas">Čia vertinamas <b>skelbimas</b> — pardavėjo surašyti duomenys. Greita, bet tai ne apžiūra: daužtas kėbulas, rūdys ar nudėvėta sankaba tekste nematyti.</p>
-      <p class="tekstas">Kai daiktas jau tavo rankose, paleisk <a href="paslauga.html">pilną vertinimą</a> — ten nuotraukos, sugadintos detalės ir jų sutvarkymo kaina.</p>
-    </div>
-
   </section>
+
+  </main>
 
   <div id="apacia"></div>
 
+  <script src="nustatymai.js"></script>
   <script src="saugiklis.js"></script>
   <script src="katalogas.js"></script>
   <script src="svetaine.js"></script>

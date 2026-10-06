@@ -39,6 +39,10 @@ const DETALES = {
     "antraste": "Kiek iš tikrųjų vertas automobilis",
     "ivadas": "Rida, techninė, serviso istorija ir tai, kas sugadinta — kiekvienas dalykas keičia kainą. Įrašyk, ką matai, ir gauk vertę, kuri nepriklauso nuo pardavėjo.",
     "min_nuotrauku": 6,
+    "be_bendru": [
+      "komplektacija",
+      "garantija"
+    ],
     "kampai": [
       "priekis",
       "galas",
@@ -112,7 +116,7 @@ const DETALES = {
           },
           {
             "raktas": "trumpa",
-            "pav": "Galioja trumpiau",
+            "pav": "Galioja trumpiau nei pusmetį",
             "poveikis": 0.0
           },
           {
@@ -189,7 +193,7 @@ const DETALES = {
           },
           {
             "raktas": "remontas",
-            "pav": "Rihtavimas ir dažymas",
+            "pav": "Ištiesinimas ir dažymas",
             "nuo": 150,
             "iki": 350
           },
@@ -235,7 +239,7 @@ const DETALES = {
           },
           {
             "raktas": "remontas",
-            "pav": "Rihtavimas ir dažymas",
+            "pav": "Ištiesinimas ir dažymas",
             "nuo": 140,
             "iki": 320
           },
@@ -252,7 +256,7 @@ const DETALES = {
         "taisymai": [
           {
             "raktas": "remontas",
-            "pav": "Rihtavimas ir dažymas",
+            "pav": "Ištiesinimas ir dažymas",
             "nuo": 180,
             "iki": 400
           },
@@ -333,13 +337,13 @@ const DETALES = {
         "taisymai": [
           {
             "raktas": "keitimas",
-            "pav": "Keitimas su dvimase",
+            "pav": "Keitimas su dvimasiu smagračiu",
             "nuo": 600,
             "iki": 1200
           },
           {
             "raktas": "paprasta",
-            "pav": "Keitimas be dvimasės",
+            "pav": "Keitimas be dvimasio smagračio",
             "nuo": 300,
             "iki": 700
           }
@@ -504,7 +508,7 @@ const DETALES = {
         "variantai": [
           {
             "raktas": "ieskomas",
-            "pav": "Ieškomas, einamas modelis",
+            "pav": "Paklausus modelis",
             "poveikis": 0.08
           },
           {
@@ -661,7 +665,7 @@ const DETALES = {
         ]
       },
       "tenas": {
-        "pav": "Tenas arba kompresorius",
+        "pav": "Kaitinimo elementas arba kompresorius",
         "taisymai": [
           {
             "raktas": "keitimas",
