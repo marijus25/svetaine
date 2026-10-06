@@ -2037,7 +2037,7 @@ a { color: var(--zydra); }
 .praleisti { position: absolute; left: 16px; top: -80px; z-index: 100; }
 .praleisti:focus { top: 12px; }
 /* Taikinys gauna fokusą tik programiškai — rėmelio aplink visą turinį nereikia */
-#turinys:focus { outline: none; }
+#turinys:focus, #skelbimoRezultatas:focus { outline: none; }
 /* Įrankių sąraše fokuso rėmelis piešiamas viduje — sąrašas apkerpa tai, kas išlenda */
 .meniu-sarasas a:focus-visible { outline-offset: -3px; }
 
@@ -2045,6 +2045,7 @@ a { color: var(--zydra); }
 @media (min-width: 1101px) {
   .langai > .langas:first-of-type .lango-turinys {
     padding-bottom: 48px;
+    scroll-padding-bottom: 56px;
     -webkit-mask-image: linear-gradient(#000 calc(100% - 56px), transparent);
             mask-image: linear-gradient(#000 calc(100% - 56px), transparent);
   }

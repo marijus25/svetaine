@@ -45,11 +45,11 @@ try { window.TV_VERSIJA = TV_VERSIJA; } catch (e) {}
 const IRANKIAI = [
   {
     raktas: "skelbimas", pav: "Patikrink skelbimą", url: "skelbimas.html",
-    trumpai: "Įklijuok nuorodą ar tekstą — vertę pasakome iškart, be nuotraukų.",
+    trumpai: "Įklijuok skelbimo tekstą — vertę pasakome iškart, be nuotraukų.",
     zodziai: "skelbimas skelbimo nuoroda kaina brangu pigu brangus autoplius skelbiu tikrinti ar verta",
     ikona: "zaibas", busena: "veikia", zyme: "Per sekundę",
     santrauka: "Radai skelbimą internete ir nori žinoti, ar kaina normali. " +
-               "Įklijuoji nuorodą arba tekstą — vertę pasakome iškart.",
+               "Įklijuoji skelbimo tekstą — vertę pasakome iškart.",
     punktai: ["Nuotraukų nereikia",
               "Metai, rida, techninė — perskaitoma pati",
               "Atsakymas per sekundę"],
@@ -57,7 +57,7 @@ const IRANKIAI = [
   },
   {
     raktas: "vertinimas", pav: "Pilnas vertinimas", url: "paslauga.html",
-    trumpai: "Nuotraukos, būklė ir sugadintos detalės — su remonto kainomis.",
+    trumpai: "Būklė ir sugadintos detalės — su remonto kainomis.",
     zodziai: "vertinimas įvertinti nuotraukos būklė sugadinta remontas detalės kiek vertas",
     ikona: "didinamasis", busena: "veikia", zyme: "Su apžiūra",
     santrauka: "Daiktas jau tavo rankose. Nufotografuoji, pažymi, kas sugadinta — " +
@@ -110,10 +110,10 @@ const SVETAINE = {
   /* Mygtukas antraštės dešinėje (puslapis gali jį persirašyti) */
   mygtukas: { pav: "Mano patikros", url: "mano-patikros.html" },
 
-  /* El. pašto adresas susisiekimui, pvz. "vardas@pastas.lt". Kol tuščias,
-     kontaktų forma ir pašto eilutė nerodomos. Įrašius adresą, viskas
-     atsiranda ir veikia savaime — daugiau nieko keisti nereikia. */
-  pastas: "",
+  /* El. pašto adresas susisiekimui įrašomas faile nustatymai.js
+     (jis bendras ir gyvai scenai). Kol tuščias, kontaktų forma, pašto
+     eilutė ir mygtukai, kviečiantys parašyti, nerodomi. */
+  pastas: String((window.AIDAS_NUSTATYMAI && window.AIDAS_NUSTATYMAI.pastas) || "").trim(),
 
   /* Poraštės stulpeliai. Tik nuorodos į puslapius, kurie tikrai yra. */
   porastes_stulpeliai: [
@@ -190,7 +190,7 @@ function zenklas() {
 /* Antraštės ženklas: kairiajame viršutiniame kampe — aidas, šalia —
    svetainės vardas. Vienas vietoje, tad kai keisis išvaizda, keisis tik čia. */
 function antrastesZenklas() {
-  return '<a class="virsaus-zenklas" href="index.html" aria-label="aidas · ' + SVETAINE.pavadinimas + ' — pradžia">' +
+  return '<a class="virsaus-zenklas" href="index.html" aria-label="aidas · ' + SVETAINE.pavadinimas + '">' +
          '<img src="aidas.png" alt="aidas" width="147" height="32">' +
          '<span class="virsaus-skirtukas" aria-hidden="true"></span>' +
          '<span class="virsaus-vardas">' + SVETAINE.pavadinimas + '</span></a>';
@@ -423,9 +423,13 @@ function poraste() {
    forma ir pašto eilutė lieka paslėptos. Temą galima parinkti nuoroda:
    kontaktai.html?tema=reklama (klausimas, klaida, reklama, imonems, kita). */
 (function kontaktuForma() {
-  const pastas = String(SVETAINE.pastas || '').trim();
+  const pastas = SVETAINE.pastas;
   const eilute = document.getElementById('pastoEilute');
   const forma = document.getElementById('kontaktuForma');
+  /* Kvietimai parašyti (pvz. „Nuomotis vietą“) be adreso vestų į aklavietę. */
+  if (!pastas) {
+    document.querySelectorAll('[data-reikia-pasto]').forEach(function (x) { x.hidden = true; });
+  }
   if (!pastas || (!eilute && !forma)) return;
 
   if (eilute) {
@@ -1226,7 +1230,7 @@ const PATAISOS = {
     { raktas: "nera",       pav: "Defektų nėra",               poveikis:  0.00 },
     { raktas: "ibrezimai",  pav: "Įbrėžimai, nutrynimai",     poveikis: -0.05 },
     { raktas: "funkcijos",  pav: "Neveikia dalis funkcijų",    poveikis: -0.15 },
-    { raktas: "keista",     pav: "Pakeista baterija ar detalė", poveikis: -0.08 },
+    { raktas: "keista",     pav: "Pakeista neoriginali baterija ar detalė", poveikis: -0.08 },
     { raktas: "remontuota", pav: "Buvo remontuota",            poveikis: -0.10 }
   ],
   amzius_uz_metus: -0.03,
@@ -1422,7 +1426,7 @@ const DUOMENYS = {
         return v instanceof Set ? v.size > 0 : (v !== undefined && v !== null && v !== "");
       }).length;
       punktai.push({ ok: uzpildyti >= Math.ceil(visi.length / 2), sv: 20,
-                     ko: "kategorijos duomenys (rida, apžiūra, istorija)" });
+                     ko: "kas svarbu šiai kategorijai" });
     }
 
     /* Procentai nuo to, ko šiame puslapyje iš viso klausiama — kitaip
@@ -1448,13 +1452,13 @@ const DUOMENYS = {
     deze.innerHTML = `
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;">
         <span class="etikete">Atsakymo tikslumas</span>
-        <span style="font-family:var(--serif);font-weight:600;color:${spalva};">${zodis} &middot; ${t.proc}%</span>
+        <span style="font-family:var(--serif);font-weight:600;color:${spalva};">${zodis} &middot; ${t.proc}&nbsp;%</span>
       </div>
       <div style="height:6px;background:var(--linija-2);border:1px solid var(--linija);margin:8px 0 6px;">
         <div style="height:100%;width:${t.proc}%;background:${spalva};transition:width .25s;"></div>
       </div>
       <span class="smulkus">${t.trukstA.length
-        ? "Tiksliau atsakysime, jei pridėsi: " + t.trukstA.slice(0, 2).join(", ") + "."
+        ? "Tikslumą padidins: " + t.trukstA.slice(0, 2).join(", ") + "."
         : "Duomenų pakanka tiksliausiam atsakymui."}</span>
     `;
   }
@@ -1858,9 +1862,13 @@ const SUGADINIMAI = {
 
     const dalys = k.eilutes.map(e => e.detale + ": " + e.taisymas +
       (e.procentas ? "" : " (" + euraiRezis(e.nuo, e.iki) + ")"));
-    deze.innerHTML = '<b>Sutvarkymas apytiksliai ' + euraiRezis(k.nuo, k.iki) + '</b>' +
+    /* Jei visi gedimai tik mažina vertę (be remonto kainos), „0 €“ atrodytų
+       kaip nemokamas remontas — tada rodome tik pažymėtus gedimus. */
+    deze.innerHTML = (k.iki > 0
+        ? '<b>Sutvarkymas apytiksliai ' + euraiRezis(k.nuo, k.iki) + '</b>'
+        : '<b>Pažymėti gedimai</b>') +
       "<span>" + dalys.join(" &middot; ") + "</span>" +
-      '<span class="smulkus">Apytiksliai — tikslią kainą pasakys servisas.</span>';
+      (k.iki > 0 ? '<span class="smulkus">Tikslią kainą pasakys servisas.</span>' : "");
   },
 
   /* Nuotraukos nebūtinos. Be variklio jos vertės nekeičia, tad ir
@@ -2189,8 +2197,13 @@ const PALYGINIMAS = {
       return;
     }
 
-    const su = sarasas.map(x => ({ x, skirtumas: ISTORIJA.skirtumas(x) }));
-    const geriausias = su.reduce((a, b) => (b.skirtumas > a.skirtumas ? b : a));
+    /* Rikiuojame pagal tą patį skaičių, kuris rodomas kortelėje, kad ženklelis
+       niekada neprieštarautų sumoms; lygiosios — pagal atstumą nuo vidurio. */
+    const balas = x => x.verdiktas === "gera-kaina" ? x.verteNuo - x.kaina
+                     : x.verdiktas === "per-brangu" ? -(x.kaina - x.verteIki) : 0;
+    const su = sarasas.map(x => ({ x, skirtumas: balas(x), vidurys: ISTORIJA.skirtumas(x) }));
+    const geriausias = su.reduce((a, b) =>
+      (b.skirtumas > a.skirtumas || (b.skirtumas === a.skirtumas && b.vidurys > a.vidurys)) ? b : a);
 
     const korteles = su.map(k => {
       const x = k.x;
@@ -2255,13 +2268,22 @@ const SKELBIMO_PATIKRA = {
   kategorija(d, tekstas) {
     if (typeof DETALES === "undefined") return null;
     if (d.rida || d.kuras || d.kebulas || d.deze) return "automobilis";
+    /* Renkame visas kategorijas, kurių žodžių yra tekste. Bendras žodis
+       „mašina“ automobiliui nieko nereiškia, jei tekste yra ir kitos
+       kategorijos žodžių (skalbimo mašina, siuvimo mašina) — tikrus
+       automobilius jau atpažino rida, kuras ar kėbulas aukščiau. */
     const q = " " + PATIKRA.normalizuoti(tekstas) + " ";
+    const rasta = [];
     for (const k of Object.keys(DETALES)) {
-      for (const z of DETALES[k].zodziai || []) {
-        if (q.indexOf(" " + PATIKRA.normalizuoti(z) + " ") >= 0) return k;
-      }
+      const zodziai = (DETALES[k].zodziai || [])
+        .map(z => PATIKRA.normalizuoti(z))
+        .filter(z => q.indexOf(" " + z + " ") >= 0);
+      if (zodziai.length) rasta.push({ k, zodziai });
     }
-    return null;
+    const kitos = rasta.filter(x => !(x.k === "automobilis" &&
+                                      x.zodziai.every(z => z === "masina")));
+    const liko = kitos.length ? kitos : rasta;
+    return liko.length ? liko[0].k : null;
   },
 
   /* Iš skelbimo laukų — į vertinimo pataisas. Kiekviena eilutė turi šaltinį
@@ -2413,7 +2435,7 @@ const SKELBIMO_PATIKRA = {
 
       deze.innerHTML =
         '<div class="kortele stulpelis tarpas-14" style="border-left:3px solid var(--pavojus);">' +
-        "<b>" + (d.kaina ? "Neradome, kas parduodama." : "Neradome, kas parduodama, ir kainos.") + "</b>" +
+        "<b>" + (d.kaina ? "Neradome, kas parduodama." : "Neradome nei pavadinimo, nei kainos.") + "</b>" +
         '<div class="laukas">' +
         '<label class="etikete" for="rPavadinimas">Kas tai per daiktas</label>' +
         '<input type="text" id="rPavadinimas" placeholder="pvz. BMW 120 2008"></div>' +
@@ -2494,7 +2516,7 @@ const SKELBIMO_PATIKRA = {
       PALYGINIMAS.piesti("palyginimas");
       const pal = document.getElementById("palyginimas");
       if (pal && pal.parentNode && !tyliai) {
-        try { pal.parentNode.scrollIntoView({ behavior: ramiai ? "auto" : "smooth", block: "start" }); } catch (e) {}
+        try { deze.scrollIntoView({ behavior: ramiai ? "auto" : "smooth", block: "start" }); } catch (e) {}
       }
       return;
     }
@@ -2628,6 +2650,10 @@ const SKELBIMO_PATIKRA = {
     if (nuoroda) nuoroda.addEventListener("keydown", e => {
       if (e.key === "Enter") { e.preventDefault(); isNuorodos(); }
     });
+    /* Pakeitus tekstą, ankstesnio skelbimo duomenys nebegalioja: kitaip kainos
+       keitimas tyliai perskaičiuotų seną skelbimą. Įklijuotas tekstas po šio
+       įvykio įvertinamas iš naujo ir duomenys vėl atsiranda. */
+    tekstas.addEventListener("input", () => { this.duomenys = null; });
     tekstas.addEventListener("paste", e => {
       const t = (e.clipboardData || window.clipboardData).getData("text");
       if (!t) return;
@@ -2765,8 +2791,9 @@ function ikona(raktas) {
     /* Skaičius rodomas tik ieškant — be paieškos jis nieko nepasako. */
     if (kiekis) kiekis.textContent = q ? "Rasta: " + sarasas.length : "";
     if (!sarasas.length) {
-      deze.innerHTML = '<p class="pasiulymai-tuscia">Tokio įrankio dar nėra. Parašyk mums per ' +
-        '<a href="kontaktai.html">kontaktus</a> — gal būtent jį ir padarysime.</p>';
+      deze.innerHTML = '<p class="pasiulymai-tuscia">Tokio įrankio dar nėra.' + (SVETAINE.pastas
+        ? ' Parašyk mums per <a href="kontaktai.html">kontaktus</a> — gal būtent jį ir padarysime.'
+        : '') + '</p>';
       return;
     }
     const grupes = [];
@@ -3295,7 +3322,7 @@ const FORMA = {
 
       '<section class="zingsnis" id="kriterijuSkiltis" style="display:none;"></section>' +
 
-      z("Nuotraukos", "Nebūtina — su jomis atsakymas tikslesnis", `
+      z("Nuotraukos", PATIKRA.agentasGalimas() ? "Nebūtina — su jomis atsakymas tikslesnis" : "Nebūtina", `
         <input type="file" id="nuotraukos" name="nuotraukos" accept="image/*" multiple class="tik-skaitytuvui">
         <label class="nuotrauku-zona" id="nuotraukuZona" for="nuotraukos">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"
@@ -3411,7 +3438,7 @@ const FORMA = {
         ? '<span style="color:var(--zenklas);">Šios prekės kataloge dar nėra.</span>'
         : yraMetai
         ? '<span style="color:var(--zenklas);">Tikslaus modelio sąraše nėra — vertinsime pagal metus ir panašius daiktus.</span>'
-        : '<span style="color:var(--zenklas);">Įrašyk pagaminimo metus — tada vertę pasakysime bet kuriam modeliui.</span>';
+        : '';
     } else if (rasta.tikslumas === "tikslus") {
       busena.innerHTML = '<span style="color:var(--gerai);">Kataloge yra: ' +
                          rasta.raktas + '</span>';
@@ -3599,8 +3626,12 @@ const FORMA = {
     });
     if (html) klaida.innerHTML = html; else klaida.textContent = tekstas;
 
+    /* Laukų poroje (metai + kaina) klaida eina po visa eilute — kitaip
+       antras laukas nusileistų ir eilutė atrodytų sugriuvusi. */
+    const poros = laukas && laukas.closest(".laukai-poromis");
     const vieta = laukas && laukas.closest(".laukas");
-    if (vieta) vieta.appendChild(klaida);
+    if (poros) poros.after(klaida);
+    else if (vieta) vieta.appendChild(klaida);
     else if (klaidosVieta) klaidosVieta.parentNode.insertBefore(klaida, klaidosVieta);
     klaida.style.display = "block";
 
@@ -3608,6 +3639,13 @@ const FORMA = {
       laukas.setAttribute("aria-invalid", "true");
       laukas.setAttribute("aria-describedby", "formosKlaida");
       laukas.focus({ preventScroll: true });
+      /* Pataisius lauką, klaida dingsta iškart, ne tik po kito paspaudimo. */
+      laukas.addEventListener("input", function () {
+        if (laukas.getAttribute("aria-invalid") !== "true") return;
+        klaida.style.display = "none";
+        laukas.removeAttribute("aria-invalid");
+        laukas.removeAttribute("aria-describedby");
+      }, { once: true });
     } else {
       klaida.focus({ preventScroll: true });
     }
@@ -3689,7 +3727,7 @@ const FORMA = {
           'elektronika, buitinė technika ar dviratis, rinkis <a href="paslauga.html">tą skiltį</a>.');
       }
       return rodytiKlaida("",
-        "<b>Trūksta pagaminimo metų.</b> Įrašyk juos laukelyje „Pagaminimo metai“.",
+        "<b>Įrašyk pagaminimo metus.</b>",
         document.getElementById("metai"));
     }
 
@@ -3873,12 +3911,14 @@ const FORMA = {
         "<span>Rinkos kaina čia nebetaikoma. Likutinė vertė <b>" +
         euraiRezis(r.lauzoVerte.nuo, r.lauzoVerte.iki) + "</b>" +
         (r.lauzoVerte.paaiskinimas ? " — " + r.lauzoVerte.paaiskinimas : "") + ".</span></div>"
-      : '<div style="display:flex;align-items:baseline;justify-content:space-between;' +
-        'gap:16px;padding:14px 0 0;">' +
-        '<span class="etikete">Sutvarkymas apytiksliai</span>' +
-        '<span class="skaicius" style="font-size:22px;color:var(--pavojus);">' +
-        euraiRezis(r.remontoNuo, r.remontoIki) + "</span></div>" +
-        '<span class="smulkus" style="margin-top:10px;">Apytiksliai — tikslią kainą pasakys servisas.</span>';
+      : (r.remontoIki > 0
+        ? '<div style="display:flex;align-items:baseline;justify-content:space-between;' +
+          'gap:16px;padding:14px 0 0;">' +
+          '<span class="etikete">Sutvarkymas apytiksliai</span>' +
+          '<span class="skaicius" style="font-size:22px;color:var(--pavojus);">' +
+          euraiRezis(r.remontoNuo, r.remontoIki) + "</span></div>" +
+          '<span class="smulkus" style="margin-top:10px;">Tikslią kainą pasakys servisas.</span>'
+        : "");
 
     sugDeze.innerHTML =
       '<div class="kortele stulpelis" style="padding:26px 28px;">' +
@@ -3923,11 +3963,11 @@ const FORMA = {
 
     if (r.pasitikejimas && r.pasitikejimas !== "aukstas") {
       eilutes.push(r.pasitikejimas === "zemas"
-        ? "Tikslumas <b>žemas</b>: atsakymas rodo tvarką, ne tikslų skaičių. " +
+        ? "Duomenų dar mažai: tai apytikslė vertė, ne tikslus skaičius. " +
           "Kuo daugiau tokių daiktų bus patikrinta, tuo siauresnis taps rėžis."
         : (r.saltinis === "panasus"
-            ? "Tikslumas <b>vidutinis</b>: remtasi panašiais, o ne tais pačiais daiktais."
-            : "Tikslumas <b>vidutinis</b>: šio modelio kainų surinkta dar nedaug."));
+            ? "Remtasi panašiais, o ne tais pačiais daiktais."
+            : "Šio modelio kainų surinkta dar nedaug."));
     }
 
     eilutes.push(r.bukleIsNuotrauku
@@ -3938,7 +3978,7 @@ const FORMA = {
        dalyvavo, bet negauna svetimo darbo recepto. */
     if (r.pataisos && r.pataisos.length) {
       eilutes.push("Papildomai įskaityta: " +
-        r.pataisos.map(p => p.pav).join("; ") + "." +
+        r.pataisos.map(p => p.pav.charAt(0).toLocaleLowerCase("lt") + p.pav.slice(1)).join("; ") + "." +
         (r.pataisosApribotos
           ? " Dalis nurodymų persidengia, tad bendras poveikis apribotas."
           : ""));
@@ -3956,10 +3996,10 @@ const FORMA = {
     }
 
     if (r.nuotraukos && r.nuotraukos.kiek > 0) {
-      const pas = { aukstas: "aukštas", vidutinis: "vidutinis", zemas: "žemas" }[r.nuotraukos.pasitikejimas];
+      const pas = { aukstas: "aukšta", vidutinis: "vidutinė", zemas: "žema" }[r.nuotraukos.pasitikejimas];
       eilutes.push(r.bukleIsNuotrauku
-        ? "Nuotraukų tikslumas — <b>" + pas + "</b>."
-        : "Nuotraukų tikslumas — <b>" + pas + "</b>. " + r.nuotraukos.tekstas);
+        ? "Nuotraukų kokybė — <b>" + pas + "</b>."
+        : "Nuotraukų kokybė — <b>" + pas + "</b>. " + r.nuotraukos.tekstas);
     }
 
     const varnele = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A5A2E" ' +

@@ -248,7 +248,7 @@ a:focus-visible, button:focus-visible, .lastele:focus-visible { outline: 2px sol
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0s !important; transition-duration: 1ms !important; transition-delay: 0s !important; }
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0s !important; transition: none !important; }
 }
 
 /* --- Telefonas ir siauri ekranai: viskas teka žemyn ----------------------- */
@@ -311,6 +311,7 @@ body.siauras .kodel { position: relative; left: auto; bottom: auto; width: auto;
     <h2 id="kontaktaiAnt">Kontaktai</h2>
     <button type="button" class="uzverti" aria-label="Uždaryti">&times;</button>
     <dl>
+      <dt data-pastas-eilute hidden><b>El. paštas</b></dt><dd data-pastas-eilute hidden><a id="pastas"></a></dd>
       <dt><b>Adresas</b></dt><dd>Alytus, Lietuva</dd>
     </dl>
   </section>
@@ -338,6 +339,7 @@ body.siauras .kodel { position: relative; left: auto; bottom: auto; width: auto;
   </div>
 </main>
 
+<script src="nustatymai.js"></script>
 <script>
 (function () {
   "use strict";
@@ -365,8 +367,8 @@ body.siauras .kodel { position: relative; left: auto; bottom: auto; width: auto;
       apie: "Įklijuok skelbimo tekstą — vertę pasakau iškart.",
       zodziai: "skelbimas skelbimo skelbimą nuoroda kaina kainos brangu brangus brangiai pigu pigus autoplius skelbiu patikrink tikrinti gera normali" },
     { pav: "Pilnas vertinimas", url: "paslauga.html", ik: "kamera", rezimas: "vertina",
-      apie: "Nuotraukos, būklė ir sugadintos detalės — su remonto kainomis.",
-      zodziai: "vertinimas įvertink įvertinti nuotraukos nuotrauka būklė sugadinta sugadintas sudaužytas remontas detalės kiek vertas verta vertė baldai sofa spinta stalas instrumentas gitara žaislai daiktas daiktą" },
+      apie: "Būklė ir sugadintos detalės — su remonto kainomis.",
+      zodziai: "vertinimas įvertink įvertinti nuotraukos nuotrauka būklė sugadinta sugadintas sudaužytas remontas detalės kiek vertas verta vertė daiktas daiktą" },
     { pav: "Kainų palyginimas", url: "palyginimas.html", ik: "svarstykles", rezimas: "iesko",
       apie: "Keli skelbimai šalia — matai, kuris iš tikrųjų vertas pinigų.",
       zodziai: "palygink palyginti palyginimas kuris geresnis geriausias variantai keli kelis rask surask ieškau pasirinkti rinktis" },
@@ -456,7 +458,7 @@ body.siauras .kodel { position: relative; left: auto; bottom: auto; width: auto;
 
     if (G.siauras) {
       kristina.style.cssText = ""; apacia.style.cssText = ""; antraste.style.cssText = ""; skaitiklis.style.cssText = "";
-      if (antraste.parentNode === apacia) { lasteles.before(antraste); antraste.after(seklos); }   /* telefone teka su puslapiu */
+      if (antraste.parentNode === apacia) { apacia.before(antraste); antraste.after(seklos); }   /* telefone teka su puslapiu */
     } else {
       if (antraste.parentNode !== apacia) { apacia.prepend(seklos); apacia.prepend(antraste); }
       kristina.style.cssText = "";
@@ -753,6 +755,7 @@ body.siauras .kodel { position: relative; left: auto; bottom: auto; width: auto;
     if (!q) { istirpdyk(); rasykSrove([]); skaiciuok([]); busena("klausosi", "aidas klausosi"); return; }
 
     var skydas = skydasPagal(q);
+    if (!skydas) atverkSkyda(null);                     /* naujas klausimas uždaro skydą, kad neužstotų atsakymo */
     if (skydas) { istirpdyk(); rasykSrove([]); skaiciuok([]); atverkSkyda(skydas); busena("klausosi", skydas === "kainos" ? "aidas parodė kainas" : "aidas parodė kontaktus"); return; }
 
     var s = suprask(q);
@@ -837,6 +840,13 @@ body.siauras .kodel { position: relative; left: auto; bottom: auto; width: auto;
     skydai.forEach(function (s) { s.hidden = s.id !== id; });
     skydoMygtukai.forEach(function (m) { m.setAttribute("aria-expanded", String(m.dataset.skydas === id)); });
   }
+  /* El. paštas — iš nustatymai.js; kol neįrašytas, eilutė nerodoma */
+  (function () {
+    var pastas = String((window.AIDAS_NUSTATYMAI && window.AIDAS_NUSTATYMAI.pastas) || "").trim();
+    if (!pastas) return;
+    var a = $("pastas"); a.href = "mailto:" + pastas; a.textContent = pastas;
+    document.querySelectorAll("[data-pastas-eilute]").forEach(function (x) { x.hidden = false; });
+  })();
   /* „kontaktai", „kainos" — ne įrankis, o skydas šiame puslapyje */
   function skydasPagal(q) {
     var b = be(q).trim();
