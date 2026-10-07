@@ -2388,3 +2388,190 @@ details.zingsnis > summary:focus-visible { outline: 2px solid var(--akcentas); o
   .z-pdf-vieta { animation: z-pdf-vieta 4s infinite; }
   @keyframes z-pdf-vieta { 0%, 54% { fill: transparent; stroke: var(--lauko-krastas); } 58%, 92% { fill: var(--akcentas-sviesus); stroke: var(--akcentas); } 100% { fill: transparent; } }
 }
+
+/* === GYVA DEMONSTRACIJA: skelbimas perkeliamas iš kitos svetainės ==========
+   Viena 16 s scena. Ketvirtis = vienas žingsnis sąraše šalia:
+   0–25 % atidaro skelbimą, 25–50 % pažymi, 50–75 % kopijuoja ir pereina
+   į mūsų svetainę, 75–100 % įklijuoja ir gauna atsakymą. */
+.kaip-naudotis { position: relative; }
+.kaip-naudotis::before {
+  content: ""; position: absolute; inset: -40px -8% 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 55% at 18% 55%, rgba(143, 234, 242, .16), transparent 70%),
+    radial-gradient(ellipse 35% 50% at 85% 40%, rgba(255, 196, 107, .12), transparent 70%),
+    radial-gradient(ellipse 30% 40% at 55% 90%, rgba(201, 182, 255, .10), transparent 70%);
+  filter: blur(6px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .kaip-naudotis::before { animation: kaip-svytejimas 14s ease-in-out infinite alternate; }
+  @keyframes kaip-svytejimas { from { transform: translateX(-2%) scale(1); opacity: .8; } to { transform: translateX(2%) scale(1.06); opacity: 1; } }
+}
+
+.kaip-demo { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; margin-top: 16px; align-items: stretch; }
+.kaip-demo .kaip-sarasas { margin: 0; grid-template-columns: minmax(0, 1fr); gap: 10px; align-content: space-between; }
+.kaip-demo .kaip-zingsnis { padding: 14px 16px; justify-content: center; }
+.demo-langas {
+  border-radius: 18px; padding: 10px;
+  background: linear-gradient(145deg, rgba(143, 234, 242, .14), rgba(255, 196, 107, .08) 60%, rgba(201, 182, 255, .10));
+  border: 1px solid var(--linija);
+  box-shadow: 0 24px 60px rgba(0, 10, 20, .45);
+}
+.demo-scena { display: block; width: 100%; height: auto; font-family: var(--sans); }
+@media (max-width: 820px) {
+  .kaip-demo { grid-template-columns: minmax(0, 1fr); }
+  .kaip-demo .kaip-sarasas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .demo-langas { padding: 6px; border-radius: 14px; }
+  .kaip-demo .kaip-sarasas { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .kaip-demo .kaip-zingsnis { padding: 10px 12px; }
+}
+
+/* Spalvos */
+.d-remas { fill: #0B1C2A; stroke: rgba(143, 234, 242, .25); }
+.d-skirt rect { fill: rgba(255, 255, 255, .04); stroke: rgba(255, 255, 255, .08); }
+.d-skirt-1 rect { fill: rgba(255, 255, 255, .12); stroke: rgba(143, 234, 242, .45); }
+.d-ikona-a { fill: #E5484D; }
+.d-ikona-m { fill: var(--zydra); }
+.d-adresas { fill: rgba(255, 255, 255, .06); }
+.d-t { fill: var(--rasalas-2); font-size: 12px; font-weight: 500; }
+.d-t-skirt { font-size: 11px; fill: var(--rasalas); }
+.d-t-adr { font-size: 10.5px; fill: var(--prislopintas); font-family: var(--mono); }
+.d-adr-2, .d-p2, .d-meniu, .d-pranesimas, .d-raktas, .d-rez { opacity: 0; }
+.d-foto { fill: rgba(143, 234, 242, .12); }
+.d-auto { fill: rgba(143, 234, 242, .38); }
+.d-ratas { fill: #0B1C2A; stroke: rgba(143, 234, 242, .6); stroke-width: 3; }
+.d-t-ant { fill: var(--rasalas); font-size: 14px; font-weight: 700; }
+.d-t-kaina { fill: var(--akcentas); font-size: 22px; font-weight: 700; }
+.d-t-kaina-m { fill: var(--akcentas); font-weight: 700; }
+.d-eil { fill: rgba(255, 255, 255, .14); }
+.d-zym { fill: rgba(56, 132, 255, .30); transform-box: fill-box; transform-origin: 0 0; transform: scale(0); }
+.d-meniu > rect:first-child { fill: #F4FBFC; filter: drop-shadow(0 6px 14px rgba(0,0,0,.5)); }
+.d-meniu text { fill: #0A1D2B; }
+.d-meniu .d-t-blyskus { fill: #5B6B75; }
+.d-meniu-zym { fill: rgba(143, 234, 242, .0); }
+.d-pranesimas rect { fill: var(--gerai); }
+.d-pranesimas text { fill: #04281A; font-weight: 700; }
+.d-t-centras, .d-t-raktas, .d-t-mygt { text-anchor: middle; }
+.d-t-h { fill: var(--rasalas); font-size: 16px; font-weight: 700; letter-spacing: .02em; }
+.d-t-et { fill: var(--zydra); font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.d-laukas { fill: rgba(255, 255, 255, .05); stroke: var(--lauko-krastas); }
+.d-iklijuota { clip-path: inset(0 100% 0 0); }
+.d-iklijuota .d-t { fill: var(--rasalas); }
+.d-zymeklis { fill: var(--zydra); opacity: 0; }
+.d-mygtukas rect { fill: var(--akcentas); }
+.d-t-mygt { fill: #2B1A00; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.d-rez rect { fill: rgba(110, 231, 183, .12); stroke: var(--gerai); }
+.d-rez circle { fill: var(--gerai); }
+.d-rez-blogai rect { fill: rgba(255, 143, 122, .12); stroke: var(--pavojus); }
+.d-rez-blogai circle { fill: var(--pavojus); }
+.d-t-rez { fill: var(--rasalas); font-size: 14px; font-weight: 700; }
+.d-t-mazas { fill: var(--prislopintas); font-size: 11px; }
+.d-raktas rect { fill: rgba(143, 234, 242, .18); stroke: var(--zydra); }
+.d-t-raktas { fill: var(--zydra); font-family: var(--mono); font-weight: 600; font-size: 11px; }
+.d-pele path { fill: #fff; stroke: #0A1D2B; stroke-width: 1.4; stroke-linejoin: round; }
+.d-spust { fill: none; stroke: var(--akcentas); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+/* Ramus vaizdas (be judesio): rodomas jau įklijuotas rezultatas */
+.d-pele { transform: translate(82px, 236px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .d-p1, .d-adr-1 { opacity: 0; }
+  .d-p2, .d-adr-2, .d-rez { opacity: 1; }
+  .d-iklijuota { clip-path: none; }
+  .d-skirt-1 rect { fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.08); }
+  .d-skirt-2 rect { fill: rgba(255,255,255,.12); stroke: rgba(143,234,242,.45); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .demo-scena * { animation-duration: 16s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+
+  .d-pele { animation-name: d-pele; }
+  @keyframes d-pele {
+    0%   { transform: translate(440px, 290px); opacity: 0; }
+    3%   { opacity: 1; }
+    13%, 23% { transform: translate(108px, 132px); }
+    27%  { transform: translate(24px, 80px); }
+    29%  { transform: translate(24px, 80px) scale(.88); }
+    42%, 49% { transform: translate(452px, 258px) scale(.88); }
+    50%  { transform: translate(452px, 258px); }
+    53%, 54% { transform: translate(330px, 160px); }
+    57%, 59% { transform: translate(372px, 176px); }
+    60%  { transform: translate(372px, 176px) scale(.88); }
+    61%  { transform: translate(372px, 176px); }
+    69%, 71% { transform: translate(236px, 28px); }
+    72%  { transform: translate(236px, 28px) scale(.88); }
+    73%  { transform: translate(236px, 28px); }
+    78%, 80% { transform: translate(200px, 166px); }
+    86%, 88% { transform: translate(80px, 236px); }
+    89%  { transform: translate(80px, 236px) scale(.88); }
+    90%, 96% { transform: translate(80px, 236px); opacity: 1; }
+    100% { transform: translate(80px, 236px); opacity: 0; }
+  }
+  .d-spust { animation-name: d-spust; animation-timing-function: ease-out; }
+  @keyframes d-spust {
+    0%, 22.5% { opacity: 0; transform: scale(.3); }
+    23%   { opacity: 1; transform: scale(.3); }
+    25%   { opacity: 0; transform: scale(1.6); }
+    25.1%, 59.4% { opacity: 0; transform: scale(.3); }
+    59.5% { opacity: 1; transform: scale(.3); }
+    61.5% { opacity: 0; transform: scale(1.6); }
+    61.6%, 71.4% { opacity: 0; transform: scale(.3); }
+    71.5% { opacity: 1; transform: scale(.3); }
+    73.5% { opacity: 0; transform: scale(1.6); }
+    73.6%, 79.4% { opacity: 0; transform: scale(.3); }
+    79.5% { opacity: 1; transform: scale(.3); }
+    81.5% { opacity: 0; transform: scale(1.6); }
+    81.6%, 88.4% { opacity: 0; transform: scale(.3); }
+    88.5% { opacity: 1; transform: scale(.3); }
+    90.5% { opacity: 0; transform: scale(1.6); }
+    100% { opacity: 0; }
+  }
+
+  /* 1 žingsnis: užvedus ant skelbimo — nuotrauka sušvyti */
+  .d-foto { animation-name: d-foto; }
+  @keyframes d-foto { 0%, 12% { fill: rgba(143,234,242,.12); } 15%, 24% { fill: rgba(143,234,242,.24); } 27%, 100% { fill: rgba(143,234,242,.12); } }
+
+  /* 2 žingsnis: pažymėjimas tempiant pelę */
+  .d-zym { animation-name: d-zym; animation-timing-function: linear; }
+  @keyframes d-zym {
+    0%, 28% { transform: scale(0); }
+    29%  { transform: scale(.02, .04); }
+    42%, 74% { transform: scale(1); }
+    75%, 100% { transform: scale(0); }
+  }
+  .d-raktas-a { animation-name: d-raktas-a; }
+  @keyframes d-raktas-a { 0%, 30% { opacity: 0; } 33%, 46% { opacity: 1; } 49%, 100% { opacity: 0; } }
+
+  /* 3 žingsnis: dešinys spustelėjimas → Kopijuoti → kitas skirtukas */
+  .d-meniu { animation-name: d-meniu; animation-timing-function: steps(1, end); }
+  @keyframes d-meniu { 0% { opacity: 0; } 54% { opacity: 1; } 61% { opacity: 0; } 100% { opacity: 0; } }
+  .d-meniu-zym { animation-name: d-meniu-zym; }
+  @keyframes d-meniu-zym { 0%, 56% { fill: rgba(143,234,242,0); } 57.5%, 61% { fill: rgba(143,234,242,.55); } 62%, 100% { fill: rgba(143,234,242,0); } }
+  .d-pranesimas { animation-name: d-pranesimas; }
+  @keyframes d-pranesimas { 0%, 61% { opacity: 0; transform: translateY(8px); } 63%, 70% { opacity: 1; transform: none; } 73%, 100% { opacity: 0; } }
+
+  /* Puslapio perjungimas 72 % */
+  .d-p1, .d-adr-1 { animation-name: d-rodyti-pirma; animation-timing-function: steps(1, end); }
+  .d-p2, .d-adr-2 { animation-name: d-rodyti-antra; animation-timing-function: steps(1, end); }
+  @keyframes d-rodyti-pirma { 0% { opacity: 1; } 72.5% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes d-rodyti-antra { 0% { opacity: 0; } 72.5% { opacity: 1; } 100% { opacity: 1; } }
+  .d-skirt-1 rect { animation-name: d-skirt-1; animation-timing-function: steps(1, end); }
+  .d-skirt-2 rect { animation-name: d-skirt-2; animation-timing-function: steps(1, end); }
+  @keyframes d-skirt-1 { 0% { fill: rgba(255,255,255,.12); stroke: rgba(143,234,242,.45); } 72.5% { fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.08); } 100% { fill: rgba(255,255,255,.04); } }
+  @keyframes d-skirt-2 { 0% { fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.08); } 72.5% { fill: rgba(255,255,255,.12); stroke: rgba(143,234,242,.45); } 100% { fill: rgba(255,255,255,.12); } }
+
+  /* 4 žingsnis: įklijavimas ir atsakymas */
+  .d-zymeklis { animation-name: d-zymeklis; animation-timing-function: steps(1, end); }
+  @keyframes d-zymeklis { 0% { opacity: 0; } 80% { opacity: 1; } 81.5% { opacity: 0; } 83% { opacity: 1; } 84% { opacity: 0; } 100% { opacity: 0; } }
+  .d-raktas-v { animation-name: d-raktas-v; }
+  @keyframes d-raktas-v { 0%, 80% { opacity: 0; } 81.5%, 88% { opacity: 1; } 90%, 100% { opacity: 0; } }
+  .d-iklijuota { animation-name: d-iklijuota; animation-timing-function: steps(1, end); }
+  @keyframes d-iklijuota { 0% { clip-path: inset(0 100% 0 0); } 82.5% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 0 0 0); } }
+  .d-mygtukas rect { animation-name: d-mygtukas; }
+  @keyframes d-mygtukas { 0%, 88% { fill: var(--akcentas); } 89%, 90.5% { fill: var(--akcentas-tamsus); } 92%, 100% { fill: var(--akcentas); } }
+  .d-rez { animation-name: d-rez; }
+  @keyframes d-rez { 0%, 90% { opacity: 0; transform: translateY(10px); } 92.5%, 100% { opacity: 1; transform: none; } }
+
+  /* Žingsniai šalia — paryškinami kartu su scena */
+  .kaip-demo .kaip-zingsnis { animation: kaip-eile 16s infinite; animation-delay: calc(var(--i) * 4s); }
+}
