@@ -2158,3 +2158,233 @@ details.zingsnis > summary:focus-visible { outline: 2px solid var(--akcentas); o
 
 /* Pažyma: etiketės tamsios ant balto, ne žydros (kontrastas 5,3:1). */
 .sertifikatas .etikete, .sertifikatas .antraste-maza { color: var(--prislopintas); }
+
+/* === KAIP NAUDOTIS: žingsnių kortelės įrankių puslapiuose ==================
+   Turinį ir paveikslėlius piešia zingsniai.js. Kortelės paryškinamos iš
+   eilės (po 4 s), paveikslėliai juda patys. Jei lankytojas išjungęs
+   judesį — rodomas ramus vaizdas. */
+.kaip-naudotis { padding-bottom: 28px; }
+.kaip-naudotis > details > summary {
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer; list-style: none;
+  padding: 8px 16px; border: 1px solid var(--lauko-krastas); border-radius: 999px;
+  font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--zydra);
+}
+.kaip-naudotis > details > summary::-webkit-details-marker { display: none; }
+.kaip-naudotis > details > summary::after {
+  content: ""; width: 7px; height: 7px; margin-top: -3px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg);
+  transition: transform .2s;
+}
+.kaip-naudotis > details[open] > summary::after { transform: rotate(-135deg); margin-top: 3px; }
+.kaip-naudotis > details > summary:hover { border-color: var(--zydra); }
+.kaip-naudotis > details > summary:focus-visible { outline: 2px solid var(--akcentas); outline-offset: 3px; }
+
+.kaip-sarasas {
+  list-style: none; margin: 16px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 14px;
+}
+.kaip-zingsnis {
+  display: flex; flex-direction: column; gap: 12px; padding: 14px 14px 18px;
+  background: var(--plokste); border: 1px solid var(--linija); border-radius: 16px;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.kaip-piesinys { border-radius: 10px; background: rgba(4, 14, 24, .45); }
+.kaip-piesinys svg { display: block; width: 100%; max-width: 280px; height: auto; margin: 0 auto; }
+.kaip-tekstas { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; row-gap: 4px; }
+.kaip-nr { grid-row: 1 / span 2; font-family: var(--mono); font-size: 13px; color: var(--akcentas); padding-top: 2px; }
+.kaip-tekstas h3 { margin: 0; font-family: var(--sans); font-size: 15.5px; font-weight: 600; line-height: 1.3; color: var(--rasalas); }
+.kaip-tekstas p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--rasalas-2); }
+
+@media (max-width: 980px) { .kaip-sarasas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .kaip-sarasas { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .kaip-zingsnis { flex-direction: row; align-items: center; padding: 10px; }
+  .kaip-piesinys { flex: 0 0 132px; }
+}
+
+/* Piešinių spalvos */
+.kaip-piesinys svg { font-family: var(--sans); }
+.z-remas { fill: rgba(255, 255, 255, .04); stroke: var(--lauko-krastas); stroke-width: 1.5; }
+.z-remas-zyd { stroke: var(--zydra); }
+.z-linija { fill: var(--rasalas); opacity: .32; }
+.z-linija-tamsi { fill: #0A1D2B; opacity: .35; }
+.z-akc, .z-akc-ap { fill: var(--akcentas); }
+.z-taskas { fill: var(--lauko-krastas); }
+.z-adresas, .z-laukas { fill: rgba(255, 255, 255, .06); stroke: var(--lauko-krastas); }
+.z-foto { fill: rgba(143, 234, 242, .14); stroke: rgba(143, 234, 242, .3); }
+.z-foto-kalnas { fill: rgba(143, 234, 242, .32); }
+.z-etiketes { fill: var(--zydra); opacity: .7; }
+.z-tekstas { fill: var(--rasalas); font-size: 9.5px; font-weight: 500; }
+.z-svet, .z-raktas text, .z-mygtuko-tekstas, .z-pdf, .z-pdf-mazas { text-anchor: middle; }
+.z-svet { font-size: 10px; fill: var(--zydra); }
+.z-raktas rect { fill: rgba(143, 234, 242, .12); stroke: var(--zydra); }
+.z-raktas text { fill: var(--zydra); font-weight: 600; font-family: var(--mono); font-size: 10px; }
+.z-pele { fill: #fff; stroke: #0A1D2B; stroke-width: 1; }
+.z-zymejimas { fill: rgba(143, 234, 242, .26); }
+.z-segtukas { fill: var(--zydra); opacity: .6; }
+.z-zymeklis { fill: var(--zydra); }
+.z-varnele circle { fill: var(--gerai); }
+.z-varnele path { fill: none; stroke: #0A1D2B; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.z-geriausias { stroke: var(--gerai); }
+.z-zvaigzde { fill: var(--akcentas); }
+.z-mygt { fill: transparent; stroke: var(--lauko-krastas); stroke-width: 1.2; }
+.z-mygt-pasirinktas, .z-mygt-pasirinktas-2 { fill: var(--akcentas); stroke: var(--akcentas); }
+.z-didelis { font-size: 26px; font-weight: 700; }
+.z-skale { fill: rgba(255, 255, 255, .08); }
+.z-skale-pilna { fill: var(--zydra); opacity: .55; }
+.z-rodykle { fill: #fff; stroke: var(--zydra); stroke-width: 2; }
+.z-mygtukas { fill: var(--akcentas); }
+.z-mygtuko-tekstas { fill: var(--ant-akcento, #2B1A00); font-weight: 700; font-size: 9px; letter-spacing: .04em; }
+.z-plysys { fill: #04101A; }
+.z-lapas-baltas { fill: #fff; }
+.z-pdf { fill: var(--zydra); font-weight: 700; font-size: 12px; letter-spacing: .1em; }
+.z-pdf-mazas { fill: #C8372D; font-weight: 700; font-size: 11px; }
+.z-pdf-vieta { fill: transparent; stroke: var(--lauko-krastas); stroke-dasharray: 3 3; }
+
+/* Pradinė ramaus vaizdo būsena (kai judesys išjungtas) */
+.z-svet-2, .z-kopija { opacity: 0; }
+.z-pele-narsykle { transform: translate(52px, 60px); }
+.z-pele-pasirinkti { transform: translate(96px, 46px); }
+.z-pele-atsakymas { transform: translate(110px, 30px); }
+.z-skaicius-1, .z-skaicius-2 { opacity: 0; }
+.z-rodykle { transform: translateX(100px); }
+.z-skale-pilna { transform-box: fill-box; transform-origin: left; transform: scaleX(.7); }
+.z-pdf-lapas { transform-box: fill-box; transform-origin: center; transform: translate(101px, 33px) scale(.25); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .kaip-zingsnis { animation: kaip-eile 16s infinite; animation-delay: calc(var(--i) * 4s); }
+  @keyframes kaip-eile {
+    0%, 22% { border-color: var(--zydra); box-shadow: 0 0 0 1px rgba(143, 234, 242, .25), 0 16px 40px rgba(0, 10, 20, .35); }
+    27%, 100% { border-color: var(--linija); box-shadow: none; }
+  }
+
+  .kaip-piesinys svg * { transform-box: fill-box; }
+  .kaip-piesinys svg .z-pele, .kaip-piesinys svg .z-rodykle { transform-box: view-box; }
+
+  /* narsykle */
+  .z-svet-1 { animation: z-svet-a 6s infinite; }
+  .z-svet-2 { animation: z-svet-b 6s infinite; }
+  @keyframes z-svet-a { 0%, 45% { opacity: 1; } 50%, 95% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes z-svet-b { 0%, 45% { opacity: 0; } 50%, 95% { opacity: 1; } 100% { opacity: 0; } }
+  .z-pele-narsykle { animation: z-pele-n 3s infinite ease-in-out; }
+  @keyframes z-pele-n {
+    0% { transform: translate(165px, 104px); }
+    45%, 55% { transform: translate(52px, 60px); }
+    60% { transform: translate(52px, 60px) scale(.85); }
+    65%, 100% { transform: translate(52px, 60px); }
+  }
+  .z-narsykle .z-foto { animation: z-foto 3s infinite; }
+  @keyframes z-foto { 0%, 58% { stroke: rgba(143,234,242,.3); } 62%, 90% { stroke: var(--zydra); stroke-width: 2; } 100% { stroke: rgba(143,234,242,.3); } }
+
+  /* pazymeti / kopijuoti / iklijuoti: klavišas spusteli */
+  .z-raktas { transform-origin: center; animation: z-raktas 4s infinite; }
+  @keyframes z-raktas { 0%, 8% { transform: scale(1); } 12% { transform: scale(.88); } 18%, 100% { transform: scale(1); } }
+  .z-raktas rect { animation: z-raktas-sv 4s infinite; }
+  @keyframes z-raktas-sv { 0%, 8% { fill: rgba(143,234,242,.12); } 12%, 22% { fill: rgba(143,234,242,.45); } 30%, 100% { fill: rgba(143,234,242,.12); } }
+
+  .z-zymejimas { transform-origin: left top; animation: z-zym 4s infinite; }
+  @keyframes z-zym {
+    0%, 12% { transform: scale(0, 1); opacity: 1; }
+    30%, 85% { transform: scale(1, 1); opacity: 1; }
+    95%, 100% { transform: scale(1, 1); opacity: 0; }
+  }
+
+  .z-kopija { animation: z-kop 4s infinite ease-in-out; }
+  @keyframes z-kop {
+    0%, 14% { transform: translate(0, 0); opacity: 0; }
+    20% { transform: translate(0, 0); opacity: 1; }
+    60%, 85% { transform: translate(102px, 4px); opacity: 1; }
+    95%, 100% { transform: translate(102px, 4px); opacity: 0; }
+  }
+
+  .z-ateina { transform-origin: left center; animation: z-ateina 4s infinite; }
+  .z-ateina-2 { animation-name: z-ateina-2; }
+  .z-ateina-3 { animation-name: z-ateina-3; }
+  .z-ateina-4 { animation-name: z-ateina-4; }
+  @keyframes z-ateina   { 0%, 16% { transform: scaleX(0); } 24%, 92% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+  @keyframes z-ateina-2 { 0%, 22% { transform: scaleX(0); } 30%, 92% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+  @keyframes z-ateina-3 { 0%, 28% { transform: scaleX(0); } 36%, 92% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+  @keyframes z-ateina-4 { 0%, 34% { transform: scaleX(0); } 42%, 92% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+  .z-zymeklis { animation: z-zymeklis 4s infinite steps(1); }
+  @keyframes z-zymeklis { 0% { opacity: 1; } 5% { opacity: 0; } 10% { opacity: 1; } 15%, 100% { opacity: 0; } }
+  .z-varnele { transform-origin: center; animation: z-varnele 4s infinite; }
+  @keyframes z-varnele { 0%, 48% { transform: scale(0); } 56% { transform: scale(1.15); } 60%, 92% { transform: scale(1); } 100% { transform: scale(0); } }
+
+  /* sarasas */
+  .z-eilute { animation: z-eilute 4s infinite ease-out; }
+  .z-eilute-2 { animation-name: z-eilute-2; }
+  .z-eilute-3 { animation-name: z-eilute-3; }
+  @keyframes z-eilute   { 0% { transform: translateX(-30px); opacity: 0; } 12%, 92% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+  @keyframes z-eilute-2 { 0%, 14% { transform: translateX(-30px); opacity: 0; } 26%, 92% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+  @keyframes z-eilute-3 { 0%, 28% { transform: translateX(-30px); opacity: 0; } 40%, 92% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+  .z-geriausias { animation: z-geriausias 4s infinite; }
+  @keyframes z-geriausias { 0%, 50% { stroke: var(--lauko-krastas); } 56%, 92% { stroke: var(--gerai); stroke-width: 2; } 100% { stroke: var(--lauko-krastas); } }
+  .z-zvaigzde { transform-origin: center; animation: z-varnele 4s infinite; }
+
+  /* pildyti */
+  .z-rasomas { animation: z-rasyti 4s infinite steps(10); }
+  .z-rasomas-2 { animation-name: z-rasyti-2; animation-timing-function: steps(4); }
+  .z-rasomas-3 { animation-name: z-rasyti-3; animation-timing-function: steps(6); }
+  @keyframes z-rasyti   { 0%, 5% { clip-path: inset(0 100% 0 0); } 30%, 92% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 100% 0 0); } }
+  @keyframes z-rasyti-2 { 0%, 34% { clip-path: inset(0 100% 0 0); } 46%, 92% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 100% 0 0); } }
+  @keyframes z-rasyti-3 { 0%, 50% { clip-path: inset(0 100% 0 0); } 66%, 92% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 100% 0 0); } }
+
+  /* pasirinkti */
+  .z-pele-pasirinkti { animation: z-pele-p 4s infinite ease-in-out; }
+  @keyframes z-pele-p {
+    0% { transform: translate(170px, 100px); }
+    22%, 28% { transform: translate(96px, 46px); }
+    31% { transform: translate(96px, 46px) scale(.85); }
+    34% { transform: translate(96px, 46px); }
+    58%, 64% { transform: translate(58px, 86px); }
+    67% { transform: translate(58px, 86px) scale(.85); }
+    70%, 100% { transform: translate(58px, 86px); }
+  }
+  .z-mygt-pasirinktas { animation: z-pas-1 4s infinite; }
+  .z-mygt-pasirinktas-2 { animation: z-pas-2 4s infinite; }
+  @keyframes z-pas-1 { 0%, 30% { fill: transparent; stroke: var(--lauko-krastas); } 32%, 94% { fill: var(--akcentas); stroke: var(--akcentas); } 100% { fill: transparent; stroke: var(--lauko-krastas); } }
+  @keyframes z-pas-2 { 0%, 66% { fill: transparent; stroke: var(--lauko-krastas); } 68%, 94% { fill: var(--akcentas); stroke: var(--akcentas); } 100% { fill: transparent; stroke: var(--lauko-krastas); } }
+
+  /* verte */
+  .z-skaicius-1 { animation: z-sk-1 6s infinite; }
+  .z-skaicius-2 { animation: z-sk-2 6s infinite; }
+  .z-skaicius-3 { animation: z-sk-3 6s infinite; }
+  @keyframes z-sk-1 { 0%, 30% { opacity: 1; } 33%, 100% { opacity: 0; } }
+  @keyframes z-sk-2 { 0%, 30% { opacity: 0; } 33%, 63% { opacity: 1; } 66%, 100% { opacity: 0; } }
+  @keyframes z-sk-3 { 0%, 63% { opacity: 0; } 66%, 100% { opacity: 1; } }
+  .z-rodykle { animation: z-rodykle 6s infinite ease-in-out; }
+  @keyframes z-rodykle { 0%, 28% { transform: translateX(118px); } 36%, 61% { transform: translateX(78px); } 69%, 100% { transform: translateX(100px); } }
+  .z-skale-pilna { animation: z-skale 6s infinite ease-in-out; }
+  @keyframes z-skale { 0%, 28% { transform: scaleX(.82); } 36%, 61% { transform: scaleX(.54); } 69%, 100% { transform: scaleX(.7); } }
+
+  /* atsakymas */
+  .z-pele-atsakymas { animation: z-pele-a 4s infinite ease-in-out; }
+  @keyframes z-pele-a {
+    0% { transform: translate(175px, 60px); }
+    22%, 28% { transform: translate(110px, 30px); }
+    31% { transform: translate(110px, 30px) scale(.85); }
+    34%, 100% { transform: translate(110px, 30px); }
+  }
+  .z-mygtukas { animation: z-mygtukas 4s infinite; }
+  @keyframes z-mygtukas { 0%, 29% { fill: var(--akcentas); } 31%, 36% { fill: var(--akcentas-tamsus); } 40%, 100% { fill: var(--akcentas); } }
+  .z-isvada { animation: z-isvada 4s infinite ease-out; }
+  @keyframes z-isvada { 0%, 34% { transform: translateY(14px); opacity: 0; } 46%, 92% { transform: none; opacity: 1; } 100% { opacity: 0; } }
+  .z-atsakymas .z-varnele { animation: z-varnele-v 4s infinite; }
+  @keyframes z-varnele-v { 0%, 52% { transform: scale(0); } 60% { transform: scale(1.15); } 64%, 92% { transform: scale(1); } 100% { transform: scale(0); } }
+
+  /* spausdinti */
+  .z-popierius { animation: z-popierius 4s infinite ease-out; }
+  @keyframes z-popierius { 0%, 15% { transform: translateY(-34px); } 55%, 90% { transform: none; } 100% { transform: translateY(-34px); } }
+  .z-akc-ap { animation: z-lempute 1s infinite alternate; }
+  @keyframes z-lempute { from { opacity: 1; } to { opacity: .3; } }
+
+  /* prideti */
+  .z-pdf-lapas { transform-origin: center; animation: z-pdf 4s infinite ease-in-out; }
+  @keyframes z-pdf {
+    0%, 15% { transform: none; opacity: 1; }
+    55%, 88% { transform: translate(101px, 33px) scale(.25); opacity: 1; }
+    96%, 100% { transform: translate(101px, 33px) scale(.25); opacity: 0; }
+  }
+  .z-pdf-vieta { animation: z-pdf-vieta 4s infinite; }
+  @keyframes z-pdf-vieta { 0%, 54% { fill: transparent; stroke: var(--lauko-krastas); } 58%, 92% { fill: var(--akcentas-sviesus); stroke: var(--akcentas); } 100% { fill: transparent; } }
+}
