@@ -10,5 +10,5 @@
    nesiunčiamos ir forma „Nupirkai ar pardavei?“ nerodoma. */
 window.AIDAS_NUSTATYMAI = {
   pastas: "",
-  kainuApi: ""
+  kainuApi: "https://aidas-kainos.marijustamulynas.workers.dev"
 };
