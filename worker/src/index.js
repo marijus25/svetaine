@@ -15,6 +15,8 @@
 
 const KATEGORIJOS = new Set(["automobilis", "elektronika", "buitine_technika", "dviratis"]);
 const BUKLES = new Set(["ideali", "naudota", "pazeista", "lauzas"]);
+const DEZES = new Set(["automatine", "mechanine"]);
+const PAVAROS = new Set(["4x4", "priekiniai", "galiniai"]);
 
 const RIBA_PER_DIENA = 30;      /* vienas siuntėjas per parą */
 const MIN_NUOLAIDAI = 8;        /* tiek porų reikia, kad nuolaida pakeistų prielaidą */
@@ -65,6 +67,9 @@ async function priimtiKaina(req, env, cors) {
   const kuras = tekstas(b.kuras, 40) || null;
   const kebulas = tekstas(b.kebulas, 40) || null;
   const bukle = BUKLES.has(b.bukle) ? b.bukle : null;
+  const deze = DEZES.has(b.deze) ? b.deze : null;
+  const pavara = PAVAROS.has(b.pavara) ? b.pavara : null;
+  const galia = sveikas(b.galia, 20, 800);   /* kW */
   const prasyta = tipas === "pardavimo" ? skaicius(b.prasyta, 1, 2000000) : null;
 
   /* Siuntėjas — tik tos dienos maišos kodas. IP nesaugomas. */
@@ -97,9 +102,10 @@ async function priimtiKaina(req, env, cors) {
 
   await env.DB.prepare(
     "INSERT INTO kainos (tipas, pavadinimas, raktas, kategorija, metai, rida, kuras, kebulas, " +
-    "bukle, kaina, prasyta, siuntejas, patvirtinta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    "deze, pavara, galia, bukle, kaina, prasyta, siuntejas, patvirtinta) " +
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   ).bind(tipas, pavadinimas, raktas, kategorija, metai, rida, kuras, kebulas,
-         bukle, kaina, prasyta, siuntejas, patvirtinta).run();
+         deze, pavara, galia, bukle, kaina, prasyta, siuntejas, patvirtinta).run();
 
   return json({ ok: true }, 200, cors);
 }
@@ -111,7 +117,7 @@ async function rinka(url, env, cors) {
   const parametrai = KATEGORIJOS.has(kat) ? [kat] : [];
 
   const { results } = await env.DB.prepare(
-    "SELECT pavadinimas, kategorija, metai, rida, kuras, kebulas, bukle, kaina, tipas, " +
+    "SELECT pavadinimas, kategorija, metai, rida, kuras, kebulas, deze, pavara, galia, bukle, kaina, tipas, " +
     "substr(sukurta, 1, 10) AS data FROM kainos " +
     "WHERE patvirtinta = 1 AND sukurta > datetime('now', '-" + SAUGOMA_DIENU + " days')" + salyga +
     " ORDER BY id DESC LIMIT " + ATIDUODAMA_DAUGIAUSIA

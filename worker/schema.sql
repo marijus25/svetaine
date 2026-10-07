@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS kainos (
   rida         INTEGER,
   kuras        TEXT,
   kebulas      TEXT,
+  deze         TEXT,      -- 'automatine' | 'mechanine'
+  pavara       TEXT,      -- '4x4' | 'priekiniai' | 'galiniai'
+  galia        INTEGER,   -- kW
   bukle        TEXT,
   kaina        REAL    NOT NULL,
   prasyta      REAL,
@@ -31,3 +34,8 @@ CREATE TABLE IF NOT EXISTS kainos (
 CREATE INDEX IF NOT EXISTS kainos_kategorija ON kainos (kategorija, patvirtinta, id);
 CREATE INDEX IF NOT EXISTS kainos_raktas     ON kainos (raktas, patvirtinta);
 CREATE INDEX IF NOT EXISTS kainos_siuntejas  ON kainos (siuntejas, sukurta);
+
+-- 2026-10-07: jau sukurtai bazei pridėti stulpeliai (vykdyta vieną kartą):
+--   ALTER TABLE kainos ADD COLUMN deze TEXT;
+--   ALTER TABLE kainos ADD COLUMN pavara TEXT;
+--   ALTER TABLE kainos ADD COLUMN galia INTEGER;

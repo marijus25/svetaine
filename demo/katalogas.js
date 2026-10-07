@@ -119,6 +119,37 @@ const DETALES = {
         "paaiskinimas": "Nuo 150 000 km skaičiuojama į abi puses"
       },
       {
+        "raktas": "deze",
+        "pav": "Pavarų dėžė",
+        "tipas": "pasirinkimas",
+        "ypatybe": true,
+        "variantai": [
+          { "raktas": "automatine", "pav": "Automatinė" },
+          { "raktas": "mechanine", "pav": "Mechaninė" }
+        ]
+      },
+      {
+        "raktas": "pavara",
+        "pav": "Varantieji ratai",
+        "tipas": "pasirinkimas",
+        "ypatybe": true,
+        "variantai": [
+          { "raktas": "4x4", "pav": "Visi (4x4)" },
+          { "raktas": "priekiniai", "pav": "Priekiniai" },
+          { "raktas": "galiniai", "pav": "Galiniai" }
+        ]
+      },
+      {
+        "raktas": "galia",
+        "pav": "Galia",
+        "tipas": "skaicius",
+        "ypatybe": true,
+        "vienetas": "kW",
+        "zingsnis_ivesties": 1,
+        "uzuomina": "pvz. 110",
+        "paaiskinimas": "Skelbime: „Variklis … AG (… kW)“"
+      },
+      {
         "raktas": "ta",
         "pav": "Techninė apžiūra",
         "tipas": "pasirinkimas",
@@ -126,12 +157,12 @@ const DETALES = {
           {
             "raktas": "ilga",
             "pav": "Galioja ilgiau nei pusmetį",
-            "poveikis": 0.04
+            "poveikis": 0.0
           },
           {
             "raktas": "trumpa",
             "pav": "Galioja trumpiau nei pusmetį",
-            "poveikis": 0.0
+            "poveikis": -0.02
           },
           {
             "raktas": "nera",
@@ -864,14 +895,31 @@ const DETALES = {
 
 /* Klasės ir nuvertėjimo kreivės. Iš jų gaunama vertė tada, kai tikslaus įrašo
    kataloge nėra — kad atsakymas būtų VISADA. Šaltinis — klases.json.
-   Tai prielaidos, todėl rezultate rodomas žemas pasitikėjimas. */
+   Tai apytikslis įvertis, todėl rezultate rodomas žemas pasitikėjimas.
+
+   Automobilių kreivė sukalibruota 2026-10-07 pagal tikras Autoplius kainas:
+   13 modelių ir metų (Octavia 2018, Golf 2015, Passat 2016, 2012 ir 2008,
+   Insignia 2014 ir 2010, Qashqai 2012, RAV4 2016, A4 2013, BMW 520 2014,
+   Polo 2012, Corsa 2010), po ~20 skelbimų, mediana × NUOLAIDOS. Vidutinė
+   paklaida ~13 % (buvo ~45 %). Iki 12 metų −11 %/m., vėliau −26 %/m.
+   „nauja“ čia — kalibravimo dydis, ne salono kaina. Komercinių nematuota. */
 const KLASES = {
   "automobilis": {
     "metinis": 0.89,
-    "metinis_veliau": 0.84,
-    "veliau_nuo": 10,
+    "metinis_veliau": 0.74,
+    "veliau_nuo": 12,
     "kreive_naudota": true,
-    "riba": 0.06,
+    "riba": 0.03,
+    "ypatybes": {
+      "_pastaba": "Kiek pavarų dėžė, varantieji ratai ir galia keičia to paties modelio kainą, palyginti su įprasta tos klasės mašina. Patikrinta Autoplius 2026-10-07: Insignia 2014 su automatine ~10 % brangesnė (čia +5/−4 %); galingesnė versija brangesnė ~0,5–1 % už 1 % galios (Insignia, Octavia, Golf; čia 0,5 %). 4x4 — PRIELAIDA. Kai bazėje susikaups tos pačios mašinos kainų, jas pakeis tikri skirtumai.",
+      "deze": { "automatine": 0.05, "mechanine": -0.04 },
+      "pavara": { "4x4": 0.04, "4x4_klasei": { "visureigis": 0.02, "komercinis": 0.03 } },
+      "galia": {
+        "tipine_kw": { "miesto": 60, "kompaktinis": 85, "vidutinis": 110, "visureigis": 110, "komercinis": 85, "premium": 135 },
+        "uz_10_proc": 0.05,
+        "riba": 0.12
+      }
+    },
     "rida_per_metus": 15000,
     "rida_zingsnis": 10000,
     "rida_uz_zingsni": -0.012,
@@ -882,27 +930,27 @@ const KLASES = {
     "klases": {
       "miesto": {
         "pav": "Miesto automobilis",
-        "nauja": 16000
+        "nauja": 22400
       },
       "kompaktinis": {
         "pav": "Kompaktinis",
-        "nauja": 25000
+        "nauja": 22100
       },
       "vidutinis": {
         "pav": "Vidutinės klasės",
-        "nauja": 34000
+        "nauja": 28200
       },
       "visureigis": {
         "pav": "Visureigis",
-        "nauja": 42000
+        "nauja": 40700
       },
       "komercinis": {
         "pav": "Komercinis",
-        "nauja": 35000
+        "nauja": 29000
       },
       "premium": {
         "pav": "Prestižinis",
-        "nauja": 62000
+        "nauja": 40500
       }
     },
     "numatyta_klase": "kompaktinis",
