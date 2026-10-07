@@ -14,7 +14,7 @@
    ========================================================================== */
 
 /* Versija. Keičiasi su kiekvienu svetainės atnaujinimu. */
-const TV_VERSIJA = "2026-10-07.2";
+const TV_VERSIJA = "2026-10-07.3";
 try { window.TV_VERSIJA = TV_VERSIJA; } catch (e) {}
 
 /* ==========================================================================
@@ -849,7 +849,8 @@ const RINKA = {
     const irasas = {
       tipas: "prasoma", pavadinimas: r.pavadinimas, kaina: r.kaina,
       kategorija: r.kategorijosRaktas || null, bukle: r.bukle ? r.bukle.raktas : null,
-      metai: p.metai || null, rida: p.rida || null, kuras: p.kuras || null, kebulas: p.kebulas || null
+      metai: p.metai || null, rida: p.rida || null, kuras: p.kuras || null, kebulas: p.kebulas || null,
+      deze: p.deze || null, pavara: p.pavara || null, galia: p.galia || null
     };
     clearTimeout(this.laukia);
     if (iskart) { this.siusti(irasas); return; }
@@ -885,7 +886,8 @@ const RINKA = {
       const ok = await this.siusti({
         tipas: "pardavimo", pavadinimas: r.pavadinimas, kaina: kaina, prasyta: r.kaina,
         kategorija: r.kategorijosRaktas || null, bukle: r.bukle ? r.bukle.raktas : null,
-        metai: p.metai || null, rida: p.rida || null, kuras: p.kuras || null, kebulas: p.kebulas || null
+        metai: p.metai || null, rida: p.rida || null, kuras: p.kuras || null, kebulas: p.kebulas || null,
+        deze: p.deze || null, pavara: p.pavara || null, galia: p.galia || null
       });
       if (ok) {
         f.innerHTML = '<span class="antraste-maza">Ačiū</span>' +
@@ -943,7 +945,9 @@ const PATIKRA = {
     let geriausias = null;
     for (const i of irasai) {
       for (const v of i.visiVardai) {
-        if (v.length >= 3 && (q.includes(v) || v.includes(q))) {
+        /* „Opel" neturi rasti „Opel Astra 2008": trumpesnė užklausa tinka
+           ilgesniam vardui tik tada, kai joje bent du žodžiai. */
+        if (v.length >= 3 && (q.includes(v) || (v.includes(q) && q.indexOf(" ") > 0))) {
           const ilgis = v.length;
           if (!geriausias || ilgis > geriausias.ilgis) {
             geriausias = { raktas: i.raktas, duomenys: i.duomenys, tikslumas: "apytikslis", ilgis };
@@ -1041,6 +1045,39 @@ const PATIKRA = {
   amziausSantykis(cfg, isMetu, iMetus) {
     const dabar = new Date().getFullYear();
     return this.amziausDalis(cfg, dabar - iMetus) / this.amziausDalis(cfg, dabar - isMetu);
+  },
+
+  /* Savybės, dėl kurių tas pats modelis kainuoja daugiau ar mažiau:
+     automatinė dėžė, 4x4, galingesnis variklis. Grąžina pataisų eilutes —
+     ir šiam daiktui, ir panašių kainoms suvienodinti (toks pat skaičiavimas
+     į abi puses, kad automatinių kainos nepakeltų mechaninės vertės). */
+  ypatybiuPataisos(pavadinimas, kategorija, poz) {
+    const cfg = (typeof KLASES !== "undefined" && kategorija && KLASES[kategorija])
+      ? KLASES[kategorija].ypatybes : null;
+    const sarasas = [];
+    if (!cfg || !poz) return { sarasas, suma: 0 };
+    const klase = (poz.deze || poz.pavara || poz.galia) ? this.klase(pavadinimas, kategorija, poz) : null;
+
+    if (poz.deze && cfg.deze && cfg.deze[poz.deze]) {
+      sarasas.push({ pav: poz.deze === "automatine" ? "Automatinė pavarų dėžė" : "Mechaninė pavarų dėžė",
+                     poveikis: cfg.deze[poz.deze], saltinis: "ypatybes" });
+    }
+    if (poz.pavara === "4x4" && cfg.pavara) {
+      const pk = cfg.pavara["4x4_klasei"] || {};
+      const p = (klase && pk[klase] !== undefined) ? pk[klase] : cfg.pavara["4x4"];
+      if (p) sarasas.push({ pav: "Visi varantys ratai (4x4)", poveikis: p, saltinis: "ypatybes" });
+    }
+    const g = cfg.galia;
+    if (poz.galia > 0 && g && g.tipine_kw && klase && g.tipine_kw[klase]) {
+      const santykis = poz.galia / g.tipine_kw[klase] - 1;
+      let p = (santykis / 0.10) * g.uz_10_proc;
+      p = Math.max(-g.riba, Math.min(g.riba, p));
+      if (Math.abs(p) >= 0.005) {
+        sarasas.push({ pav: "Galia " + poz.galia + " kW",
+                       poveikis: Math.round(p * 1000) / 1000, saltinis: "ypatybes" });
+      }
+    }
+    return { sarasas, suma: sarasas.reduce((s, x) => s + x.poveikis, 0) };
   },
 
   /* 3 pakopa. Grąžina { verte, klase, pav } arba null. */
@@ -1155,6 +1192,15 @@ const PATIKRA = {
 
       if (poz && poz.kuras && st.kuras &&
           this.normalizuoti(poz.kuras) !== this.normalizuoti(st.kuras)) svoris *= 0.7;
+
+      /* Ta pati mašina — ir ta pati dėžė bei pavara. Skirtinga sveria mažiau,
+         o jos kaina perskaičiuojama į įprastą (be savybių) ir tik tada
+         lyginama. Šio daikto savybės pridedamos vėliau, pataisose. */
+      if (poz && poz.deze && st.deze && poz.deze !== st.deze) svoris *= 0.8;
+      if (poz && poz.pavara && st.pavara && poz.pavara !== st.pavara) svoris *= 0.8;
+      const stYp = this.ypatybiuPataisos(st.pavadinimas || pavadinimas, kategorija,
+        { deze: st.deze, pavara: st.pavara, galia: st.galia, kebulas: st.kebulas });
+      if (stYp.suma) pataisa /= 1 + stYp.suma;
 
       const pardavimo = st.tipas === "pardavimo";
       if (pardavimo) svoris *= 1.6;
@@ -1302,6 +1348,16 @@ const PATIKRA = {
     if (saltinis !== "katalogas" || atskaitos) {
       const liko = (p.sarasas || []).filter(x => x.saltinis !== "amzius" && x.saltinis !== "rida");
       p = { sarasas: liko, suma: liko.reduce((sk, x) => sk + x.poveikis, 0) };
+    }
+
+    /* Dėžė, 4x4, galia — skaičiuojamos čia, vienoje vietoje, kad skelbimo
+       patikra ir pilna forma duotų tą patį atsakymą. */
+    if (poz && !(p.sarasas || []).some(x => x.saltinis === "ypatybes")) {
+      const yp = this.ypatybiuPataisos(pavadinimas, kategorija, poz);
+      if (yp.sarasas.length) {
+        const sar = (p.sarasas || []).concat(yp.sarasas);
+        p = { sarasas: sar, suma: sar.reduce((sk, x) => sk + x.poveikis, 0) };
+      }
     }
 
     const poBukles = Math.round(bazine * b.koef);
@@ -1822,6 +1878,9 @@ const SUGADINIMAI = {
   kriterijuPataisos() {
     const sarasas = [];
     for (const k of this.kriterijuSarasas()) {
+      /* Dėžė, pavara, galia — ne pataisos, o daikto savybės: jas skaičiuoja
+         PATIKRA.skaiciuoti iš požymių (žr. ypatybes()). */
+      if (k.ypatybe) continue;
       const v = this.kriterijai.get(k.raktas);
       if (v === undefined || v === null || v === "") continue;
 
@@ -1850,6 +1909,19 @@ const SUGADINIMAI = {
     return { sarasas, suma: sarasas.reduce((s, x) => s + x.poveikis, 0) };
   },
 
+  /* Savybių kriterijų reikšmės vertinimui (deze, pavara, galia). */
+  ypatybes() {
+    const r = {};
+    for (const k of this.kriterijuSarasas()) {
+      if (!k.ypatybe) continue;
+      const v = this.kriterijai.get(k.raktas);
+      if (v === undefined || v === null || v === "") continue;
+      if (k.tipas === "skaicius") { const sk = parseFloat(v); if (sk > 0) r[k.raktas] = sk; }
+      else r[k.raktas] = v;
+    }
+    return r;
+  },
+
   piestiKriterijus() {
     const deze = document.getElementById("kriterijuSkiltis");
     if (!deze) return;
@@ -1871,7 +1943,7 @@ const SUGADINIMAI = {
           '<label class="etikete" for="kr_' + k.raktas + '">' + k.pav +
           (k.vienetas ? ", " + k.vienetas : "") + "</label>" +
           '<input type="number" id="kr_' + k.raktas + '" data-kriterijus-laukas="' + k.raktas +
-          '" min="0" step="1000" placeholder="' + (k.uzuomina || "") + '" value="' +
+          '" min="0" step="' + (k.zingsnis_ivesties || 1000) + '" placeholder="' + (k.uzuomina || "") + '" value="' +
           (v === undefined ? "" : v) + '">' +
           (k.paaiskinimas ? '<span class="smulkus">' + k.paaiskinimas + "</span>" : "") +
           "</div>";
@@ -2592,6 +2664,14 @@ const SKELBIMO_PATIKRA = {
     return { sarasas, suma: sarasas.reduce((s, x) => s + x.poveikis, 0) };
   },
 
+  /* Tai, ką vertinimas naudoja iš skelbimo. Vienas sąrašas visiems keliams:
+     vertei, kreivei, istorijai ir rinkos bazei. */
+  pozymiai(d) {
+    return { metai: d.metai || null, menuo: d.menuo || null, rida: d.rida || null,
+             kuras: d.kuras || null, kebulas: d.kebulas || null,
+             deze: d.deze || null, pavara: d.pavara || null, galia: d.galia || null };
+  },
+
   /* Būklė iš pardavėjo žodžių. Be nuotraukų kitaip jos nenustatysi, tad
      imama atsargiai: „daužtas" reiškia pažeistą, visa kita — naudotą. */
   bukle(d) {
@@ -2638,7 +2718,7 @@ const SKELBIMO_PATIKRA = {
       sugadinimai: null,
       lauzoVerte: (kat && DETALES[kat]) ? DETALES[kat].lauzo_verte : null,
       kategorija: kat,
-      pozymiai: { metai: d.metai, rida: d.rida, kuras: d.kuras, kebulas: d.kebulas }
+      pozymiai: this.pozymiai(d)
     });
     PATIKRA.irasytiStebejima(d, kat);
     r.kategorija = (kat && DETALES[kat]) ? DETALES[kat].pav : null;
@@ -2651,17 +2731,23 @@ const SKELBIMO_PATIKRA = {
   /* --- Piešimas ------------------------------------------------------------ */
   /* beKainos — kai prašoma kaina jau parodyta didžiuoju skaičiumi virš lentelės. */
   piestiDuomenis(d, beKainos) {
+    const variklis = d.variklis ||
+      [d.turis ? d.turis.toFixed(1) + " l" : null, d.galia ? d.galia + " kW" : null].filter(Boolean).join(", ");
     const eil = [
       ["Prekė", d.pavadinimas],
       ["Kaina", !beKainos && d.kaina ? eurai(d.kaina) : null],
-      ["Metai", d.metai],
+      [d.menuo ? "Pirma registracija" : "Metai",
+       d.metai ? d.metai + (d.menuo ? "-" + String(d.menuo).padStart(2, "0") : "") : null],
       ["Rida", d.rida ? d.rida.toLocaleString("lt-LT") + " km" : null],
-      ["Variklis", d.variklis],
+      ["Variklis", variklis],
       ["Kuras", d.kuras],
-      ["Pavarų dėžė", d.deze],
+      ["Pavarų dėžė", d.dezeTekstas || d.deze],
+      ["Varantieji ratai", d.pavaraTekstas || (d.pavara === "4x4" ? "4x4" : d.pavara)],
       ["Kėbulas", d.kebulas],
       ["Techninė apžiūra iki", d.ta],
+      ["Euro standartas", d.euro],
       ["Defektai", d.defektai],
+      ["Pardavėjas", d.pardavejas],
     ].filter(x => x[1]);
 
     return '<div class="skelbimo-laukai">' + eil.map(x =>
@@ -2765,8 +2851,7 @@ const SKELBIMO_PATIKRA = {
 
     /* Į istoriją — iš ten dirba ir palyginimas, ir „Mano patikros". */
     r.isSkelbimo = true;
-    r.pozymiai = { metai: d.metai || null, rida: d.rida || null,
-                   kuras: d.kuras || null, kebulas: d.kebulas || null };
+    r.pozymiai = this.pozymiai(d);
     RINKA.siustiPrasoma(r);
 
     try {
@@ -2810,7 +2895,12 @@ const SKELBIMO_PATIKRA = {
 
       '<div style="margin-top:26px;">' +
       '<h3 class="antraste-maza" style="margin-bottom:12px;">Ką perskaitėme skelbime</h3>' +
-      this.piestiDuomenis(d, true) + "</div>" +
+      this.piestiDuomenis(d, true) +
+      /* Kas įskaityta — vardai be svorių, kaip ir rezultato puslapyje. */
+      (r.pataisos && r.pataisos.length
+        ? '<p class="smulkus" style="margin-top:12px;">Vertinant įskaityta: ' +
+          tekstoSauga(r.pataisos.map(p => p.pav.charAt(0).toLocaleLowerCase("lt") + p.pav.slice(1)).join("; ")) +
+          ".</p>" : "") + "</div>" +
 
       /* Kita kategorija neturi savo vertinimo — tada renkamasi iš sąrašo. */
       '<a class="mygtukas m-kontūras" style="margin-top:26px;" href="' +
@@ -2824,7 +2914,7 @@ const SKELBIMO_PATIKRA = {
     VERTES_KREIVE.piesti("vertesKreive", {
       pavadinimas: r.pavadinimas, kategorija: r.kategorijosRaktas,
       metai: d.metai, verteNuo: r.verteNuo, verteIki: r.verteIki, kaina: r.kaina,
-      pozymiai: { metai: d.metai, rida: d.rida, kuras: d.kuras, kebulas: d.kebulas }
+      pozymiai: this.pozymiai(d)
     });
 
     ISTORIJA.prideti(r);
@@ -3206,14 +3296,25 @@ const SKELBIMAS = {
     const zodziai = this.markes();
 
     const kelias = /\s[>›»]\s.*\s[>›»]\s/;   /* „Skelbimai > Automobiliai > Opel" — ne pavadinimas */
-    for (const e of eilutes.slice(0, 60)) {
-      if (e.length > 90 || kelias.test(e)) continue;
+    /* Autoplius viršuje kelias eina eilutėmis po vieną žodį („Opel“,
+       „Insignia“), todėl pirmiau ieškom eilutės su markė IR modeliu. */
+    /* „2014Opel Insignia“ — metai prilipę prie markės: atskiriam, kad markė
+       būtų atpažinta, o metus nuimam (jie atskiras laukas). */
+    const svarus = (e) => e.replace(/^(19[5-9]\d|20[0-4]\d)(?=[A-Za-zĄ-ž])/, "").trim();
+    const laukas = (e) => !!(this.ETIKETES[this.etikete(e)] || this.etiketeTarpu(e) || this.etiketeSulipusi(e));
+    let vienas = null;
+    for (const e0 of eilutes.slice(0, 160)) {
+      const e = svarus(e0);
+      if (e.length > 90 || kelias.test(e) || laukas(e)) continue;
       const maza = " " + e.toLowerCase().replace(/[,.;]/g, " ") + " ";
-      if (zodziai.some(z => maza.indexOf(" " + z + " ") >= 0)) return e.slice(0, 80);
+      if (!zodziai.some(z => maza.indexOf(" " + z + " ") >= 0)) continue;
+      if (e.split(/\s+/).length >= 2) return e.slice(0, 80);
+      if (!vienas) vienas = e;
     }
+    if (vienas) return vienas.slice(0, 80);
 
     for (const e of eilutes.slice(0, 20)) {
-      if (e.length >= 6 && e.length <= 80 && /[a-z]/i.test(e) && /\d/.test(e) && !kelias.test(e)) return e;
+      if (e.length >= 6 && e.length <= 80 && /[a-z]/i.test(e) && /\d/.test(e) && !kelias.test(e) && !laukas(e)) return e;
     }
     return eilutes.length ? eilutes[0].slice(0, 80) : null;
   },
@@ -3235,34 +3336,160 @@ const SKELBIMAS = {
     };
 
     const d = this.skaityti(tekstas);
+    this.paskutiniai = d;
     nustatyti("preke", d.pavadinimas, "prekė");
     nustatyti("kaina", d.kaina, "kaina");
-    nustatyti("kr_rida", d.rida, "rida");
     nustatyti("metai", d.metai, "metai");
+
+    /* Kriterijai, kurių formoje ieškotum pats: rida, dėžė, pavara, galia,
+       techninė apžiūra. Pažymimi taip pat, lyg būtum paspaudęs. */
+    if (typeof SUGADINIMAI !== "undefined" && SUGADINIMAI.kategorija) {
+      const yra = (r) => SUGADINIMAI.kriterijuSarasas().some(k => k.raktas === r);
+      const ta = this.taBusena(d.ta);
+      const pazymeti = [
+        ["rida", d.rida, d.rida ? "rida" : null],
+        ["deze", d.deze, "pavarų dėžė"],
+        ["pavara", d.pavara, "varantieji ratai"],
+        ["galia", d.galia, "galia " + d.galia + " kW"],
+        ["ta", ta, "techninė apžiūra"]
+      ];
+      let kas = false;
+      for (const [r, v, pav] of pazymeti) {
+        if (v === undefined || v === null || !yra(r)) continue;
+        SUGADINIMAI.kriterijai.set(r, v);
+        if (r !== "rida" && r !== "galia") rasta.push(pav);
+        else rasta.push(r === "rida" ? "rida: " + Number(v).toLocaleString("lt-LT") + " km" : pav);
+        kas = true;
+      }
+      if (kas) {
+        SUGADINIMAI.piestiKriterijus();
+        if (typeof DUOMENYS !== "undefined") DUOMENYS.atnaujintiTiksluma();
+      }
+    } else {
+      nustatyti("kr_rida", d.rida, "rida");
+    }
     return rasta;
   },
 
 
   /* --- Struktūrinis skaitymas -----------------------------------------------
-     Skelbimų portalai rašo laukus vienodai: „Pagaminimo data: 2008-05",
-     „Rida: 240 000 km", „Kuro tipas: Dyzelinas". Todėl ieškome ne HTML
-     struktūros, o šitų žodžių — jie nesikeičia net portalui perdarius dizainą.
+     Skelbimų portalai rašo laukus vienodai. Autoplius „Techninė informacija“
+     nukopijuota atrodo taip — etiketė vienoje eilutėje, reikšmė kitoje:
+         Pirma registracija
+         2014-12
+         Rida
+         279 747 km
+     Kiti portalai rašo „Rida: 279 747 km“ arba per tabuliaciją. Skaitome
+     visus tris būdus. Etiketė turi stovėti eilutės pradžioje — taip aprašyme
+     paminėtas žodis („variklis veikia puikiai“) nesupainiojamas su lauku.
 
-     Grąžina viską, ką pavyko atpažinti. Ko nerado — nėra, ir niekas
-     neprasimanoma. */
+     Grąžinama tik tai, kas rasta. Niekas neprasimanoma. */
+  ETIKETES: {
+    "pirma registracija": "registracija", "pagaminimo data": "registracija",
+    "pagaminimo metai": "registracija", "metai": "registracija",
+    "rida": "rida",
+    "variklis": "variklis", "darbinis turis cm3": "turis", "darbinis turis": "turis",
+    "galia": "galia",
+    "kuro tipas": "kuras", "kuras": "kuras",
+    "kebulo tipas": "kebulas",
+    "duru skaicius": "durys",
+    "varantieji ratai": "pavara", "pavara": "pavara",
+    "pavaru deze": "deze",
+    "klimato valdymas": "klimatas",
+    "spalva": "spalva",
+    "tech apziura iki": "ta", "technine apziura iki": "ta", "ta galioja iki": "ta",
+    "ratlankiu skersmuo": "ratlankiai",
+    "sedimu vietu skaicius": "vietos",
+    "pirmosios registracijos salis": "salis",
+    "euro standartas": "euro",
+    "co2 emisija g km": "co2", "co2 emisija": "co2",
+    "defektai": "defektai",
+    "kaina": "kaina"
+  },
+
+  /* Etiketė be lietuviškų raidžių ir skyrybos: „CO₂ emisija, g/km“ → „co2 emisija g km“. */
+  etikete(e) {
+    return String(e || "").replace(/₂/g, "2").replace(/³/g, "3").toLowerCase()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, " ").trim();
+  },
+
+  /* Visos etiketė–reikšmė poros. Imama pirma pora: santrauka viršuje ir
+     lentelė apačioje sutampa, o aprašymas eina po jų. */
+  lentele(t) {
+    const eil = String(t || "").split(/\r?\n/).map(x => x.replace(/ /g, " ").trim());
+    const poros = {};
+    const kitaEtikete = (x) => !!this.ETIKETES[this.etikete(x)];
+    for (let i = 0; i < eil.length; i++) {
+      const e = eil[i];
+      if (!e || e.length > 60) continue;
+      let raktas = null, v = null;
+      const sk = e.match(/^([^:\t]{2,40}?)\s*(?::|\t|\s{2,})\s*(.+)$/);
+      const tarpu = e.length <= 45 ? this.etiketeTarpu(e) : null;
+      if (sk && this.ETIKETES[this.etikete(sk[1])]) {
+        raktas = this.ETIKETES[this.etikete(sk[1])];
+        v = sk[2];
+      } else if (tarpu) {
+        raktas = tarpu.raktas;
+        v = tarpu.v;
+      } else if (this.ETIKETES[this.etikete(e)]) {
+        raktas = this.ETIKETES[this.etikete(e)];
+        for (let j = i + 1; j < Math.min(eil.length, i + 4); j++) {
+          if (!eil[j]) continue;
+          if (!kitaEtikete(eil[j])) v = eil[j];
+          break;
+        }
+      } else {
+        const sulipe = this.etiketeSulipusi(e);
+        if (sulipe) { raktas = sulipe.raktas; v = sulipe.v; }
+      }
+      if (raktas && v && v.length <= 80 && poros[raktas] === undefined) poros[raktas] = v;
+    }
+    return poros;
+  },
+
+  /* „Rida 329 699 km“ — etiketė ir reikšmė per vieną tarpą. Kad aprašymo
+     sakinys („Rida tikra, patikrinta“) nebūtų palaikytas lauku, skaitinės
+     reikšmės turi turėti skaičių, o tekstinės būti trumpos. */
+  SKAITINIAI: new Set(["registracija", "rida", "ta", "co2", "galia", "variklis", "turis", "kaina"]),
+  etiketeTarpu(e) {
+    const z = e.split(/\s+/);
+    for (let k = Math.min(5, z.length - 1); k >= 1; k--) {
+      const raktas = this.ETIKETES[this.etikete(z.slice(0, k).join(" "))];
+      if (!raktas) continue;
+      const v = z.slice(k).join(" ");
+      if (this.SKAITINIAI.has(raktas) ? !/\d/.test(v) : z.length - k > 3) return null;
+      return { raktas, v };
+    }
+    return null;
+  },
+
+  /* „Pirma registracija2014-12“, „Kuro tipasDyzelinas“ — taip Autoplius
+     santrauka nukopijuojama kai kuriose naršyklėse: etiketė ir reikšmė be
+     tarpo. Reikšmė turi prasidėti didžiąja raide arba skaičiumi — kitaip tai
+     tiesiog ilgesnis žodis („Ridos istorija“). */
+  etiketeSulipusi(e) {
+    for (let i = Math.min(45, e.length - 1); i >= 3; i--) {
+      const raktas = this.ETIKETES[this.etikete(e.slice(0, i))];
+      if (!raktas) continue;
+      const c = e.charAt(i);
+      if (!/[0-9A-ZĄČĘĖĮŠŲŪŽ€(]/.test(c) || /\s/.test(e.charAt(i - 1))) return null;
+      const v = e.slice(i).trim();
+      if (this.SKAITINIAI.has(raktas) && !/\d/.test(v)) return null;
+      return { raktas, v };
+    }
+    return null;
+  },
+
+  /* Senesnis būdas kitiems portalams: „Rida 260 tūkst. km“ sakinio viduje. */
   LAUKAI: [
-    { raktas: "metai",   zodziai: ["pagaminimo data", "pagaminimo metai", "metai"],
-      tipas: "metai" },
     { raktas: "rida",    zodziai: ["rida"], tipas: "skaicius" },
-    { raktas: "kuras",   zodziai: ["kuro tipas", "kuras"], tipas: "tekstas" },
-    { raktas: "variklis",zodziai: ["variklis", "darbinis turis"], tipas: "tekstas" },
+    { raktas: "kuras",   zodziai: ["kuro tipas"], tipas: "tekstas" },
     { raktas: "deze",    zodziai: ["pavarų dėžė", "pavaru deze"], tipas: "tekstas" },
     { raktas: "kebulas", zodziai: ["kėbulo tipas", "kebulo tipas"], tipas: "tekstas" },
     { raktas: "ta",      zodziai: ["tech. apžiūra iki", "techninė apžiūra iki",
                                    "tech apziura iki", "ta galioja iki"], tipas: "data" },
     { raktas: "defektai",zodziai: ["defektai"], tipas: "tekstas" },
-    { raktas: "spalva",  zodziai: ["spalva"], tipas: "tekstas" },
-    { raktas: "galia",   zodziai: ["galia"], tipas: "tekstas" },
   ],
 
   laukas(t, zodziai, tipas) {
@@ -3273,11 +3500,8 @@ const SKELBIMAS = {
       if (!m) continue;
       const v = m[1].trim();
       if (tipas === "skaicius") {
-        const sk = v.match(/\d[\d  .,]*/);
+        const sk = v.match(/\d[\d  .,]*/);
         if (sk) return this.skaicius(sk[0]) * this.tukst(v.slice(sk.index + sk[0].length));
-      } else if (tipas === "metai") {
-        const sk = v.match(/(19[5-9]\d|20[0-4]\d)/);
-        if (sk) return parseInt(sk[1], 10);
       } else if (tipas === "data") {
         const d = v.match(/(19|20)\d{2}[-./](\d{1,2})/);
         if (d) return d[0];
@@ -3290,24 +3514,111 @@ const SKELBIMAS = {
     return null;
   },
 
+  /* Reikšmės, kurias supranta vertinimas, iš pardavėjo žodžių. */
+  pavaraIs(v) {
+    const s = this.etikete(v);
+    if (/4x4|visi varantys|visu ratu|awd|4wd|4motion|quattro|xdrive|4matic|allgrip|4x4/.test(s)) return "4x4";
+    if (/priekin/.test(s)) return "priekiniai";
+    if (/galin/.test(s)) return "galiniai";
+    return null;
+  },
+  dezeIs(v) {
+    const s = this.etikete(v);
+    if (/automat|dsg|robotizuota|variator|cvt|tiptronic/.test(s)) return "automatine";
+    if (/mechanin|rankin/.test(s)) return "mechanine";
+    return null;
+  },
+
+  /* Kaina. Autoplius ją rašo atskira eilute („6 250 €“) tuoj po antrašte;
+     po to eina kredito įmoka („90 €/ mėn.“), registracijos mokestis ir
+     panašių skelbimų kainos. Todėl imame pirmą tokią eilutę po pavadinimo. */
+  kainosEilute(t, pavadinimas) {
+    const eil = String(t || "").split(/\r?\n/).map(x => x.replace(/ /g, " ").trim());
+    const nuo = pavadinimas ? Math.max(0, eil.findIndex(x => x.indexOf(pavadinimas) >= 0)) : 0;
+    const re = /^(?:€\s*)?(\d{1,3}(?:[ .]\d{3})+|\d{2,7})(?:[.,]\d{1,2})?\s*(?:€|eur\b)(.*)$/i;
+    const tinka = (x) => {
+      const m = x.match(re);
+      if (!m) return null;
+      if (/^\s*\/|^\s*(per\s+)?m[ėe]n/i.test(m[2])) return null;   /* kredito įmoka */
+      if (m[2].trim() && !/^\s*(lr |su pvm|be pvm|\(|derinama|galima|kaina)/i.test(m[2])) return null;
+      const v = this.skaicius(m[1]);
+      return v >= 1 ? v : null;
+    };
+    for (let i = nuo; i < eil.length; i++) { const v = tinka(eil[i]); if (v) return v; }
+    for (let i = 0; i < nuo; i++) { const v = tinka(eil[i]); if (v) return v; }
+    return null;
+  },
+
   /* Visas skelbimas vienu ypu. */
   skaityti(t, meta) {
     meta = meta || this.meta || {};
-    const d = {
-      pavadinimas: this.pavadinimas(t, (meta || {}).antraste),
-      kaina: (meta && meta.kaina) ? this.skaicius(meta.kaina) : this.kaina(t)
-    };
+    t = String(t || "");
+    const d = { pavadinimas: this.pavadinimas(t, (meta || {}).antraste) };
+    const l = this.lentele(t);
+
+    /* Kaina: meta žyma → „Kaina:“ laukas → atskira eilutė po pavadinimu → bet kur. */
+    d.kaina = (meta && meta.kaina) ? this.skaicius(meta.kaina) : null;
+    if (!d.kaina && l.kaina) d.kaina = this.skaicius((l.kaina.match(/\d[\d .,]*/) || [""])[0]) || null;
+    if (!d.kaina) d.kaina = this.kainosEilute(t, d.pavadinimas);
     if (!d.kaina) d.kaina = this.kaina(t);
-    for (const l of this.LAUKAI) {
-      const v = this.laukas(t, l.zodziai, l.tipas);
-      if (v !== null) d[l.raktas] = v;
+
+    if (l.registracija) {
+      const m = l.registracija.match(/(19[5-9]\d|20[0-4]\d)(?:\s*[-./]\s*(\d{1,2}))?/);
+      if (m) {
+        d.metai = parseInt(m[1], 10);
+        const men = m[2] ? parseInt(m[2], 10) : 0;
+        if (men >= 1 && men <= 12) d.menuo = men;
+      }
+    }
+    if (l.rida) {
+      const sk = l.rida.match(/\d[\d .,]*/);
+      if (sk) d.rida = this.skaicius(sk[0]) * this.tukst(l.rida.slice(sk.index + sk[0].length));
+    }
+
+    /* Variklis: „1956 cm³, 163 AG (120kW)“, „2.0 l“, „120 kW“. */
+    const variklis = [l.variklis, l.turis, l.galia].filter(Boolean).join(", ");
+    if (l.variklis) d.variklis = l.variklis;
+    else if (l.turis) d.variklis = l.turis;
+    if (variklis) {
+      const cm = variklis.match(/(\d{3,4})\s*cm/i);
+      const lt = variklis.match(/(\d[.,]\d)\s*l\b/i);
+      if (cm) d.turis = Math.round(parseInt(cm[1], 10) / 100) / 10;
+      else if (lt) d.turis = parseFloat(lt[1].replace(",", "."));
+      const kw = variklis.match(/(\d{2,3})\s*kw/i);
+      const ag = variklis.match(/(\d{2,3})\s*(?:ag|aj|hp|ps|zs)\b/i);
+      if (kw) d.galia = parseInt(kw[1], 10);
+      else if (ag) d.galia = Math.round(parseInt(ag[1], 10) * 0.7355);
+      if (ag) d.ag = parseInt(ag[1], 10);
+    }
+
+    for (const r of ["kuras", "kebulas", "durys", "klimatas", "spalva", "ratlankiai",
+                     "vietos", "salis", "euro", "defektai"]) {
+      if (l[r]) d[r] = l[r];
+    }
+    if (l.co2) { const c = l.co2.match(/\d{2,3}/); if (c) d.co2 = parseInt(c[0], 10); }
+    if (l.ta) {
+      const m = l.ta.match(/(19|20)\d{2}(?:[-./]\d{1,2})?/);
+      if (m) d.ta = m[0];
+    }
+    if (l.pavara) { d.pavaraTekstas = l.pavara; d.pavara = this.pavaraIs(l.pavara); }
+    if (l.deze) { d.dezeTekstas = l.deze; d.deze = this.dezeIs(l.deze); }
+
+    /* Kiti portalai — laukai sakinio viduje. */
+    for (const f of this.LAUKAI) {
+      if (d[f.raktas] !== undefined && f.raktas !== "deze") continue;
+      if (f.raktas === "deze" && d.deze) continue;
+      const v = this.laukas(t, f.zodziai, f.tipas);
+      if (v === null) continue;
+      if (f.raktas === "deze") { d.dezeTekstas = v; d.deze = this.dezeIs(v); }
+      else d[f.raktas] = v;
     }
     if (d.rida === undefined) {
       const r = this.rida(t);
       if (r) d.rida = r;
     }
-    /* Autoplius antraštėje kuras ir kėbulas stovi atskiromis eilutėmis,
-       be pavadinimų: „Dyzelinas", „Universalas". */
+
+    /* Autoplius antraštėje kuras, kėbulas, dėžė stovi atskiromis eilutėmis,
+       be pavadinimų: „Dyzelinas“, „Universalas“, „Automatinė“. */
     const eilutes = t.split(/\n/).map(x => x.trim()).filter(Boolean);
     const rastiEilute = (re) => eilutes.find(x => x.length <= 30 && re.test(x));
     if (d.kuras === undefined) {
@@ -3318,9 +3629,24 @@ const SKELBIMAS = {
       const k = rastiEilute(/^(hečbekas|hecbekas|sedanas|universalas|visureigis|krosoveris|vienatūris|vienaturis|kupė|kupe|kabrioletas|pikapas|komercinis|mikroautobusas|furgonas)(\s*\/.*)?$/i);
       if (k) d.kebulas = k;
     }
+    if (!d.deze) {
+      const k = rastiEilute(/^(automatinė|automatine|mechaninė|mechanine)$/i);
+      if (k) { d.dezeTekstas = k; d.deze = this.dezeIs(k); }
+    }
+    /* 4x4 pavadinime („Passat 2.0 TDI 4Motion“) — tai irgi pardavėjo žodžiai. */
+    if (!d.pavara && d.pavadinimas) d.pavara = this.pavaraIs(d.pavadinimas) === "4x4" ? "4x4" : undefined;
+    if (!d.pavara) delete d.pavara;
+    if (!d.deze) delete d.deze;
+
     if (d.metai === undefined) {
       const m = this.metai(t);
       if (m) d.metai = m;
+    }
+    /* Pardavėjas: įmonė ar privatus. Įmonė skelbime save pristato teisine forma. */
+    if (/^(UAB|MB|IĮ|AB|VšĮ|Autosalonas)\s+\S/m.test(t) || /platininis partneris|auksinis partneris|įmonės skelbimas/i.test(t)) {
+      d.pardavejas = "įmonė";
+    } else if (/privatus (asmuo|pardavėjas)/i.test(t)) {
+      d.pardavejas = "privatus";
     }
     return d;
   },
@@ -3549,7 +3875,7 @@ const FORMA = {
             <summary>Užpildyti iš skelbimo teksto</summary>
             <div class="laukas" style="margin-top:12px;">
               <textarea id="skelbimoTekstas" rows="4" style="height:104px;" aria-label="Skelbimo tekstas"
-                        placeholder="Pažymėk skelbimo tekstą, nukopijuok ir įklijuok čia"></textarea>
+                        placeholder="Skelbime Ctrl+A ir Ctrl+C, čia Ctrl+V"></textarea>
               <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
                 <button type="button" class="mygtukas mygtukas-sm m-kontūras" id="skelbimoMygtukas">Užpildyti iš teksto</button>
                 <span class="smulkus" id="skelbimoAtsakas" aria-live="polite"></span>
@@ -3810,10 +4136,17 @@ const FORMA = {
        („Peugeot 307 2006"). Be šito kreivė neturi nuo ko skaičiuoti. */
     const metusPav = metaiIsPavadinimo(pavadinimas);
     const metaiLauke = metaiIsLauko();
-    const pozymiai = {
-      metai: metaiLauke !== null ? metaiLauke : metusPav,
-      rida: ridosLaukas && ridosLaukas.value ? parseFloat(ridosLaukas.value) : null
-    };
+    /* Kuras, kėbulas, registracijos mėnuo — iš įklijuoto skelbimo, jei
+       žmogus nepakeitė prekės pavadinimo; dėžė, pavara, galia — iš formos. */
+    const sk = SKELBIMAS.paskutiniai;
+    const tasPats = sk && sk.pavadinimas && sk.pavadinimas.trim() === pavadinimas;
+    const pozymiai = Object.assign(
+      tasPats ? { kuras: sk.kuras || null, kebulas: sk.kebulas || null, menuo: sk.menuo || null } : {},
+      (typeof SUGADINIMAI !== "undefined") ? SUGADINIMAI.ypatybes() : {},
+      {
+        metai: metaiLauke !== null ? metaiLauke : metusPav,
+        rida: ridosLaukas && ridosLaukas.value ? parseFloat(ridosLaukas.value) : null
+      });
 
     return {
       pavadinimas, kaina, bukle: pasirinktaBukle, tyliai: !!tyliai,

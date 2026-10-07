@@ -11,19 +11,19 @@
 
 const ZINGSNIAI = {
   skelbimas: [
-    { pav: "Atsidaryk skelbimą", txt: "Autoplius, Skelbiu.lt ar kitoje svetainėje.", piesinys: "narsykle" },
-    { pav: "Pažymėk viską", txt: "Kompiuteryje Ctrl+A, telefone ilgai spausk tekstą → „Pažymėti viską“.", piesinys: "pazymeti" },
+    { pav: "Atsidaryk patį skelbimą", txt: "Vieno automobilio puslapį, ne paieškos sąrašą. Telefone — naršyklėje, ne programėlėje.", piesinys: "narsykle" },
+    { pav: "Pažymėk visą puslapį", txt: "Ctrl+A (telefone: ilgai spausk tekstą → „Pažymėti viską“). Kartu paimama ir „Techninė informacija“.", piesinys: "pazymeti" },
     { pav: "Nukopijuok", txt: "Ctrl+C arba dešiniu pelės mygtuku → „Kopijuoti“, tada grįžk čia.", piesinys: "kopijuoti" },
-    { pav: "Įklijuok čia", txt: "Ctrl+V į laukelį žemiau — atsakymas pasirodys pats.", piesinys: "iklijuoti" }
+    { pav: "Įklijuok čia", txt: "Ctrl+V į laukelį žemiau. Nieko įvedinėti nereikia — atsakymas pasirodys pats.", piesinys: "iklijuoti" }
   ],
   palyginimas: [
-    { pav: "Atsidaryk skelbimą", txt: "Autoplius, Skelbiu.lt ar kitoje svetainėje.", piesinys: "narsykle" },
-    { pav: "Pažymėk viską", txt: "Kompiuteryje Ctrl+A, telefone ilgai spausk tekstą → „Pažymėti viską“.", piesinys: "pazymeti" },
+    { pav: "Atsidaryk patį skelbimą", txt: "Vieno automobilio puslapį, ne paieškos sąrašą.", piesinys: "narsykle" },
+    { pav: "Pažymėk visą puslapį", txt: "Ctrl+A (telefone: ilgai spausk tekstą → „Pažymėti viską“). Kartu paimama ir „Techninė informacija“.", piesinys: "pazymeti" },
     { pav: "Nukopijuok", txt: "Ctrl+C arba dešiniu pelės mygtuku → „Kopijuoti“, tada grįžk čia.", piesinys: "kopijuoti" },
     { pav: "Įklijuok ir spausk „Pridėti“", txt: "Pakartok su kitais skelbimais — geriausias pirkinys pažymimas pats.", piesinys: "iklijuoti" }
   ],
   patikra: [
-    { pav: "Įrašyk daiktą ir kainą", txt: "Arba spausk „Užpildyti iš skelbimo teksto“ ir įklijuok skelbimą.", piesinys: "pildyti" },
+    { pav: "Įklijuok skelbimą", txt: "Skelbime Ctrl+A ir Ctrl+C, čia „Užpildyti iš skelbimo teksto“ ir Ctrl+V. Duomenys užsipildo patys.", piesinys: "pildyti" },
     { pav: "Pasirink, kas tinka", txt: "Būklę ir tai, ką matai pats.", piesinys: "pasirinkti" },
     { pav: "Stebėk vertę", txt: "Ji keičiasi iškart, kai pildai.", piesinys: "verte" },
     { pav: "Spausk „Gauti atsakymą“", txt: "Gausi vertę, kuri nepriklauso nuo pardavėjo.", piesinys: "atsakymas" }
