@@ -13,14 +13,14 @@ const ZINGSNIAI = {
   skelbimas: [
     { pav: "Atsidaryk skelbimą", txt: "Autoplius, Skelbiu.lt ar kitoje svetainėje.", piesinys: "narsykle" },
     { pav: "Pažymėk viską", txt: "Kompiuteryje Ctrl+A, telefone ilgai spausk tekstą → „Pažymėti viską“.", piesinys: "pazymeti" },
-    { pav: "Nukopijuok", txt: "Ctrl+C arba „Kopijuoti“.", piesinys: "kopijuoti" },
+    { pav: "Nukopijuok", txt: "Ctrl+C arba dešiniu pelės mygtuku → „Kopijuoti“, tada grįžk čia.", piesinys: "kopijuoti" },
     { pav: "Įklijuok čia", txt: "Ctrl+V į laukelį žemiau — atsakymas pasirodys pats.", piesinys: "iklijuoti" }
   ],
   palyginimas: [
     { pav: "Atsidaryk skelbimą", txt: "Autoplius, Skelbiu.lt ar kitoje svetainėje.", piesinys: "narsykle" },
-    { pav: "Nukopijuok visą tekstą", txt: "Ctrl+A ir Ctrl+C, telefone „Pažymėti viską“ → „Kopijuoti“.", piesinys: "pazymeti" },
-    { pav: "Įklijuok ir spausk „Pridėti“", txt: "Skelbimas atsiras sąraše žemiau.", piesinys: "iklijuoti" },
-    { pav: "Pakartok su kitais", txt: "Geriausias pirkinys pažymimas pats.", piesinys: "sarasas" }
+    { pav: "Pažymėk viską", txt: "Kompiuteryje Ctrl+A, telefone ilgai spausk tekstą → „Pažymėti viską“.", piesinys: "pazymeti" },
+    { pav: "Nukopijuok", txt: "Ctrl+C arba dešiniu pelės mygtuku → „Kopijuoti“, tada grįžk čia.", piesinys: "kopijuoti" },
+    { pav: "Įklijuok ir spausk „Pridėti“", txt: "Pakartok su kitais skelbimais — geriausias pirkinys pažymimas pats.", piesinys: "iklijuoti" }
   ],
   patikra: [
     { pav: "Įrašyk daiktą ir kainą", txt: "Arba spausk „Užpildyti iš skelbimo teksto“ ir įklijuok skelbimą.", piesinys: "pildyti" },
@@ -163,6 +163,74 @@ const PIESINIAI = {
       '<text class="z-tekstas z-pdf-mazas" x="36" y="66">PDF</text></g>'
 };
 
+/* Gyva demonstracija puslapiams, kur skelbimas perkeliamas iš kitos svetainės:
+   pelė atidaro skelbimą, pažymi, nukopijuoja, pereina į mūsų svetainę ir
+   įklijuoja. Žingsnių sąrašas šalia paryškinamas kartu su scena (po 4 s). */
+const DEMO = {
+  skelbimas:   { antraste: "PATIKRINK SKELBIMĄ", adresas: "skelbimas", mygtukas: "PATIKRINTI", rezultatas: "Kaina per didelė", rezPav: "Vertė apie 29 500 €", blogai: true },
+  palyginimas: { antraste: "KAINŲ PALYGINIMAS",  adresas: "palyginimas", mygtukas: "PRIDĖTI", rezultatas: "Pridėta į palyginimą", rezPav: "Įklijuok kitą skelbimą", blogai: false }
+};
+
+function demoScena(d) {
+  return '' +
+  '<svg class="demo-scena" viewBox="0 0 480 300" aria-hidden="true">' +
+    '<rect class="d-remas" x="6" y="6" width="468" height="288" rx="14"/>' +
+    /* skirtukai */
+    '<g class="d-skirt d-skirt-1"><rect x="18" y="14" width="140" height="26" rx="8"/>' +
+      '<circle class="d-ikona-a" cx="34" cy="27" r="5"/><text class="d-t d-t-skirt" x="46" y="31">autoplius.lt</text></g>' +
+    '<g class="d-skirt d-skirt-2"><rect x="164" y="14" width="150" height="26" rx="8"/>' +
+      '<circle class="d-ikona-m" cx="180" cy="27" r="5"/><text class="d-t d-t-skirt" x="192" y="31">aidas · Tikra vertė</text></g>' +
+    /* adresas */
+    '<rect class="d-adresas" x="18" y="46" width="444" height="20" rx="10"/>' +
+    '<text class="d-t d-t-adr d-adr-1" x="32" y="60">autoplius.lt/skelbimai/jeep-grand-cherokee</text>' +
+    '<text class="d-t d-t-adr d-adr-2" x="32" y="60">marijus25.github.io/svetaine/' + d.adresas + '</text>' +
+    /* 1 puslapis: svetimas skelbimas */
+    '<g class="d-p1">' +
+      '<rect class="d-foto" x="26" y="80" width="160" height="104" rx="8"/>' +
+      '<path class="d-auto" d="M46 160h120l-8-22-22-10h-50l-26 14z"/>' +
+      '<circle class="d-ratas" cx="70" cy="162" r="9"/><circle class="d-ratas" cx="142" cy="162" r="9"/>' +
+      '<text class="d-t d-t-ant" x="202" y="96">Jeep Grand Cherokee, 2018</text>' +
+      '<text class="d-t" x="202" y="116">156 000 km · Dyzelinas</text>' +
+      '<text class="d-t" x="202" y="134">Automatinė · Vilnius</text>' +
+      '<text class="d-t d-t-kaina" x="202" y="164">33 000 €</text>' +
+      '<rect class="d-eil" x="26" y="198" width="420" height="7" rx="3.5"/>' +
+      '<rect class="d-eil" x="26" y="214" width="380" height="7" rx="3.5"/>' +
+      '<rect class="d-eil" x="26" y="230" width="400" height="7" rx="3.5"/>' +
+      '<rect class="d-eil" x="26" y="246" width="300" height="7" rx="3.5"/>' +
+      '<rect class="d-zym" x="22" y="78" width="432" height="182" rx="4"/>' +
+      '<g class="d-meniu"><rect x="330" y="160" width="120" height="74" rx="8"/>' +
+        '<rect class="d-meniu-zym" x="334" y="166" width="112" height="20" rx="5"/>' +
+        '<text class="d-t" x="344" y="180">Kopijuoti</text>' +
+        '<text class="d-t d-t-blyskus" x="344" y="202">Pažymėti viską</text>' +
+        '<text class="d-t d-t-blyskus" x="344" y="222">Spausdinti</text></g>' +
+      '<g class="d-pranesimas"><rect x="170" y="262" width="140" height="24" rx="12"/>' +
+        '<text class="d-t d-t-centras" x="240" y="278">✓ Nukopijuota</text></g>' +
+    '</g>' +
+    /* 2 puslapis: mūsų svetainė */
+    '<g class="d-p2">' +
+      '<text class="d-t d-t-h" x="26" y="96">' + d.antraste + '</text>' +
+      '<text class="d-t d-t-et" x="26" y="118">SKELBIMO TEKSTAS</text>' +
+      '<rect class="d-laukas" x="26" y="126" width="428" height="80" rx="8"/>' +
+      '<g class="d-iklijuota">' +
+        '<text class="d-t" x="38" y="146">Jeep Grand Cherokee, 2018</text>' +
+        '<text class="d-t" x="38" y="164">156 000 km · Dyzelinas · Automatinė</text>' +
+        '<text class="d-t d-t-kaina-m" x="38" y="186">33 000 €</text></g>' +
+      '<rect class="d-zymeklis" x="38" y="134" width="2" height="16"/>' +
+      '<g class="d-mygtukas"><rect x="26" y="220" width="112" height="30" rx="15"/>' +
+        '<text class="d-t d-t-mygt" x="82" y="239.5">' + d.mygtukas + '</text></g>' +
+      '<g class="d-rez' + (d.blogai ? ' d-rez-blogai' : '') + '"><rect x="152" y="216" width="302" height="62" rx="10"/>' +
+        '<circle cx="176" cy="247" r="11"/>' +
+        '<text class="d-t d-t-rez" x="196" y="243">' + d.rezultatas + '</text>' +
+        '<text class="d-t d-t-mazas" x="196" y="262">' + d.rezPav + '</text></g>' +
+    '</g>' +
+    /* klavišai */
+    '<g class="d-raktas d-raktas-a"><rect x="388" y="264" width="70" height="22" rx="6"/><text class="d-t d-t-raktas" x="423" y="279">Ctrl + A</text></g>' +
+    '<g class="d-raktas d-raktas-v"><rect x="388" y="84" width="70" height="22" rx="6"/><text class="d-t d-t-raktas" x="423" y="99">Ctrl + V</text></g>' +
+    /* pelė */
+    '<g class="d-pele"><path d="M0 0v22l6-6 4.5 10 4.5-2-4.5-9.6h8.5z"/><circle class="d-spust" cx="0" cy="0" r="10"/></g>' +
+  '</svg>';
+}
+
 (function kaipNaudotis() {
   const vardas = document.body.dataset.puslapis;
   const zingsniai = ZINGSNIAI[vardas];
@@ -177,11 +245,13 @@ const PIESINIAI = {
   const kitas = antraste.nextElementSibling;
   const plotis = kitas && kitas.style.maxWidth ? kitas.style.maxWidth : "";
 
+  const demo = DEMO[vardas];
   const korteles = zingsniai.map((z, i) =>
     '<li class="kaip-zingsnis" style="--i:' + i + '">' +
+      (demo ? '' :
       '<div class="kaip-piesinys" aria-hidden="true">' +
         '<svg viewBox="0 0 200 120" class="z-' + z.piesinys + '">' + PIESINIAI[z.piesinys] + '</svg>' +
-      '</div>' +
+      '</div>') +
       '<div class="kaip-tekstas">' +
         '<span class="kaip-nr">' + String(i + 1).padStart(2, "0") + '</span>' +
         '<h3>' + z.pav + '</h3>' +
@@ -190,13 +260,18 @@ const PIESINIAI = {
     '</li>'
   ).join("");
 
+  const sarasas = '<ol class="kaip-sarasas" style="--n:' + zingsniai.length + '">' + korteles + '</ol>';
+  const turinys = demo
+    ? '<div class="kaip-demo"><div class="demo-langas">' + demoScena(demo) + '</div>' + sarasas + '</div>'
+    : sarasas;
+
   const sekcija = document.createElement("section");
   sekcija.className = "wrap kaip-naudotis";
   if (plotis) sekcija.style.maxWidth = plotis;
   sekcija.innerHTML =
     '<details' + (sutraukta ? '' : ' open') + '>' +
       '<summary><span>Kaip naudotis</span></summary>' +
-      '<ol class="kaip-sarasas" style="--n:' + zingsniai.length + '">' + korteles + '</ol>' +
+      turinys +
     '</details>';
   antraste.after(sekcija);
 
