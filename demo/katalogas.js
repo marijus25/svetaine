@@ -13,6 +13,8 @@
    n           — iš kiek skelbimų apskaičiuota
    atnaujinta  — kada skaičiuota
    pavyzdys    — true reiškia, kad reikšmė laikina ir nepatikrinta
+   pardavimo   — true, jei vertė iš tikrų sandorių; kitaip ji laikoma
+                 skelbimų (prašoma) kaina ir sumažinama pagal NUOLAIDOS
    ========================================================================== */
 
 const KATALOGAS = {
@@ -30,6 +32,18 @@ const BUKLES = [
   { raktas: "pazeista", pav: "Pažeista", koef: 0.35, apibudinimas: "Reikia remonto arba veikia iš dalies" },
   { raktas: "lauzas", pav: "Laužas", koef: 0.10, apibudinimas: "Nebepataisoma, vertingos tik dalys" }
 ];
+
+/* Prašoma kaina nėra sandorio kaina: pardavėjas prašo daugiau, nei galiausiai
+   gauna. Koeficientas = tikėtina pardavimo kaina / prašoma kaina. Tai
+   pradinės prielaidos — kai svetainė surenka pakankamai tikrų pardavimo
+   kainų (forma „Nupirkai ar pardavei?“), jas pakeičia apskaičiuotos. */
+const NUOLAIDOS = {
+  automobilis: 0.92,
+  elektronika: 0.88,
+  buitine_technika: 0.85,
+  dviratis: 0.87,
+  kita: 0.88
+};
 
 /* Sugadintos detalės pagal kategoriją. Šaltinis — detales.json.
    Kainos yra REŽIAI ir apytikslės: servisų įkainiai skiriasi. */
