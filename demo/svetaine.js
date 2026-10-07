@@ -97,11 +97,11 @@ const SVETAINE = {
   pavadinimas: "Tikra vertė",
 
   /* Meniu. Įrankiai eina iš IRANKIAI, čia lieka tik tai, kas ne įrankis.
-     „Pradžia" — klasikinės svetainės pradžia (langai.html). Gyva scena
-     (index.html) pasiekiama paspaudus ženklą kairėje. „Įmonėms" — poraštėje
+     „Pradžia" ir ženklas kairėje veda į pagrindinį puslapį — sceną su
+     kortelėmis (index.html). langai.html nebenaudojamas. „Įmonėms" — poraštėje
      ir kainų puslapyje, ne viršuje. */
   meniu: [
-    { pav: "Pradžia",  url: "langai.html" },
+    { pav: "Pradžia",  url: "index.html" },
     { pav: "Įrankiai", irankiai: true },
     { pav: "Kainos",    url: "kainos.html" },
     { pav: "Kontaktai", url: "kontaktai.html" }
@@ -134,31 +134,31 @@ const SVETAINE = {
   puslapiai: {
     index:        { aktyvus: "Pradžia" },
     skelbimas:    { aktyvus: "Patikrink skelbimą",
-                    trupiniai: [["Pradžia","langai.html"], ["Patikrink skelbimą"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Patikrink skelbimą"]] },
     palyginimas:  { aktyvus: "Kainų palyginimas",
-                    trupiniai: [["Pradžia","langai.html"], ["Kainų palyginimas"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Kainų palyginimas"]] },
     patikros:     { aktyvus: null,
                     mygtukas: { pav: "Patikrinti skelbimą", url: "skelbimas.html" },
-                    trupiniai: [["Pradžia","langai.html"], ["Mano patikros"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Mano patikros"]] },
     paslauga:     { aktyvus: "Pilnas vertinimas",
-                    trupiniai: [["Pradžia","langai.html"], ["Pilnas vertinimas"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Pilnas vertinimas"]] },
     /* patikra-*.html — po vieną kiekvienai kategorijai (kopija iš patikra-kita.html).
        Trupinių paskutinė dalis įrašoma iš data-pav, tad naujai kategorijai
        čia nieko keisti nereikia. */
     patikra:      { aktyvus: "Pilnas vertinimas",
-                    trupiniai: [["Pradžia","langai.html"], ["Pilnas vertinimas","paslauga.html"], ["Patikra"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Pilnas vertinimas","paslauga.html"], ["Patikra"]] },
     kainos:       { aktyvus: "Kainos",
-                    trupiniai: [["Pradžia","langai.html"], ["Kainos"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Kainos"]] },
     imonems:      { aktyvus: "Įmonėms",
-                    trupiniai: [["Pradžia","langai.html"], ["Įmonėms"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Įmonėms"]] },
     kontaktai:    { aktyvus: "Kontaktai",
-                    trupiniai: [["Pradžia","langai.html"], ["Kontaktai"]] },
+                    trupiniai: [["Pradžia","index.html"], ["Kontaktai"]] },
     rezultatas:   { aktyvus: "Pilnas vertinimas",
                     mygtukas: { pav: "Nauja patikra", url: "paslauga.html" },
-                    trupiniai: [["Pradžia","langai.html"], ["Pilnas vertinimas","paslauga.html"], ["Rezultatas"]],
+                    trupiniai: [["Pradžia","index.html"], ["Pilnas vertinimas","paslauga.html"], ["Rezultatas"]],
                     trupiniu_desine: "&nbsp;" },
     sertifikatas: { aktyvus: "Pažyma pardavėjams",
-                    trupiniai: [["Pradžia","langai.html"], ["Pažyma pardavėjams"]] }
+                    trupiniai: [["Pradžia","index.html"], ["Pažyma pardavėjams"]] }
   }
 };
 
@@ -248,7 +248,7 @@ function trupiniai(cfg) {
 
   /* „Atgal": grįžta ten, iš kur atėjai. Jei atėjai iš kitur (nuoroda, žymė),
      veda vienu laipteliu aukščiau pagal trupinius — niekada iš svetainės. */
-  const tevas = cfg.trupiniai.length > 1 ? (cfg.trupiniai[cfg.trupiniai.length - 2][1] || 'langai.html') : 'langai.html';
+  const tevas = cfg.trupiniai.length > 1 ? (cfg.trupiniai[cfg.trupiniai.length - 2][1] || 'index.html') : 'index.html';
   const atgal = '<a class="atgal" href="' + tevas + '" data-atgal="1">' +
     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Atgal</a>';
