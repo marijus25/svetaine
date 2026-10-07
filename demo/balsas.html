@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kristinos balsas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* Balso scena. Vienas vaizdas per visą ekraną: Kristina ir Žemė kairėje, valdymas dešinėje apačioje.
+   Dvi spalvos kaip 2 versijoje: vėsi (klausosi, kalba, rado), šilta (mąsto). */
+:root {
+  --naktis: #04161b;
+  --stiklas: rgba(3, 20, 25, .62);
+  --linija: rgba(170, 236, 244, .18);
+  --tekstas: #eef7f8;
+  --blankus: rgba(222, 240, 243, .66);
+  --vesi: #8fe8f2;
+  --silta: #ffb547;
+  --sriftas: "Montserrat", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--naktis); color: var(--tekstas);
+  font-family: var(--sriftas); font-size: 14px; line-height: 1.5;
+  overflow: hidden; -webkit-font-smoothing: antialiased;
+}
+.scena { position: fixed; inset: 0; overflow: hidden; }
+.scena img {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
+  object-fit: cover; object-position: var(--fx, 30%) 50%;
+  filter: saturate(1.05);
+  animation: isziebti 1.6s ease-out both;
+}
+.scena canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.uzdanga {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 38%, rgba(2, 14, 18, .55) 78%, rgba(2, 14, 18, .8)),
+    linear-gradient(0deg, rgba(2, 14, 18, .7), transparent 34%),
+    radial-gradient(120% 90% at 30% 50%, transparent 55%, rgba(0, 0, 0, .45));
+}
+@keyframes isziebti { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
+
+/* viršus */
+.virsus {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) 32px 0;
+}
+.zenklas { font-weight: 600; font-size: 21px; letter-spacing: .02em; color: var(--tekstas); text-decoration: none; }
+.zenklas span { font-family: var(--mono); font-size: 10.5px; font-weight: 400; letter-spacing: .14em; color: var(--blankus); margin-left: 10px; text-transform: uppercase; }
+.virsus nav { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.mazas {
+  font: 500 10.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--blankus); background: transparent; border: 1px solid var(--linija);
+  border-radius: 999px; padding: 9px 13px; cursor: pointer; text-decoration: none;
+  transition: color .18s, border-color .18s, background .18s;
+}
+.mazas:hover, .mazas[aria-pressed="true"] { color: var(--tekstas); border-color: rgba(143, 232, 242, .5); }
+.mazas[aria-pressed="true"] { background: rgba(143, 232, 242, .1); }
+:focus-visible { outline: 2px solid var(--vesi); outline-offset: 3px; }
+
+/* valdymas */
+.pultas {
+  position: fixed; z-index: 3; right: 32px; bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  width: min(400px, calc(100vw - 64px));
+  display: grid; gap: 16px;
+}
+.busena { display: flex; align-items: center; gap: 10px; font: 500 10.5px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--blankus); }
+.busena i { width: 7px; height: 7px; border-radius: 50%; background: var(--blankus); transition: background .2s, box-shadow .2s; }
+[data-busena="klauso"] .busena i, [data-busena="kalba"] .busena i { background: var(--vesi); box-shadow: 0 0 10px var(--vesi); }
+[data-busena="mąsto"] .busena i { background: var(--silta); box-shadow: 0 0 10px var(--silta); }
+.busena b { margin-left: auto; font-weight: 400; color: rgba(222, 240, 243, .42); }
+
+.eilute { display: flex; align-items: center; gap: 14px; }
+.mikrofonas {
+  position: relative; flex: none; width: 76px; height: 76px; border-radius: 50%;
+  border: 1px solid rgba(143, 232, 242, .55); background: rgba(4, 30, 36, .55);
+  color: var(--tekstas); cursor: pointer; display: grid; place-items: center;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: transform .18s, border-color .18s, background .18s;
+}
+.mikrofonas:hover { transform: scale(1.04); border-color: var(--vesi); }
+.mikrofonas svg { width: 26px; height: 26px; }
+.mikrofonas::after {
+  content: ""; position: absolute; inset: -7px; border-radius: 50%;
+  border: 1px solid rgba(143, 232, 242, .35); opacity: 0; transform: scale(.9);
+}
+[data-busena="klauso"] .mikrofonas { background: rgba(143, 232, 242, .16); border-color: var(--vesi); }
+[data-busena="klauso"] .mikrofonas::after { animation: banga 1.4s ease-out infinite; }
+[data-busena="mąsto"] .mikrofonas { border-color: var(--silta); }
+@keyframes banga { from { opacity: .9; transform: scale(.92); } to { opacity: 0; transform: scale(1.35); } }
+.zodziai { min-width: 0; display: grid; gap: 4px; }
+.zodziai strong { font-weight: 600; font-size: 17.5px; line-height: 1.3; text-wrap: balance; }
+.zodziai small { font-size: 14px; color: var(--blankus); min-height: 1.5em; overflow-wrap: anywhere; }
+.zodziai small q { quotes: "„" "“"; color: var(--tekstas); }
+
+.titrai {
+  margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--stiklas);
+  border: 1px solid var(--linija); font-size: 15.5px; line-height: 1.55;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.titrai::before { content: "Kristina"; display: block; font: 500 10.5px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--vesi); margin-bottom: 8px; }
+
+.greitai { display: flex; flex-wrap: wrap; gap: 6px; }
+.greitai button {
+  font: 500 13px/1 var(--sriftas); color: var(--tekstas); cursor: pointer;
+  background: rgba(4, 30, 36, .5); border: 1px solid var(--linija); border-radius: 999px; padding: 10px 14px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: border-color .18s, background .18s;
+}
+.greitai button:hover { border-color: rgba(143, 232, 242, .55); background: rgba(143, 232, 242, .1); }
+
+.rasymas { display: flex; gap: 8px; }
+.rasymas input {
+  flex: 1; min-width: 0; font: 400 15px var(--sriftas); color: var(--tekstas);
+  background: var(--stiklas); border: 1px solid var(--linija); border-radius: 999px; padding: 12px 16px;
+}
+.rasymas input::placeholder { color: rgba(222, 240, 243, .45); }
+.rasymas button { font: 600 13px var(--sriftas); border: 0; border-radius: 999px; padding: 0 18px; background: var(--vesi); color: #032127; cursor: pointer; }
+
+.pranesimas {
+  margin: 0; padding: 12px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5;
+  background: rgba(255, 181, 71, .12); border: 1px solid rgba(255, 181, 71, .35); color: #ffe3b8;
+}
+
+/* Žemės liestukas: nematomas mygtukas tiksliai ant Žemės */
+.zeme { position: fixed; z-index: 2; border-radius: 50%; border: 0; background: transparent; cursor: pointer; padding: 0; }
+.zeme span {
+  position: absolute; left: 50%; top: calc(100% + 18px); transform: translateX(-50%); white-space: nowrap;
+  font: 500 10.5px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--tekstas);
+  padding: 8px 12px; border-radius: 999px; background: rgba(3, 20, 25, .55); border: 1px solid var(--linija);
+  transition: opacity .3s;
+}
+.pradeta .zeme span { opacity: 0; pointer-events: none; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .scena { bottom: auto; height: 62%; }
+  .scena img { --fx: 7%; }
+  .virsus { padding-inline: 16px; }
+  .zenklas span { display: none; }
+  .pultas { left: 16px; right: 16px; width: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); gap: 12px; }
+  .uzdanga { background: linear-gradient(0deg, var(--naktis) 0%, rgba(4, 22, 27, .5) 22%, transparent 45%), radial-gradient(120% 90% at 30% 40%, transparent 55%, rgba(0, 0, 0, .4)); }
+  .mikrofonas { width: 64px; height: 64px; }
+  .titrai { font-size: 14.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scena img { animation: none; }
+  [data-busena="klauso"] .mikrofonas::after { animation: none; opacity: .8; transform: scale(1.12); }
+}
+</style>
+</head>
+<body>
+
+
+<div class="scena" aria-hidden="true">
+  <img id="vaizdas" src="nuotraukos/kristina-scena.jpg" alt="">
+  <canvas id="drobe"></canvas>
+  <div class="uzdanga"></div>
+</div>
+
+<header class="virsus">
+  <a class="zenklas" href="index.html">aidas<span>balso scena</span></a>
+  <nav aria-label="Nustatymai">
+    <button class="mazas" id="titruMygtukas" type="button" aria-pressed="false">Titrai</button>
+    <button class="mazas" id="rasytiMygtukas" type="button" aria-pressed="false">Rašyti</button>
+    <a class="mazas" href="langai.html">Įprasta svetainė</a>
+  </nav>
+</header>
+
+<button class="zeme" id="zeme" type="button" aria-label="Paliesk Žemę ir Kristina prabils"><span>Paliesk Žemę</span></button>
+
+<main class="pultas" id="pultas" data-busena="ramu">
+  <div class="busena" role="status"><i></i><span id="busenosZodis">Laukia</span><b id="balsoVardas"></b></div>
+  <div class="eilute">
+    <button class="mikrofonas" id="mikrofonas" type="button" aria-label="Įjungti Kristinos balsą">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+    </button>
+    <div class="zodziai">
+      <strong id="kvietimas">Kristina pasakys pati</strong>
+      <small id="girdi">Įjunk garsą ir paliesk mikrofoną.</small>
+    </div>
+  </div>
+  <p class="titrai" id="titrai" hidden></p>
+  <p class="pranesimas" id="pranesimas" hidden></p>
+  <div class="greitai" id="greitai" hidden>
+    <button type="button" data-sakinys="patikrink skelbimą">Patikrink skelbimą</button>
+    <button type="button" data-sakinys="įvertink daiktą">Įvertink daiktą</button>
+    <button type="button" data-sakinys="palygink kainas">Palygink kainas</button>
+    <button type="button" data-sakinys="pažyma pardavėjui">Pažyma</button>
+  </div>
+  <form class="rasymas" id="rasymas" hidden>
+    <label class="sr" for="klausimas">Parašyk Kristinai</label>
+    <input id="klausimas" autocomplete="off" placeholder="Pvz.: kiek vertas mano telefonas?">
+    <button type="submit">Siųsti</button>
+  </form>
+  <div class="sr" aria-live="polite" id="skaitytuvui"></div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ---------- Nuotrauka: Žemės vieta originale (1376 × 768) ---------- */
+  const VAIZDAS = { w: 1376, h: 768, zx: 462, zy: 420, zr: 64 };
+
+  /* ---------- Įrankiai: vienas šaltinis, kaip IRANKIAI svetaine.js ---------- */
+  const IRANKIAI = {
+    skelbimas:   { puslapis: "skelbimas.html",   sako: "Patikrinsiu skelbimą. Įklijuok nuorodą arba skelbimo tekstą, ir aš pasakysiu, ar kaina teisinga." },
+    vertinimas:  { puslapis: "paslauga.html",    sako: "Įvertinsiu tavo daiktą. Atsakyk į kelis klausimus, ir sužinosi jo tikrąją vertę." },
+    palyginimas: { puslapis: "palyginimas.html", sako: "Palyginsiu kainas. Įrašyk kelis pasiūlymus, ir parodysiu, kuris naudingiausias." },
+    pazyma:      { puslapis: "sertifikatas.html", sako: "Paruošiu pažymą pardavėjams. Ją sudarau iš tavo patikros, ir ją gali parodyti pirkėjui." },
+    iprasta:     { puslapis: "langai.html",      sako: "Gerai, atidarau įprastą svetainę." }
+  };
+
+  const SAKINIAI = {
+    labas: "Labas, aš Kristina. Skaityti nereikia, tiesiog pasakyk, ko tau reikia. Galiu patikrinti skelbimą, įvertinti daiktą, palyginti kainas arba paruošti pažymą pardavėjui.",
+    klausau: "Klausau.",
+    pasirink: "Pasirink apačioje, ko reikia, arba parašyk.",
+    kasTu: "Aš Kristina, aido balsas. Aidas yra dirbtinis intelektas, kuris vertina, ieško ir kuria už tave. Aš tau pasakau, ką jis rado.",
+    moku: "Moku keturis dalykus: patikrinti skelbimą, įvertinti daiktą, palyginti kainas ir paruošti pažymą pardavėjui. Pasakyk, kurį.",
+    kainos: "Šiuo metu visi keturi įrankiai nemokami. Pilna ataskaita dar ruošiama.",
+    reklama: "Reklamos vietas nuomojame čia, šalia manęs. Kaina sutariama individualiai.",
+    pazintys: "Pažinčių langas dar ruošiamas. Kai bus paruoštas, papasakosiu apie jį pirmoji.",
+    aciu: "Prašom. Jei dar ko reikės, tiesiog pasakyk.",
+    sveikas: "Labas! Ką tau padaryti?",
+    nesupratau: "Atsiprašau, to dar nemoku. Pasakyk, pavyzdžiui: patikrink skelbimą.",
+    atidarau: "Atidarau.",
+    nera: "Šioje peržiūroje įrankių puslapių nėra. Tavo svetainėje jis atsidarytų iškart."
+  };
+
+  // Ketinimai: pirmas atitikęs laimi. Tikrinama be lietuviškų raidžių, kad tiktų ir rašytas tekstas.
+  const KETINIMAI = [
+    [/\b(tyl|sustok|nutil|stop|uztenka|gana)/, "tyla"],
+    [/pakartok|dar karta/, "pakartok"],
+    [/\baciu|dekoj/, "aciu"],
+    [/kas tu|kas esi|tavo vard|kristin|kas yra aidas/, "kasTu"],
+    [/palygin|lygin|pigiau|brangiau/, "palyginimas"],
+    [/pazym|sertifikat|parduod|pardavej/, "pazyma"],
+    [/skelbim|autoplius|aruod|nuorod/, "skelbimas"],
+    [/vertin|kiek vert|verta|automobil|masin|telefon|dvirat|kompiuter|technik|daikt/, "vertinimas"],
+    [/kain|mokam|mokes/, "kainos"],
+    [/reklam/, "reklama"],
+    [/pazint/, "pazintys"],
+    [/ka moki|ka gali|ka darai|padek|pagalb|ka siul|irank/, "moku"],
+    [/iprast|skaityt|senoj|visa svetain/, "iprasta"],
+    [/^(labas|sveik|laba diena|labukas)/, "sveikas"]
+  ];
+
+  const be = s => s.toLowerCase()
+    .replace(/[ą]/g, "a").replace(/[čc]/g, "c").replace(/[ęė]/g, "e").replace(/[į]/g, "i")
+    .replace(/[š]/g, "s").replace(/[ųū]/g, "u").replace(/[ž]/g, "z").trim();
+
+  /* ---------- Elementai ---------- */
+  const $ = id => document.getElementById(id);
+  const pultas = $("pultas"), mikrofonas = $("mikrofonas"), titrai = $("titrai"), girdi = $("girdi"),
+        kvietimas = $("kvietimas"), busenosZodis = $("busenosZodis"), balsoVardas = $("balsoVardas"),
+        pranesimas = $("pranesimas"), greitai = $("greitai"), rasymas = $("rasymas"), klausimas = $("klausimas"),
+        skaitytuvui = $("skaitytuvui"), zeme = $("zeme");
+
+  const saugok = (k, v) => { try { v === undefined ? (v = localStorage.getItem(k)) : localStorage.setItem(k, v); } catch (e) { v = null; } return v; };
+  let rodytiTitrus = saugok("kristina-titrai") === "1";
+
+  /* ---------- Balsas (kalbėjimas) ---------- */
+  const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
+  let balsas = null, paskutinis = SAKINIAI.labas, kalbosEile = 0;
+  let gyviSakymai = []; // laikom nuorodas, kad Chrome nepamestų onend
+
+  function rinktisBalsa() {
+    if (!synth) return;
+    const visi = synth.getVoices();
+    const lt = visi.filter(v => /^lt/i.test(v.lang));
+    // Pirmiausia moteriškas Edge „Ona“ (natūralus), tada bet kuris natūralus, tada bet kuris lietuviškas
+    balsas = lt.find(v => /ona/i.test(v.name) && /natural|online/i.test(v.name))
+          || lt.find(v => /ona/i.test(v.name))
+          || lt.find(v => /natural|online|neural/i.test(v.name))
+          || lt[0] || null;
+    balsoVardas.textContent = balsas ? balsas.name.replace(/^Microsoft\s+/, "").replace(/\s*\(.*$/, "").replace(/\s+Online.*$/, "").replace(/ - .*$/, "") : "";
+  }
+  if (synth) { rinktisBalsa(); synth.addEventListener?.("voiceschanged", rinktisBalsa); }
+
+  // Ilgą tekstą skaidom sakiniais: Chrome nutraukia ilgus sakymus (~15 s)
+  function sakyk(tekstas, poto) {
+    paskutinis = tekstas;
+    const eile = ++kalbosEile;
+    stabdykKlausyma();
+    skaitytuvui.textContent = tekstas;
+    const sakiniai = tekstas.match(/[^.!?:]+[.!?:]?/g).map(s => s.trim()).filter(Boolean);
+    const baigta = () => { if (eile !== kalbosEile) return; garsumas.tikslas = 0; nustatyk("ramu"); poto && poto(); };
+
+    if (!synth || !balsas) {
+      // Be lietuviško balso: rodom titrus ir laikom tiek, kiek truktų kalba
+      rodykTitra(tekstas, true);
+      nustatyk("kalba");
+      garsumas.tikslas = .5;
+      setTimeout(baigta, Math.min(9000, 900 + tekstas.length * 55));
+      return;
+    }
+    synth.cancel();
+    gyviSakymai = [];
+    nustatyk("kalba");
+    sakiniai.forEach((s, i) => {
+      const u = new SpeechSynthesisUtterance(s);
+      u.voice = balsas; u.lang = balsas.lang || "lt-LT"; u.rate = 1; u.pitch = 1;
+      u.onstart = () => { if (eile === kalbosEile) { rodykTitra(s); garsumas.tikslas = .55; } };
+      u.onboundary = () => { if (eile === kalbosEile) garsumas.smugis = 1; };
+      if (i === sakiniai.length - 1) { u.onend = baigta; u.onerror = baigta; }
+      gyviSakymai.push(u);
+      synth.speak(u);
+    });
+  }
+  function nutilk() { kalbosEile++; synth && synth.cancel(); garsumas.tikslas = 0; stabdykKlausyma(); nustatyk("ramu"); }
+
+  function rodykTitra(s, priverstinai) {
+    titrai.textContent = s;
+    titrai.hidden = !(rodytiTitrus || priverstinai);
+  }
+
+  /* ---------- Klausymas (balso komandos) ---------- */
+  const Atpazinimas = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let atpazinimas = null, klausosi = false;
+
+  function klausyk() {
+    if (!Atpazinimas) { greitai.hidden = false; return; }
+    stabdykKlausyma();
+    atpazinimas = new Atpazinimas();
+    atpazinimas.lang = "lt-LT"; atpazinimas.interimResults = true; atpazinimas.maxAlternatives = 1; atpazinimas.continuous = false;
+    let galutinis = "";
+    atpazinimas.onresult = e => {
+      let tarpinis = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        r.isFinal ? (galutinis += r[0].transcript) : (tarpinis += r[0].transcript);
+      }
+      const rodyti = (galutinis + tarpinis).trim();
+      if (rodyti) { girdi.innerHTML = ""; const q = document.createElement("q"); q.textContent = rodyti; girdi.append(q); }
+    };
+    atpazinimas.onerror = e => {
+      klausosi = false;
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        rodykPranesima("Mikrofonas neleidžiamas. Leisk jį naršyklės adreso juostoje arba rinkis mygtukais apačioje.");
+        greitai.hidden = false;
+      } else if (e.error === "network") {
+        rodykPranesima("Balso atpažinimui reikia interneto ryšio. Kol jo nėra, rinkis mygtukais apačioje.");
+        greitai.hidden = false;
+      } else if (e.error !== "no-speech" && e.error !== "aborted") {
+        greitai.hidden = false;
+      }
+      nustatyk("ramu");
+    };
+    atpazinimas.onend = () => {
+      klausosi = false;
+      const t = galutinis.trim();
+      if (t) atsakyk(t);
+      else if (pultas.dataset.busena === "klauso") { nustatyk("ramu"); girdi.textContent = "Nieko negirdėjau. Paliesk mikrofoną ir kalbėk."; }
+    };
+    try { atpazinimas.start(); klausosi = true; nustatyk("klauso"); girdi.textContent = "Kalbėk…"; }
+    catch (e) { klausosi = false; greitai.hidden = false; }
+  }
+  function stabdykKlausyma() {
+    if (atpazinimas) { atpazinimas.onend = null; atpazinimas.onresult = null; atpazinimas.onerror = null; try { atpazinimas.abort(); } catch (e) {} }
+    atpazinimas = null; klausosi = false;
+  }
+
+  /* ---------- Atsakymas ---------- */
+  function atpazinkKetinima(t) {
+    const n = be(t);
+    for (const [re, k] of KETINIMAI) if (re.test(n)) return k;
+    return null;
+  }
+
+  function atsakyk(tekstas) {
+    const k = atpazinkKetinima(tekstas);
+    girdi.innerHTML = ""; const q = document.createElement("q"); q.textContent = tekstas; girdi.append(q);
+    if (k === "tyla") { nutilk(); girdi.textContent = "Nutilau. Paliesk mikrofoną, kai reikės."; return; }
+    nustatyk("mąsto");
+    setTimeout(() => {
+      if (k === "pakartok") return sakyk(paskutinis, toliau);
+      if (IRANKIAI[k]) return atidaryk(k);
+      sakyk(SAKINIAI[k] || SAKINIAI.nesupratau, toliau);
+    }, 420);
+  }
+  // Po atsakymo Kristina vėl klausosi (jei balso komandos veikia)
+  function toliau() { if (Atpazinimas && !mikrofonasIsjungtas) klausyk(); }
+
+  async function atidaryk(k) {
+    const irankis = IRANKIAI[k];
+    let yra = location.protocol === "file:";
+    if (!yra) { try { yra = (await fetch(irankis.puslapis, { cache: "no-store" })).ok; } catch (e) { yra = false; } }
+    if (!yra) return sakyk(irankis.sako + " " + SAKINIAI.nera, toliau);
+    sakyk(k === "iprasta" ? irankis.sako : irankis.sako + " " + SAKINIAI.atidarau, () => { location.href = irankis.puslapis; });
+  }
+
+  /* ---------- Būsena ---------- */
+  const ZODIS = { ramu: "Laukia", klauso: "Klausosi", "mąsto": "Mąsto", kalba: "Kalba" };
+  function nustatyk(b) {
+    pultas.dataset.busena = b; busenosZodis.textContent = ZODIS[b];
+    kvietimas.textContent = b === "klauso" ? "Klausausi" : b === "kalba" ? "Kristina kalba" : b === "mąsto" ? "Galvoju" : (pradeta ? (Atpazinimas ? "Paliesk ir kalbėk" : "Pasirink arba parašyk") : "Kristina pasakys pati");
+    mikrofonas.setAttribute("aria-label", b === "klauso" ? "Baigti klausytis" : b === "kalba" ? "Nutildyti Kristiną" : pradeta ? "Kalbėti Kristinai" : "Įjungti Kristinos balsą");
+  }
+  function rodykPranesima(t) { pranesimas.textContent = t; pranesimas.hidden = false; }
+
+  /* ---------- Pradžia ---------- */
+  let pradeta = false, mikrofonasIsjungtas = false;
+  function pradeti() {
+    if (pradeta) return;
+    pradeta = true; document.body.classList.add("pradeta");
+    rinktisBalsa();
+    girdi.textContent = Atpazinimas ? "Kai ji baigs, kalbėk." : "";
+    if (!synth || !balsas) {
+      rodykPranesima(synth
+        ? "Šioje naršyklėje nėra lietuviško balso, todėl Kristina kalba titrais. Atidaryk svetainę Microsoft Edge naršyklėje (balsas „Ona“) arba Windows nustatymuose įdiek lietuvių kalbos balsą."
+        : "Ši naršyklė nemoka kalbėti balsu, todėl Kristina kalba titrais.");
+    }
+    if (!Atpazinimas) greitai.hidden = false;
+    sakyk(SAKINIAI.labas, () => Atpazinimas ? sakyk(SAKINIAI.klausau, toliau) : sakyk(SAKINIAI.pasirink));
+  }
+
+  mikrofonas.addEventListener("click", () => {
+    if (!pradeta) return pradeti();
+    const b = pultas.dataset.busena;
+    if (b === "kalba") { nutilk(); return; }
+    if (b === "klauso") { mikrofonasIsjungtas = true; stabdykKlausyma(); nustatyk("ramu"); girdi.textContent = "Paliesk mikrofoną, kai reikės."; return; }
+    mikrofonasIsjungtas = false;
+    if (Atpazinimas) klausyk(); else { rasymas.hidden = false; $("rasytiMygtukas").setAttribute("aria-pressed", "true"); klausimas.focus(); }
+  });
+  zeme.addEventListener("click", () => pradeta ? mikrofonas.click() : pradeti());
+
+  greitai.addEventListener("click", e => {
+    const b = e.target.closest("button[data-sakinys]");
+    if (!b) return;
+    if (!pradeta) { pradeta = true; document.body.classList.add("pradeta"); rinktisBalsa(); }
+    atsakyk(b.dataset.sakinys);
+  });
+  rasymas.addEventListener("submit", e => {
+    e.preventDefault();
+    const t = klausimas.value.trim(); if (!t) return;
+    klausimas.value = "";
+    if (!pradeta) { pradeta = true; document.body.classList.add("pradeta"); rinktisBalsa(); }
+    atsakyk(t);
+  });
+
+  const titruMygtukas = $("titruMygtukas"), rasytiMygtukas = $("rasytiMygtukas");
+  titruMygtukas.setAttribute("aria-pressed", String(rodytiTitrus));
+  titruMygtukas.addEventListener("click", () => {
+    rodytiTitrus = !rodytiTitrus; saugok("kristina-titrai", rodytiTitrus ? "1" : "0");
+    titruMygtukas.setAttribute("aria-pressed", String(rodytiTitrus));
+    titrai.hidden = !rodytiTitrus || !titrai.textContent;
+  });
+  rasytiMygtukas.addEventListener("click", () => {
+    rasymas.hidden = !rasymas.hidden; greitai.hidden = rasymas.hidden && !!Atpazinimas;
+    rasytiMygtukas.setAttribute("aria-pressed", String(!rasymas.hidden));
+    if (!rasymas.hidden) klausimas.focus();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.code === "Space" && e.target === document.body) { e.preventDefault(); mikrofonas.click(); }
+    if (e.key === "Escape") nutilk();
+  });
+
+  nustatyk("ramu");
+
+  /* ---------- Scena: Žemė kalba šviesa ---------- */
+  const drobe = $("drobe"), ctx = drobe.getContext("2d"), img = $("vaizdas");
+  const mazinti = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const garsumas = { dabar: 0, tikslas: 0, smugis: 0 };
+  let W = 0, H = 0, dpr = 1, Z = { x: 0, y: 0, r: 0 };
+  const daleles = Array.from({ length: 70 }, () => ({ a: Math.random() * Math.PI * 2, d: 1.5 + Math.random() * 2.6, v: (.0006 + Math.random() * .0016) * (Math.random() < .5 ? -1 : 1), s: .5 + Math.random() * 1.3, f: Math.random() }));
+
+  function matmenys() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const sc = drobe.parentElement;
+    W = sc.clientWidth; H = sc.clientHeight;
+    drobe.width = W * dpr; drobe.height = H * dpr;
+    // Ta pati matematika kaip object-fit: cover su object-position
+    const fx = parseFloat(getComputedStyle(img).objectPosition) / 100 || .3;
+    const k = Math.max(W / VAIZDAS.w, H / VAIZDAS.h);
+    const ox = (W - VAIZDAS.w * k) * fx, oy = (H - VAIZDAS.h * k) * .5;
+    Z = { x: ox + VAIZDAS.zx * k, y: oy + VAIZDAS.zy * k, r: VAIZDAS.zr * k };
+    const d = Z.r * 2.4;
+    Object.assign(zeme.style, { left: (Z.x - d / 2) + "px", top: (Z.y - d / 2) + "px", width: d + "px", height: d + "px" });
+  }
+  addEventListener("resize", matmenys);
+  matmenys();
+
+  const VESI = "143,232,242", SILTA = "255,181,71";
+  let t0 = performance.now();
+  function kadras(t) {
+    const dt = Math.min(50, t - t0); t0 = t;
+    const b = pultas.dataset.busena;
+    garsumas.smugis *= .88;
+    const tikslas = garsumas.tikslas + garsumas.smugis * .45 + (b === "kalba" ? Math.max(0, Math.sin(t / 95) * Math.sin(t / 233)) * .25 : 0);
+    garsumas.dabar += (tikslas - garsumas.dabar) * .18;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const { x, y, r } = Z, g = garsumas.dabar;
+    const spalva = b === "mąsto" ? SILTA : VESI;
+
+    // švytėjimas: kvėpuoja ramybėje, auga kalbant
+    const kvep = mazinti ? .5 : .5 + .5 * Math.sin(t / 1600);
+    const sv = ctx.createRadialGradient(x, y, r * .8, x, y, r * (2.4 + g * 1.4));
+    sv.addColorStop(0, `rgba(${spalva},${.16 + kvep * .06 + g * .22})`);
+    sv.addColorStop(1, `rgba(${spalva},0)`);
+    ctx.fillStyle = sv; ctx.beginPath(); ctx.arc(x, y, r * (2.4 + g * 1.4), 0, Math.PI * 2); ctx.fill();
+
+    // balso žiedas: 96 spinduliai, ilgis pagal kalbą
+    if (g > .02 && !mazinti) {
+      const n = 96;
+      ctx.lineCap = "round";
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2 - Math.PI / 2;
+        const bang = (Math.sin(a * 3 + t / 180) + Math.sin(a * 7 - t / 120) + Math.sin(a * 13 + t / 70)) / 3;
+        const ilgis = r * (.06 + g * (.22 + .28 * (bang * .5 + .5)));
+        const r1 = r * 1.16;
+        ctx.strokeStyle = `rgba(${spalva},${.35 + g * .5})`;
+        ctx.lineWidth = Math.max(1, r * .028);
+        ctx.beginPath();
+        ctx.moveTo(x + Math.cos(a) * r1, y + Math.sin(a) * r1);
+        ctx.lineTo(x + Math.cos(a) * (r1 + ilgis), y + Math.sin(a) * (r1 + ilgis));
+        ctx.stroke();
+      }
+    }
+
+    // plonas žiedas su 10 padalų (10 įrankių vietų, kaip 2 versijoje)
+    ctx.strokeStyle = `rgba(${VESI},.22)`; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(x, y, r * 1.62, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < 10; i++) {
+      const a = i / 10 * Math.PI * 2 - Math.PI / 2 + (mazinti ? 0 : t / 40000);
+      const aktyvus = i < 4;
+      ctx.strokeStyle = `rgba(${VESI},${aktyvus ? .75 : .25})`;
+      ctx.beginPath();
+      ctx.moveTo(x + Math.cos(a) * r * 1.56, y + Math.sin(a) * r * 1.56);
+      ctx.lineTo(x + Math.cos(a) * r * 1.70, y + Math.sin(a) * r * 1.70);
+      ctx.stroke();
+    }
+
+    // klausymasis: bangos sueina į Žemę
+    if (b === "klauso" && !mazinti) {
+      for (let i = 0; i < 3; i++) {
+        const p = ((t / 1400) + i / 3) % 1;
+        ctx.strokeStyle = `rgba(${VESI},${(1 - p) * .0 + p * .45})`;
+        ctx.beginPath(); ctx.arc(x, y, r * (2.6 - p * 1.4), 0, Math.PI * 2); ctx.stroke();
+      }
+    }
+    // mąstymas: šiltas lankas sukasi
+    if (b === "mąsto") {
+      const a = t / 260;
+      ctx.strokeStyle = `rgba(${SILTA},.85)`; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, r * 1.38, a, a + 1.4); ctx.stroke();
+    }
+
+    // dalelės orbitose
+    for (const p of daleles) {
+      if (!mazinti) p.a += p.v * dt * (1 + g * 3);
+      const d = r * (p.d + Math.sin(t / 2400 + p.f * 6) * .05);
+      const px = x + Math.cos(p.a) * d, py = y + Math.sin(p.a) * d * .62;
+      ctx.fillStyle = `rgba(${spalva},${.25 + p.f * .45})`;
+      ctx.beginPath(); ctx.arc(px, py, p.s * (1 + g * .6), 0, Math.PI * 2); ctx.fill();
+    }
+    requestAnimationFrame(kadras);
+  }
+  requestAnimationFrame(kadras);
+})();
+</script>
+
+</body>
+</html>
