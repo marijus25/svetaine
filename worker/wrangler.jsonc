@@ -13,5 +13,12 @@
   ],
   "vars": {
     "LEIDZIAMI": "https://marijus25.github.io"
+  },
+  // Šakų peržiūroms (Workers Builds paleidžia `wrangler preview` kiekvienai ne main šakai).
+  // Tikros kainų duomenų bazės (DB) čia sąmoningai nėra, kad peržiūros nerašytų į ją.
+  "previews": {
+    "vars": {
+      "LEIDZIAMI": "https://marijus25.github.io"
+    }
   }
 }
