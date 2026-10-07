@@ -14,7 +14,7 @@
    ========================================================================== */
 
 /* Versija. Keičiasi su kiekvienu svetainės atnaujinimu. */
-const TV_VERSIJA = "2026-10-07.1";
+const TV_VERSIJA = "2026-10-07.2";
 try { window.TV_VERSIJA = TV_VERSIJA; } catch (e) {}
 
 /* ==========================================================================
@@ -997,7 +997,14 @@ const PATIKRA = {
     const k = KLASES[kategorija];
     const q = " " + this.normalizuoti(pavadinimas) + " ";
 
-    /* Automobiliui klasę tiksliausiai pasako kėbulo tipas iš skelbimo. */
+    /* Žinomas modelis pasako klasę tiksliausiai: Insignia hečbekas vis tiek
+       vidutinės klasės, o ne kompaktinis. Prestižinė markė — taip pat. */
+    if ((k.premium_markes || []).some(m => q.indexOf(" " + m + " ") >= 0)) return "premium";
+    for (const m of Object.keys(k.modeliai || {})) {
+      if (q.indexOf(" " + this.normalizuoti(m) + " ") >= 0) return k.modeliai[m];
+    }
+
+    /* Kitaip klasę pasako kėbulo tipas iš skelbimo. */
     if (poz && poz.kebulas && k.kebulai) {
       const kb = this.normalizuoti(poz.kebulas);
       for (const raktas of Object.keys(k.kebulai)) {
@@ -1012,10 +1019,28 @@ const PATIKRA = {
     }
     if ((k.premium_markes || []).some(m => q.indexOf(" " + m + " ") >= 0)) return "premium";
 
+
     for (const z of Object.keys(k.zodziu_klases || {})) {
       if (q.indexOf(" " + this.normalizuoti(z) + " ") >= 0) return k.zodziu_klases[z];
     }
     return k.numatyta_klase || null;
+  },
+
+  /* Kokia naujos kainos dalis lieka po tiek metų. Kreivė gali turėti du
+     tempus: automobilis pirmą dešimtmetį pigsta ~11 % per metus, vėliau —
+     sparčiau, nes seni, daug nuvažiavę automobiliai rinkoje vertinami mažai. */
+  amziausDalis(cfg, amzius) {
+    const a = Math.max(0, amzius);
+    const nuo = cfg.veliau_nuo || Infinity;
+    let dalis = Math.pow(cfg.metinis, Math.min(a, nuo));
+    if (a > nuo) dalis *= Math.pow(cfg.metinis_veliau || cfg.metinis, a - nuo);
+    return Math.max(cfg.riba || 0, dalis);
+  },
+
+  /* Kaip pasikeičia vertė, kai daiktas yra ne tokio amžiaus, o kitokio. */
+  amziausSantykis(cfg, isMetu, iMetus) {
+    const dabar = new Date().getFullYear();
+    return this.amziausDalis(cfg, dabar - iMetus) / this.amziausDalis(cfg, dabar - isMetu);
   },
 
   /* 3 pakopa. Grąžina { verte, klase, pav } arba null. */
@@ -1030,8 +1055,7 @@ const PATIKRA = {
     if (!metai) return null;
     const amzius = Math.max(0, new Date().getFullYear() - metai);
 
-    let dalis = Math.pow(cfg.metinis, amzius);
-    if (dalis < cfg.riba) dalis = cfg.riba;
+    let dalis = this.amziausDalis(cfg, amzius);
 
     /* Rida lyginama su tuo, kiek jos turėtų būti pagal amžių. Mašina su
        120 000 km po dešimties metų verta daugiau nei su 300 000. */
@@ -1043,7 +1067,15 @@ const PATIKRA = {
       dalis = dalis * (1 + p);
     }
 
-    return { verte: Math.round(kl.nauja * dalis), klase: klase, pav: kl.pav };
+    /* Automobilio kreivė rodo įprastos naudotos būklės rinkos kainą: tokio
+       amžiaus „idealios" mašinos rinkoje beveik nėra. Kad toliau būklės
+       koeficientas nebūtų pritaikytas antrą kartą, verčiam į idealią. */
+    let verte = kl.nauja * dalis;
+    if (cfg.kreive_naudota) {
+      const n = BUKLES.find(x => x.raktas === "naudota");
+      if (n) verte = verte / n.koef;
+    }
+    return { verte: Math.round(verte), klase: klase, pav: kl.pav };
   },
 
   /* 2 pakopa. Panašių daiktų kainos — tikri sandoriai ir skelbimai.
@@ -1103,7 +1135,7 @@ const PATIKRA = {
         const skirt = st.metai - metai;
         if (Math.abs(skirt) > 5) continue;
         svoris *= 1 - Math.abs(skirt) * 0.12;
-        if (cfg && cfg.metinis) pataisa *= Math.pow(cfg.metinis, skirt);
+        if (cfg && cfg.metinis) pataisa *= this.amziausSantykis(cfg, st.metai, metai);
       } else if (metai || st.metai) {
         svoris *= 0.7;
       }
@@ -1214,7 +1246,7 @@ const PATIKRA = {
         const cfg = KLASES[kategorija];
         atskaitos = true;
         if (a.metai && poz.metai) {
-          bazine = bazine * Math.pow(cfg.metinis, a.metai - poz.metai);
+          bazine = bazine * this.amziausSantykis(cfg, a.metai, poz.metai);
         }
         if (a.rida && poz.rida && cfg.rida_zingsnis) {
           let pr = ((poz.rida - a.rida) / cfg.rida_zingsnis) * cfg.rida_uz_zingsni;
@@ -1307,8 +1339,11 @@ const PATIKRA = {
 
     /* Verdiktas lyginamas su rėžiu: per brangu tik tada, kai kaina viršija net
        palankiausią rėžio galą, o gera kaina — kai nesiekia nė griežčiausio. */
+    /* Kai vertė tik apytikslė, „per brangu" sakome tik esant akivaizdžiam
+       skirtumui — kitaip kaltintume pardavėją dėl savo duomenų trūkumo. */
+    const ribaBrangu = pasitikejimas === "zemas" ? 1.5 : this.RIBA_BRANGU;
     let verdiktas, skirtumas = null;
-    if (kaina > verteIki * this.RIBA_BRANGU) {
+    if (kaina > verteIki * ribaBrangu) {
       verdiktas = "per-brangu";
       skirtumas = Math.round(kaina - verteIki);
     } else if (kaina < verteNuo * this.RIBA_PIGU) {
@@ -2232,9 +2267,7 @@ const VERTES_KREIVE = {
     const y = (v) => VIRSUS + (1 - Math.min(1, v / maksY)) * (aukstis - VIRSUS - APACIA);
 
     const kreiveTaske = (m) => {
-      let dalis = Math.pow(cfg.metinis, m);
-      if (dalis < cfg.riba) dalis = cfg.riba;
-      return kl.nauja * dalis;
+      return kl.nauja * PATIKRA.amziausDalis(cfg, m);
     };
 
     /* Viršutinė riba parenkama taip, kad tilptų ir kreivė, ir abu taškai —
@@ -2546,7 +2579,7 @@ const SKELBIMO_PATIKRA = {
     if (d.metai && typeof PATAISOS !== "undefined") {
       const amzius = new Date().getFullYear() - d.metai;
       const p = Math.max(PATAISOS.amzius_riba, PATAISOS.amzius_uz_metus * amzius);
-      if (p) sarasas.push({ pav: amzius + " m. amžius", poveikis: p });
+      if (p) sarasas.push({ pav: amzius + " m. amžius", poveikis: p, saltinis: "amzius" });
     }
 
     const def = SKELBIMAS.defektuBusena(d.defektai);
@@ -3272,6 +3305,18 @@ const SKELBIMAS = {
     if (d.rida === undefined) {
       const r = this.rida(t);
       if (r) d.rida = r;
+    }
+    /* Autoplius antraštėje kuras ir kėbulas stovi atskiromis eilutėmis,
+       be pavadinimų: „Dyzelinas", „Universalas". */
+    const eilutes = t.split(/\n/).map(x => x.trim()).filter(Boolean);
+    const rastiEilute = (re) => eilutes.find(x => x.length <= 30 && re.test(x));
+    if (d.kuras === undefined) {
+      const k = rastiEilute(/^(dyzelinas|benzinas|elektra|hibridas|dujos|benzinas\s*\/\s*(dujos|elektra)|dyzelinas\s*\/\s*elektra)$/i);
+      if (k) d.kuras = k;
+    }
+    if (d.kebulas === undefined) {
+      const k = rastiEilute(/^(hečbekas|hecbekas|sedanas|universalas|visureigis|krosoveris|vienatūris|vienaturis|kupė|kupe|kabrioletas|pikapas|komercinis|mikroautobusas|furgonas)(\s*\/.*)?$/i);
+      if (k) d.kebulas = k;
     }
     if (d.metai === undefined) {
       const m = this.metai(t);
