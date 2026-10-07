@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "aidas-kainos",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "aidas-kainos",
+      "database_id": "d84fe595-8839-4775-89c9-d4c7652e2003"
+    }
+  ],
+  "vars": {
+    "LEIDZIAMI": "https://marijus25.github.io"
+  }
+}

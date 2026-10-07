@@ -14,7 +14,7 @@
    ========================================================================== */
 
 /* Versija. Keičiasi su kiekvienu svetainės atnaujinimu. */
-const TV_VERSIJA = "2026-10-03.1";
+const TV_VERSIJA = "2026-10-07.1";
 try { window.TV_VERSIJA = TV_VERSIJA; } catch (e) {}
 
 /* ==========================================================================
@@ -755,6 +755,150 @@ function tekstoSauga(t) {
     c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 }
 
+/* ==========================================================================
+   RINKA — tikros kainos iš bendros duomenų bazės (Cloudflare Worker + D1)
+
+   Kas renkama:
+     prašomos kainos  — iš kiekvieno patikrinto skelbimo;
+     pardavimo kainos — iš formos „Nupirkai ar pardavei?“ po rezultatu.
+   Iš pardavimo ir prašomos kainos porų apskaičiuojama, kiek realiai
+   nusiderama — tada prašomos kainos verčiamos sandorio kainomis.
+
+   Adresas nurodomas nustatymai.js (kainuApi). Kol jis tuščias, niekas
+   nesiunčiama ir vertinimas remiasi tik katalogas.js duomenimis.
+   Duomenys laikomi naršyklėje kelias valandas, todėl skaičiavimas lieka
+   sinchroninis ir veikia akimirksniu.
+   ========================================================================== */
+const RINKA = {
+  RAKTAS: "tv_rinka_v1",
+  GALIOJA_MS: 6 * 3600 * 1000,
+  duomenys: null,
+
+  adresas() {
+    const n = window.AIDAS_NUSTATYMAI || {};
+    return String(n.kainuApi || "").trim().replace(/\/+$/, "");
+  },
+  ijungta() { return !!this.adresas(); },
+
+  pakrauti() {
+    if (this.duomenys) return this.duomenys;
+    try {
+      const d = JSON.parse(localStorage.getItem(this.RAKTAS) || "null");
+      if (d && d.adresas === this.adresas()) this.duomenys = d;
+    } catch (e) {}
+    return this.duomenys;
+  },
+
+  /* Parsisiunčia šviežius duomenis, jei turimi paseno. Vertinimas juos
+     paima pats — kiekvienas skaičiavimas skaito RINKA.pakrauti(). */
+  async atnaujinti() {
+    if (!this.ijungta()) return;
+    const turimi = this.pakrauti();
+    if (turimi && Date.now() - turimi.gauta < this.GALIOJA_MS) return;
+    try {
+      const a = await fetch(this.adresas() + "/rinka");
+      if (!a.ok) return;
+      const j = await a.json();
+      this.duomenys = {
+        adresas: this.adresas(), gauta: Date.now(),
+        stebejimai: Array.isArray(j.stebejimai) ? j.stebejimai : [],
+        nuolaidos: j.nuolaidos || {}
+      };
+      try { localStorage.setItem(this.RAKTAS, JSON.stringify(this.duomenys)); } catch (e) {}
+    } catch (e) { /* tinklas neatsakė — dirbam su tuo, ką turim */ }
+  },
+
+  /* Visi stebėjimai: katalogas.js ir parsiųsti iš bazės. */
+  stebejimai() {
+    const vietiniai = (typeof STEBEJIMAI !== "undefined" ? STEBEJIMAI : [])
+      .map(s => Object.assign({ tipas: "prasoma" }, s));
+    const d = this.pakrauti();
+    return vietiniai.concat(d ? d.stebejimai : []);
+  },
+
+  /* Tikėtina pardavimo kaina / prašoma kaina šioje kategorijoje.
+     Grąžina ir šaltinį: „rinka“ — apskaičiuota iš tikrų sandorių. */
+  nuolaida(kategorija) {
+    const k = kategorija || "kita";
+    const d = this.pakrauti();
+    if (d && d.nuolaidos && d.nuolaidos[k] && d.nuolaidos[k].koef > 0) {
+      return { koef: d.nuolaidos[k].koef, rinka: true };
+    }
+    const prielaidos = typeof NUOLAIDOS !== "undefined" ? NUOLAIDOS : {};
+    return { koef: prielaidos[k] || prielaidos.kita || 0.9, rinka: false };
+  },
+
+  async siusti(irasas) {
+    if (!this.ijungta()) return false;
+    try {
+      const a = await fetch(this.adresas() + "/kaina", {
+        method: "POST",
+        keepalive: true,   /* išsiunčiama ir tada, kai puslapis jau keičiamas */
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(irasas)
+      });
+      return a.ok;
+    } catch (e) { return false; }
+  },
+
+  /* Prašoma kaina iš patikrinto skelbimo ar formos. Siunčiama tik galutinė:
+     kol žmogus dar taiso kainą laukelyje, tarpinės reikšmės neišeina. */
+  siustiPrasoma(r, pozymiai, iskart) {
+    if (!this.ijungta() || !r || r.busena !== "ok" || !r.kaina) return;
+    const p = pozymiai || r.pozymiai || {};
+    const irasas = {
+      tipas: "prasoma", pavadinimas: r.pavadinimas, kaina: r.kaina,
+      kategorija: r.kategorijosRaktas || null, bukle: r.bukle ? r.bukle.raktas : null,
+      metai: p.metai || null, rida: p.rida || null, kuras: p.kuras || null, kebulas: p.kebulas || null
+    };
+    clearTimeout(this.laukia);
+    if (iskart) { this.siusti(irasas); return; }
+    this.laukia = setTimeout(() => this.siusti(irasas), 5000);
+  },
+
+  /* Forma „Nupirkai ar pardavei?“ — rodoma tik kai bazė prijungta. */
+  forma(r) {
+    if (!this.ijungta() || !r || r.busena !== "ok") return "";
+    return '<form class="kortele stulpelis tarpas-12 sandorio-forma" style="padding:22px 24px;" novalidate>' +
+      '<label class="antraste-maza" for="sandorioKaina">Nupirkai ar pardavei?</label>' +
+      '<span class="smulkus">Įrašyk galutinę kainą — vertinimas taps tikslesnis.</span>' +
+      '<div class="laukas"><div class="su-mygtuku">' +
+      '<div class="su-valiuta" style="flex:1;"><input type="number" id="sandorioKaina" min="1" step="1" ' +
+      'inputmode="numeric" placeholder="galutinė kaina" style="width:100%;">' +
+      '<span class="valiuta">&euro;</span></div>' +
+      '<button type="submit" class="mygtukas m-pagrindinis">Įrašyti</button></div></div>' +
+      '<span class="smulkus sandorio-busena" role="status" aria-live="polite"></span></form>';
+  },
+
+  prijungtiForma(saknis, r) {
+    const f = saknis && saknis.querySelector(".sandorio-forma");
+    if (!f) return;
+    const laukas = f.querySelector("input");
+    const busena = f.querySelector(".sandorio-busena");
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const kaina = parseFloat(laukas.value);
+      if (isNaN(kaina) || kaina <= 0) { busena.textContent = "Įrašyk kainą eurais."; laukas.focus(); return; }
+      const mygtukas = f.querySelector("button");
+      mygtukas.disabled = true;
+      const p = r.pozymiai || {};
+      const ok = await this.siusti({
+        tipas: "pardavimo", pavadinimas: r.pavadinimas, kaina: kaina, prasyta: r.kaina,
+        kategorija: r.kategorijosRaktas || null, bukle: r.bukle ? r.bukle.raktas : null,
+        metai: p.metai || null, rida: p.rida || null, kuras: p.kuras || null, kebulas: p.kebulas || null
+      });
+      if (ok) {
+        f.innerHTML = '<span class="antraste-maza">Ačiū</span>' +
+          '<span class="smulkus">Kaina įrašyta: ' + eurai(kaina) + ".</span>";
+      } else {
+        mygtukas.disabled = false;
+        busena.textContent = "Nepavyko išsiųsti. Pabandyk vėliau.";
+      }
+    });
+  }
+};
+RINKA.atnaujinti();
+
 const PATIKRA = {
 
   /* Verdikto ribos. 1.3 = brangiau nei 30 % virš vertės jau yra pervertinimas. */
@@ -831,11 +975,14 @@ const PATIKRA = {
      Įrankis, kuris sako „duomenų nėra", nėra paslauga. Vertę pasakome visada —
      tik sąžiningai pasakome, kiek tuo galima remtis. Todėl trys pakopos:
 
-       1. KATALOGAS  — tikslus įrašas, apskaičiuotas iš stebėtų kainų.
+       1. KATALOGAS  — tikslus įrašas, apskaičiuotas iš stebėtų kainų ir
+                       sumažintas iki sandorio kainos (NUOLAIDOS).
                        Pasitikėjimas aukštas.
-       2. PANAŠŪS    — tikslaus įrašo nėra, bet yra stebėtų panašių skelbimų:
-                       ta pati klasė, artimi metai ir rida. Imamas jų svertinis
-                       vidurkis. Pasitikėjimas vidutinis.
+       2. PANAŠŪS    — panašių daiktų kainos iš bendros bazės (RINKA) ir
+                       katalogas.js: tikri sandoriai ir skelbimai, perskaičiuoti
+                       į sandorio kainą, be kraštutinumų. Kai jų bent 5 —
+                       naudojami pirmiau už katalogą. Pasitikėjimas vidutinis,
+                       su pakankamai tikrų sandorių — aukštas.
        3. KREIVĖ     — nežinome nieko konkretaus, bet žinome klasę. Nuvertėjimo
                        kreivės forma segmente vienoda, tad iš naujos kainos,
                        amžiaus ir ridos gaunamas įvertis. Pasitikėjimas žemas,
@@ -899,61 +1046,130 @@ const PATIKRA = {
     return { verte: Math.round(kl.nauja * dalis), klase: klase, pav: kl.pav };
   },
 
-  /* 2 pakopa. Panašūs stebėti skelbimai. Panašumas skaičiuojamas, o ne
-     spėjamas: kiekvienas nesutapimas atima svorio, per mažo svorio įrašai
-     atmetami visai. */
-  panasus(pavadinimas, kategorija, poz) {
-    if (typeof STEBEJIMAI === "undefined" || !STEBEJIMAI.length) return null;
-    if (!poz || !poz.metai) return null;
+  /* 2 pakopa. Panašių daiktų kainos — tikri sandoriai ir skelbimai.
 
-    const q = this.normalizuoti(pavadinimas);
-    const qZodziai = q.split(" ").filter(z => z.length > 2);
+     Kiekviena kaina pirmiausia paverčiama ta pačia „valiuta“: IDEALIOS būklės
+     SANDORIO kaina BŪTENT šiam daiktui.
+       prašoma kaina × nuolaida   — pardavėjo noras → tikėtinas sandoris;
+       ÷ būklės koeficientas      — jei nežinoma, laikoma „naudota“;
+       × amžiaus ir ridos pataisa — kito daikto metai ir rida → šio daikto.
+     Tik tada lyginama. Kraštutinės kainos atmetamos, tad vienas pardavėjas,
+     prašantis dvigubai, rezultato nepajudina. Tikros pardavimo kainos sveria
+     daugiau nei prašomos, naujesnės — daugiau nei senos. */
+  panasus(pavadinimas, kategorija, poz) {
+    const visi = RINKA.stebejimai();
+    if (!visi.length) return null;
+
+    const zodziai = (t) => this.normalizuoti(t).split(" ").filter(z => z.length > 2 || /\d/.test(z));
+    const skaiciai = (zz) => zz.filter(z => /^\d{1,3}$/.test(z));
+    const qZodziai = zodziai(pavadinimas);
+    if (!qZodziai.length) return null;
+    const qSkaiciai = skaiciai(qZodziai);
+
+    const cfg = (typeof KLASES !== "undefined" && kategorija) ? KLASES[kategorija] : null;
+    const metai = poz && poz.metai ? poz.metai : null;
+    const musuKlase = cfg && metai ? this.klase(pavadinimas, kategorija, poz) : null;
+    const nuolaida = RINKA.nuolaida(kategorija).koef;
+    const naudota = BUKLES.find(x => x.raktas === "naudota");
+    const dabar = Date.now();
     const kandidatai = [];
 
-    for (const st of STEBEJIMAI) {
+    for (const st of visi) {
       if (kategorija && st.kategorija && st.kategorija !== kategorija) continue;
-      if (!st.metai || !st.kaina) continue;
+      if (!st.kaina || st.kaina <= 0 || st.bukle === "lauzas") continue;
 
       let svoris = 1;
 
-      const metuSkirtumas = Math.abs(st.metai - poz.metai);
-      if (metuSkirtumas > 5) continue;
-      svoris *= 1 - metuSkirtumas * 0.12;
+      /* Pavadinimas. Daiktams be metų modelio numeris turi sutapti: PS4 nėra
+         PS5. Automobiliams panašumą tiksliau pasako metai, rida ir klasė. */
+      const stZodziai = zodziai(st.pavadinimas || "");
+      const stSkaiciai = skaiciai(stZodziai);
+      if (!metai && qSkaiciai.length && stSkaiciai.length &&
+          !qSkaiciai.some(z => stSkaiciai.includes(z))) continue;
+      const bendri = qZodziai.filter(z => stZodziai.includes(z)).length;
+      if (bendri) {
+        const visoZodziu = new Set(qZodziai.concat(stZodziai)).size;
+        svoris *= 0.5 + bendri / visoZodziu;
+      } else {
+        /* Be bendrų žodžių lyginama tik ta pati klasė, tų pačių laikų. */
+        if (!musuKlase || !st.metai) continue;
+        if (this.klase(st.pavadinimas || "", kategorija, { kebulas: st.kebulas }) !== musuKlase) continue;
+        svoris *= 0.5;
+      }
 
-      if (poz.rida && st.rida) {
+      /* Metai: skirtumas mažina svorį, o kaina perskaičiuojama į šio daikto metus. */
+      let pataisa = 1;
+      if (metai && st.metai) {
+        const skirt = st.metai - metai;
+        if (Math.abs(skirt) > 5) continue;
+        svoris *= 1 - Math.abs(skirt) * 0.12;
+        if (cfg && cfg.metinis) pataisa *= Math.pow(cfg.metinis, skirt);
+      } else if (metai || st.metai) {
+        svoris *= 0.7;
+      }
+
+      if (poz && poz.rida && st.rida) {
         const rs = Math.abs(st.rida - poz.rida) / 100000;
         if (rs > 2) continue;
         svoris *= 1 - Math.min(0.5, rs * 0.25);
-      } else {
+        if (cfg && cfg.rida_zingsnis) {
+          let pr = ((poz.rida - st.rida) / cfg.rida_zingsnis) * cfg.rida_uz_zingsni;
+          pr = Math.max(cfg.rida_riba[0], Math.min(cfg.rida_riba[1], pr));
+          pataisa *= 1 + pr;
+        }
+      } else if (poz && poz.rida) {
         svoris *= 0.85;
       }
 
-      if (poz.kuras && st.kuras &&
+      if (poz && poz.kuras && st.kuras &&
           this.normalizuoti(poz.kuras) !== this.normalizuoti(st.kuras)) svoris *= 0.7;
 
-      /* Sutampantys žodžiai pavadinime — stipriausias panašumo ženklas. */
-      const stZodziai = this.normalizuoti(st.pavadinimas || "").split(" ").filter(z => z.length > 2);
-      const bendri = qZodziai.filter(z => stZodziai.includes(z)).length;
-      svoris *= 1 + Math.min(1.5, bendri * 0.5);
+      const pardavimo = st.tipas === "pardavimo";
+      if (pardavimo) svoris *= 1.6;
+      if (st.bukle === "pazeista") svoris *= 0.5;
+      if (st.data) {
+        const dienos = (dabar - Date.parse(st.data)) / 864e5;
+        if (dienos > 0) svoris *= Math.pow(0.5, dienos / 240);
+      }
 
       if (svoris < 0.25) continue;
-      kandidatai.push({ kaina: st.kaina, svoris: svoris });
+
+      const bk = BUKLES.find(x => x.raktas === st.bukle) || naudota;
+      const sandorio = pardavimo ? st.kaina : st.kaina * nuolaida;
+      kandidatai.push({ kaina: sandorio / bk.koef * pataisa, svoris, pardavimo });
     }
 
     if (kandidatai.length < 3) return null;
 
-    kandidatai.sort((a, b) => a.kaina - b.kaina);
-    const visoSvorio = kandidatai.reduce((s, x) => s + x.svoris, 0);
-    let sukaupta = 0, mediana = kandidatai[0].kaina;
-    for (const k of kandidatai) {
+    /* Kraštutinumai: toliau nei trys tipiniai nuokrypiai nuo vidurio
+       arba daugiau nei 2,5 karto nuo jo — atmetama. */
+    const vidurys = this.mediana(kandidatai.map(k => k.kaina));
+    const nuokrypis = this.mediana(kandidatai.map(k => Math.abs(k.kaina - vidurys))) * 1.4826;
+    const leidziama = Math.max(nuokrypis * 3, vidurys * 0.25);
+    const svarus = kandidatai.filter(k => Math.abs(k.kaina - vidurys) <= leidziama &&
+      k.kaina <= vidurys * 2.5 && k.kaina >= vidurys / 2.5);
+    if (svarus.length < 3) return null;
+
+    svarus.sort((a, b) => a.kaina - b.kaina);
+    const visoSvorio = svarus.reduce((s, x) => s + x.svoris, 0);
+    let sukaupta = 0, mediana = svarus[0].kaina;
+    for (const k of svarus) {
       sukaupta += k.svoris;
       if (sukaupta >= visoSvorio / 2) { mediana = k.kaina; break; }
     }
 
-    /* Stebėtos kainos yra PRAŠOMOS, o ne sandorio — jos pripūstos maždaug
-       vienodai. Dalijam iš to paties koeficiento kaip ir variklis. */
-    const b = BUKLES.find(x => x.raktas === "naudota");
-    return { verte: Math.round(mediana / (b ? b.koef : 0.7)), n: kandidatai.length };
+    return {
+      verte: Math.round(mediana),
+      n: svarus.length,
+      pardavimu: svarus.filter(k => k.pardavimo).length,
+      atmesta: kandidatai.length - svarus.length
+    };
+  },
+
+  mediana(sk) {
+    const s = sk.slice().sort((a, b) => a - b);
+    const v = Math.floor(s.length / 2);
+    return s.length % 2 ? s[v] : (s[v - 1] + s[v]) / 2;
   },
 
   /* --- Nerastos užklausos --------------------------------------------------
@@ -975,12 +1191,16 @@ const PATIKRA = {
     const b = BUKLES.find(x => x.raktas === bukle) || BUKLES[1]; /* numatyta: naudota */
     const poz = pozymiai || null;
 
-    /* --- Trys pakopos. Atsakymas gaunamas visada, skiriasi tik pagrįstumas. */
+    /* --- Trys pakopos. Atsakymas gaunamas visada, skiriasi tik pagrįstumas.
+       Gyva rinka (bent 5 švarios panašių daiktų kainos) aplenkia katalogą:
+       ji šviežesnė ir joje yra tikrų sandorių. */
     let bazine = null, saltinis = null, pasitikejimas = null, rastas = null;
-    let klasesPav = null, panasiuN = null, placiau = 0;
+    let klasesPav = null, panasiuN = null, pardavimuN = 0, placiau = 0;
+    let koreguotaNuolaida = false;
 
     let atskaitos = false;
-    rastas = this.rasti(pavadinimas, kategorija);
+    const rinka = this.panasus(pavadinimas, kategorija, poz);
+    rastas = (rinka && rinka.n >= 5) ? null : this.rasti(pavadinimas, kategorija);
     if (rastas) {
       bazine = rastas.duomenys.verte;
       saltinis = "katalogas";
@@ -1001,19 +1221,26 @@ const PATIKRA = {
           pr = Math.max(cfg.rida_riba[0], Math.min(cfg.rida_riba[1], pr));
           bazine = bazine * (1 + pr);
         }
-        bazine = Math.round(bazine);
       }
+
+      /* Katalogo vertės skaičiuotos iš skelbimų, t. y. iš PRAŠOMŲ kainų.
+         Paverčiam jas tikėtina sandorio kaina. */
+      if (!rastas.duomenys.pardavimo) {
+        bazine = bazine * RINKA.nuolaida(rastas.duomenys.kategorija || kategorija).koef;
+        koreguotaNuolaida = true;
+      }
+      bazine = Math.round(bazine);
     }
 
-    if (bazine === null) {
-      const pan = this.panasus(pavadinimas, kategorija, poz);
-      if (pan) {
-        bazine = pan.verte;
-        panasiuN = pan.n;
-        saltinis = "panasus";
-        pasitikejimas = "vidutinis";
-        placiau = 0.12;
-      }
+    if (bazine === null && rinka) {
+      bazine = rinka.verte;
+      panasiuN = rinka.n;
+      pardavimuN = rinka.pardavimu;
+      saltinis = "panasus";
+      koreguotaNuolaida = rinka.pardavimu < rinka.n;
+      const tvirta = rinka.n >= 8 && rinka.pardavimu >= 3;
+      pasitikejimas = tvirta ? "aukstas" : "vidutinis";
+      placiau = tvirta ? 0.08 : 0.12;
     }
 
     if (bazine === null) {
@@ -1100,6 +1327,8 @@ const PATIKRA = {
       pasitikejimas: pasitikejimas,
       klasesPav: klasesPav,
       panasiuN: panasiuN,
+      pardavimuN: pardavimuN,
+      koreguotaNuolaida: koreguotaNuolaida,
       pavyzdine: rastas ? !!rastas.duomenys.pavyzdys : false,
       n: rastas ? (rastas.duomenys.n || null) : null,
       atnaujinta: rastas ? (rastas.duomenys.atnaujinta || null) : null,
@@ -2503,7 +2732,9 @@ const SKELBIMO_PATIKRA = {
 
     /* Į istoriją — iš ten dirba ir palyginimas, ir „Mano patikros". */
     r.isSkelbimo = true;
-    r.pozymiai = { metai: d.metai || null, rida: d.rida || null };
+    r.pozymiai = { metai: d.metai || null, rida: d.rida || null,
+                   kuras: d.kuras || null, kebulas: d.kebulas || null };
+    RINKA.siustiPrasoma(r);
 
     try {
       sessionStorage.setItem("tv_skelbimas", JSON.stringify(Object.assign({ tekstas: tekstas }, this.duomenys)));
@@ -2552,7 +2783,10 @@ const SKELBIMO_PATIKRA = {
       '<a class="mygtukas m-kontūras" style="margin-top:26px;" href="' +
       (r.kategorijosRaktas && DETALES[r.kategorijosRaktas]
         ? "patikra-" + r.kategorijosRaktas + ".html?is=skelbimo" : "paslauga.html") +
-      '">Pilnas vertinimas</a>';
+      '">Pilnas vertinimas</a>' +
+
+      (RINKA.ijungta() ? '<div style="margin-top:26px;">' + RINKA.forma(r) + "</div>" : "");
+    RINKA.prijungtiForma(deze, r);
 
     VERTES_KREIVE.piesti("vertesKreive", {
       pavadinimas: r.pavadinimas, kategorija: r.kategorijosRaktas,
@@ -3733,6 +3967,7 @@ const FORMA = {
 
     PATIKRA.issaugoti(r);
     if (typeof ISTORIJA !== "undefined") ISTORIJA.prideti(r);
+    RINKA.siustiPrasoma(r, r.pozymiai, true);
     window.location.href = "rezultatas.html";
   });
 })();
@@ -3950,15 +4185,19 @@ const FORMA = {
         (r.atnaujinta ? ", atnaujinta " + r.atnaujinta : "") + "." +
         (r.n >= 3 ? " Kraštutinės kainos atmestos, imta rinkos vidurio reikšmė." : ""));
     } else if (r.saltinis === "panasus") {
-      eilutes.push("Tikslaus įrašo apie šį daiktą neturime, tad vertinta pagal <b>" +
-        r.panasiuN + "</b> panašius stebėtus skelbimus — tos pačios klasės, artimų " +
-        "metų ir ridos.");
+      eilutes.push("Vertinta pagal <b>" + r.panasiuN + "</b> panašių daiktų kainas" +
+        (r.pardavimuN ? ", iš jų <b>" + r.pardavimuN + "</b> — tikri sandoriai" : "") +
+        ". Kraštutinės kainos atmestos.");
     } else if (r.saltinis === "kreive") {
       eilutes.push("Tikslių šio modelio kainų dar nesukaupėme, tad vertinta pagal " +
         "tos pačios klasės daiktus" + (r.klasesPav ? " (<b>" + r.klasesPav + "</b>)" : "") +
         ". Įvertis realus, bet rėžis platesnis.");
     } else {
       eilutes.push("Vertinta pagal katalogo duomenis apie šį daiktą.");
+    }
+
+    if (r.koreguotaNuolaida) {
+      eilutes.push("Skelbimų kainos perskaičiuotos į tikėtiną sandorio kainą — pardavėjo prašoma kaina vertės nedidina.");
     }
 
     if (r.pasitikejimas && r.pasitikejimas !== "aukstas") {
@@ -4028,6 +4267,13 @@ const FORMA = {
       pavadinimas: r.pavadinimas, kategorija: r.kategorijosRaktas, metai: metai,
       verteNuo: r.verteNuo, verteIki: r.verteIki, kaina: r.kaina, pozymiai: r.pozymiai
     });
+  }
+
+  /* Tikra sandorio kaina — vertingiausias duomuo visam vertinimui. */
+  const sandorio = document.getElementById("sandorioVieta");
+  if (sandorio) {
+    sandorio.innerHTML = RINKA.forma(r);
+    RINKA.prijungtiForma(sandorio, r);
   }
 
   /* Sertifikatas atsidaro būtent šiai patikrai. */
